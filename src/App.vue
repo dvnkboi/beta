@@ -1,26 +1,186 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="w-full flex justify-center items-center space-y-10 flex-col xl:flex-row xl:h-full pt-16 pb-16 xl:space-x-10 xl:space-y-0">
+    <connectivity :show="!connected" />
+    <MainCard ref="mainCard" @failed="getQueue(true)" @loading="loading = true" @loaded="loading = false" :title="queue[0].title" :artist="queue[0].artist" :cover="queue[0].cover" :changed="queue[0].changed" />
+    <Card @failed="getQueue(true)" :title="queue[1].title" :artist="queue[1].artist" :cover="queue[1].cover" :minutes="queue[1].minutes" :changed="queue[1].changed" />
+    <Card @failed="getQueue(true)" :title="queue[2].title" :artist="queue[2].artist" :cover="queue[2].cover" :minutes="queue[2].minutes" :changed="queue[2].changed" />
+    <Card @failed="getQueue(true)" :title="queue[3].title" :artist="queue[3].artist" :cover="queue[3].cover" :minutes="queue[3].minutes" :changed="queue[3].changed" />
+    <Loading :show="loading" />
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+  import MainCard from './components/MainCard.vue';
+  import Card from './components/Card.vue';
+  import Connectivity from './components/connectivity.vue';
+  import Loading from './components/loading.vue';
+  import { io } from 'socket.io-client';
 
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+  require('dotenv').config();
+  const bent = require('bent');
+  var _ = require('lodash');
+
+  export default {
+    name: 'App',
+    data() {
+      return {
+        oof: 'wuw',
+        queueUrl: `https://api.ampupradio.com:3000/v2?apikey=${process.env.VUE_APP_API_KEY}&action=get_queue`,
+        artUrl: `https://api.ampupradio.com:3000/v2?apikey=${process.env.VUE_APP_API_KEY}&action=get_art`,
+        covers: 4,
+        queue: [{}, {}, {}, {}],
+        art: [],
+        pongOpen: true,
+        queueOpen: true,
+        previousCover: null,
+        connected: true,
+        loading: false,
+        previousTitle: null,
+      };
+    },
+    methods: {
+      async getQueue(immediate) {
+        if (this.queueOpen) {
+          this.queueOpen = false;
+          console.log('get queue');
+          const request = bent('GET', 'json');
+          let res = await request(this.queueUrl);
+          if (this.art.length < 1) {
+            this.art = [];
+          }
+          let cover;
+          let equalCheck;
+          for (var i = 0; i < this.covers; i++) {
+            cover = await request(
+              this.artUrl +
+                `&entity=${res.response.history[i].artist
+                  .trim()
+                  .split(',')[0]
+                  .split(' ')
+                  .join('_')
+                  .toLowerCase()}&identifier=${res.response.history[i].album
+                  .trim()
+                  .split(' ')
+                  .join('_')
+                  .toLowerCase()}`
+            );
+
+            equalCheck = _.get(cover, 'response[0].images[0].thumbnails.small') || _.get(cover, 'response[0].images[0].thumbnails["250"]') || _.get(cover, 'response[0].images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png';
+            let redundant = this.previousDesc == _.get(cover, 'response[0].desc') && this.previousDesc && _.get(cover, 'response[0].desc');
+            console.log(this.previousDesc, _.get(cover, 'response[0].desc'));
+            if (redundant) {
+              console.log('break lol');
+              return setTimeout(() => {
+                this.queueOpen = true;
+              }, 2500);
+            } else {
+              this.art[i] = _.get(cover, 'response[0].images[0]') || Math.random() * Math.random() * 1000;
+              if (i == 0) {
+                this.previousCover = equalCheck;
+                this.previousDesc = _.get(cover, 'response[0].desc');
+              }
+            }
+          }
+
+          this.previousCover = _.get(this.art[0], 'image');
+          this.art = _.uniqWith(this.art, _.isEqual);
+          let tmpCover;
+          setTimeout(
+            async () => {
+              for (i = 0; i < this.covers; i++) {
+                console.log('components', i);
+                if (!this.art[i]) {
+                  console.log('failed art class :c');
+                  this.art[i] = await request(
+                    this.artUrl +
+                      `&entity=${res.response.history[i].artist
+                        .trim()
+                        .split(',')[0]
+                        .split(' ')
+                        .join('_')
+                        .toLowerCase()}&identifier=${res.response.history[i].album
+                        .trim()
+                        .split(' ')
+                        .join('_')
+                        .toLowerCase()}`
+                  );
+                }
+                this.queue[i].changed = !this.queue[i].changed;
+
+                this.queue[i].title = res.response.history[i].title.split('(')[0];
+                this.queue[i].artist = res.response.history[i].artist;
+
+                tmpCover = _.get(this.art[i], 'thumbnails.small') || _.get(this.art[i], 'thumbnails["250"]') || _.get(this.art[i], 'image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png';
+
+                if (tmpCover !== this.queue[i].cover && tmpCover) {
+                  this.queue[i].cover = tmpCover;
+                }
+                this.queue[i].cover = this.queue[i].cover == this.queue[i].cover ? this.queue[i].cover : tmpCover;
+
+                this.queue[i].minutes = Math.floor((new Date().getTime() - new Date(res.response.history[i].date_played).getTime()) / 60000);
+              }
+              setTimeout(() => {
+                this.queueOpen = true;
+              }, 2500);
+            },
+            immediate ? 0 : this.$refs.mainCard.loadingTime * 1000
+          );
+        }
+      },
+      reconnectSocket() {
+        let proxy = this;
+        this.socket = null;
+        this.socket = new io('https://api.ampupradio.com:8080', { secure: true, rejectUnauthorized: false });
+        this.socket.on('message', async (msg) => {
+          console.log(msg);
+          if (msg == 'song changed') {
+            proxy.state = msg;
+            if (proxy.state == 'song changed') {
+              try {
+                await proxy.getQueue(false);
+              } catch (e) {
+                console.error(e);
+              }
+            }
+          }
+        });
+      },
+    },
+    beforeUnmount() {},
+    async mounted() {
+      let proxy = this;
+      document.addEventListener('visibilitychange', async function() {
+        if (!document.hidden) {
+          try {
+            proxy.$refs.mainCard.key = Date.now();
+          } catch (e) {
+            //
+          }
+          await proxy.getQueue(true);
+        }
+      });
+
+      await this.getQueue(true);
+      this.reconnectSocket();
+      this.socketTimeout = setTimeout(this.reconnectSocket, 40000);
+
+      navigator.connection.onchange = function() {
+        if (this.downlink == 0) {
+          console.log('OFFLINE');
+          proxy.connected = false;
+        } else {
+          console.log('BACK ONLINE');
+          proxy.connected = true;
+          proxy.reconnectSocket();
+          proxy.getQueue(true);
+        }
+      };
+    },
+    components: {
+      MainCard,
+      Card,
+      Connectivity,
+      Loading,
+    },
+  };
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>

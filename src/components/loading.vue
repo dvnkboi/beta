@@ -8,7 +8,7 @@
 
 
 <script>
-import {RotateSquare5} from 'vue-loading-spinner'
+import RotateSquare5 from './RotateSquare5.vue'
   export default {
     name: 'Loading',
     props:{

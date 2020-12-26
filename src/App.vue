@@ -1,7 +1,7 @@
 <template>
   <div class="w-full flex justify-center items-center space-y-10 flex-col xl:flex-row xl:h-full pt-16 pb-16 xl:space-x-10 xl:space-y-0">
     <connectivity :show="!connected" />
-    <MainCard ref="mainCard" @failed="getQueue(true)" @loading="loading = true" @loaded="loading = false" :title="queue[0].title" :artist="queue[0].artist" :cover="queue[0].cover" :changed="queue[0].changed" />
+    <MainCard ref="mainCard" @reloadStream="getQueue(true)" @failed="getQueue(true)" @loading="loading = true" @loaded="loading = false" :title="queue[0].title" :artist="queue[0].artist" :cover="queue[0].cover" :changed="queue[0].changed" />
     <Card @failed="getQueue(true)" :title="queue[1].title" :artist="queue[1].artist" :cover="queue[1].cover" :minutes="queue[1].minutes" :changed="queue[1].changed" />
     <Card @failed="getQueue(true)" :title="queue[2].title" :artist="queue[2].artist" :cover="queue[2].cover" :minutes="queue[2].minutes" :changed="queue[2].changed" />
     <Card @failed="getQueue(true)" :title="queue[3].title" :artist="queue[3].artist" :cover="queue[3].cover" :minutes="queue[3].minutes" :changed="queue[3].changed" />

@@ -118,6 +118,7 @@
         let pausedMs = this.pauseDate > 0 ? Date.now() - this.pauseDate : 0;
         console.log(pausedMs);
         if (!this.audio || state == 'unloaded' || pausedMs > 60000) {
+          this.$emit('reloadStream');
           console.log('init audio');
           this.initAudio();
         } else {

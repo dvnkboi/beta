@@ -36,7 +36,8 @@
         connected: true,
         loading: false,
         previousTitle: null,
-        songChangeTimer:null
+        songChangeTimer:null,
+        socket:null
       };
     },
     methods: {
@@ -122,7 +123,7 @@
               }
               setTimeout(() => {
                 this.queueOpen = true;
-              }, 2500);
+              }, 500);
             },
             immediate ? 0 : this.$refs.mainCard.loadingTime * 1000
           );
@@ -130,46 +131,73 @@
       },
       reconnectSocket() {
         let proxy = this;
-        this.socket = null;
-        this.socket = new io('https://api.ampupradio.com:8080', { secure: true, rejectUnauthorized: false });
-        this.socket.on('message', async (msg) => {
-          console.log(msg);
-          proxy.state = msg;
-          if (proxy.state == 'song changed') {
+        if(this.socket == null){
+          this.socket = new io('https://api.ampupradio.com:8080', { secure: true, rejectUnauthorized: false });
+          this.socket.connect();
+          
+          this.socket.on('message',(msg) => { 
+            console.log(msg);
+          });
+
+          this.socket.on('songChanged',async () => {
             console.log('load them songs rn');
-            try {
-              await proxy.getQueue(false);
-            } catch (e) {
-              console.error(e);
-            }
-            clearTimeout(proxy.songChangeTimer);
-            proxy.songChangeTimer = null;
-          }
-          else if(proxy.state == 'unsafePreload'){
+              try {
+                await proxy.getQueue(false);
+              } catch (e) {
+                console.error(e);
+              }
+              clearTimeout(proxy.songChangeTimer);
+              proxy.songChangeTimer = null;
+          });
+
+          this.socket.on('unsafePreload',async () => {
             console.log('preloading for consistancy');
-            if(proxy.songChangeTimer){
-              clearTimeout(proxy.songChangeTimer);
-              proxy.songChangeTimer = null;
-            }
-            proxy.songChangeTimer = setTimeout(proxy.getQueue,5000,false);
-          }
-          else if(proxy.state == 'preload'){
+              if(proxy.songChangeTimer){
+                clearTimeout(proxy.songChangeTimer);
+                proxy.songChangeTimer = null;
+              }
+              proxy.songChangeTimer = setTimeout(() => {
+                proxy.getQueue(false);
+              },6000);
+          });
+          
+          this.socket.on('preload',async () => {
             console.log('preloading');
-            if(proxy.songChangeTimer){
-              clearTimeout(proxy.songChangeTimer);
-              proxy.songChangeTimer = null;
-            }
-            proxy.songChangeTimer = setTimeout(proxy.getQueue,10000,false);
-          }
-          else if(proxy.state == 'safePreload'){
+              if(proxy.songChangeTimer){
+                clearTimeout(proxy.songChangeTimer);
+                proxy.songChangeTimer = null;
+              }
+              proxy.songChangeTimer = setTimeout(() => {
+                proxy.getQueue(false);
+              },11000);
+          });
+
+          this.socket.on('safePreload',async () => {
             console.log('preloading safely');
-            if(proxy.songChangeTimer){
-              clearTimeout(proxy.songChangeTimer);
-              proxy.songChangeTimer = null;
-            }
-            proxy.songChangeTimer = setTimeout(proxy.getQueue,25000,false);
-          }
-        });
+              if(proxy.songChangeTimer){
+                clearTimeout(proxy.songChangeTimer);
+                proxy.songChangeTimer = null;
+              }
+              proxy.songChangeTimer = setTimeout(() => {
+                proxy.getQueue(false);
+              },26000);
+          });
+
+          proxy.socket.on("connect_error", () => {
+            setTimeout(() => {
+              proxy.socket.connect();
+            }, 1000);
+          });
+          
+        }
+        else{
+          console.log('reconnected');
+          this.socket.disconnect();
+          setTimeout(() => {
+            proxy.socket.connect();
+          }, 1000);
+        }
+        
       },
     },
     beforeUnmount() {},

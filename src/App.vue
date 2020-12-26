@@ -71,7 +71,6 @@
           console.log('finished getting art');
 
           this.previousCover = _.get(this.art[0][0], 'image');
-          this.art = _.uniqWith(this.art, _.isEqual);
           let tmpCover;
           setTimeout(
             async () => {

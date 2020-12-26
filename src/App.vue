@@ -37,7 +37,8 @@
         loading: false,
         previousTitle: null,
         songChangeTimer:null,
-        socket:null
+        socket:null,
+        request: bent('GET', 'json')
       };
     },
     methods: {
@@ -45,15 +46,14 @@
         if (this.queueOpen) {
           this.queueOpen = false;
           console.log('get queue');
-          const request = bent('GET', 'json');
-          let res = await request(this.queueUrl);
+          let res = await this.request(this.queueUrl);
           if (this.art.length < 1) {
             this.art = [];
           }
           let cover;
           let equalCheck;
           for (var i = 0; i < this.covers; i++) {
-            cover = await request(
+            cover = await this.request(
               this.artUrl +
                 `&entity=${res.response.history[i].artist
                   .trim()
@@ -96,7 +96,7 @@
                 console.log('components', i);
                 if (!this.art[i]) {
                   console.log('failed art class :c');
-                  this.art[i] = await request(
+                  this.art[i] = await this.request(
                     this.artUrl +
                       `&entity=${res.response.history[i].artist
                         .trim()

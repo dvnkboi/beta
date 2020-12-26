@@ -36,6 +36,7 @@
         connected: true,
         loading: false,
         previousTitle: null,
+        songChangeTimer:null
       };
     },
     methods: {
@@ -133,15 +134,36 @@
         this.socket = new io('https://api.ampupradio.com:8080', { secure: true, rejectUnauthorized: false });
         this.socket.on('message', async (msg) => {
           console.log(msg);
-          if (msg == 'song changed') {
-            proxy.state = msg;
-            if (proxy.state == 'song changed') {
-              try {
-                await proxy.getQueue(false);
-              } catch (e) {
-                console.error(e);
-              }
+          proxy.state = msg;
+          if (proxy.state == 'song changed') {
+            try {
+              await proxy.getQueue(false);
+            } catch (e) {
+              console.error(e);
             }
+            clearTimeout(proxy.songChangeTimer);
+            proxy.songChangeTimer = null;
+          }
+          else if(proxy.state == 'unsafePreload'){
+            if(proxy.songChangeTimer){
+              clearTimeout(proxy.songChangeTimer);
+              proxy.songChangeTimer = null;
+            }
+            proxy.songChangeTimer = setTimeout(proxy.getQueue,5000,false);
+          }
+          else if(proxy.state == 'preload'){
+            if(proxy.songChangeTimer){
+              clearTimeout(proxy.songChangeTimer);
+              proxy.songChangeTimer = null;
+            }
+            proxy.songChangeTimer = setTimeout(proxy.getQueue,10000,false);
+          }
+          else if(proxy.state == 'safePreload'){
+            if(proxy.songChangeTimer){
+              clearTimeout(proxy.songChangeTimer);
+              proxy.songChangeTimer = null;
+            }
+            proxy.songChangeTimer = setTimeout(proxy.getQueue,25000,false);
           }
         });
       },

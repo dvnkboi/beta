@@ -205,11 +205,6 @@
       let proxy = this;
       document.addEventListener('visibilitychange', async function() {
         if (!document.hidden) {
-          try {
-            proxy.$refs.mainCard.key = Date.now();
-          } catch (e) {
-            //
-          }
           await proxy.getQueue(true);
         }
       });

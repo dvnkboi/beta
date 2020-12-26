@@ -126,7 +126,7 @@
               }
               setTimeout(() => {
                 this.queueOpen = true;
-              }, 2000);
+              }, 3000);
             },
             immediate ? 0 : this.$refs.mainCard.loadingTime * 1000
           );

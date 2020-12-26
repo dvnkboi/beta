@@ -3,7 +3,7 @@
     <div class="flex flex-col justify-center items-center">
       <div class="h-64 w-64 relative mt-2">
         <transition name="fade-up" mode="out-in" appear>
-          <img ref="coverArt" v-show="hasLoaded" @load="loaded" :src="updatedCover" class="z-10 artistImg h-full w-full object-cover rounded-4xl ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute" alt="" />
+          <img ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover rounded-4xl ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute" alt="" />
         </transition>
         <transition name="fade-up" mode="out-in" appear>
           <div v-if="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad rounded-4xl ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute"></div>
@@ -243,12 +243,12 @@
       this.audio = null;
     },
     directives: {
-      // loadedifcomplete: function(el, binding) {
-      //   if (el.complete) {
-      //     console.log('completed main', binding.instance.hasLoaded);
-      //     binding.instance.hasLoaded = true;
-      //   }
-      // },
+      loadedifcomplete: function(el, binding) {
+        if (el.complete) {
+          console.log('completed main', binding.instance.hasLoaded);
+          binding.instance.hasLoaded = true;
+        }
+      },
     },
     props: {
       cover: String,

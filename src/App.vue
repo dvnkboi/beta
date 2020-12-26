@@ -65,7 +65,8 @@
                   .split(' ')
                   .join('_')
                   .toLowerCase()}`
-            );
+            );  
+            console.log('processing art',i);
 
             equalCheck = _.get(cover, 'response[0].images[0].thumbnails.small') || _.get(cover, 'response[0].images[0].thumbnails["250"]') || _.get(cover, 'response[0].images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png';
             let redundant = this.previousDesc == _.get(cover, 'response[0].desc') && this.previousDesc && _.get(cover, 'response[0].desc');
@@ -83,6 +84,8 @@
               }
             }
           }
+
+          console.log('finished getting art');
 
           this.previousCover = _.get(this.art[0], 'image');
           this.art = _.uniqWith(this.art, _.isEqual);
@@ -123,7 +126,7 @@
               }
               setTimeout(() => {
                 this.queueOpen = true;
-              }, 500);
+              }, 2000);
             },
             immediate ? 0 : this.$refs.mainCard.loadingTime * 1000
           );
@@ -141,11 +144,8 @@
 
           this.socket.on('songChanged',async () => {
             console.log('load them songs rn');
-              try {
-                await proxy.getQueue(false);
-              } catch (e) {
-                console.error(e);
-              }
+              await proxy.getQueue(false);
+
               clearTimeout(proxy.songChangeTimer);
               proxy.songChangeTimer = null;
           });

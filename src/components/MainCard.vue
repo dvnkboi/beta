@@ -38,6 +38,8 @@
 
 <script>
   import AdjustingInterval from '../utils.js';
+  // eslint-disable-next-line no-unused-vars
+  import {Howl, Howler} from 'howler';
 
   export default {
     name: 'MainCard',
@@ -69,67 +71,82 @@
         this.hasLoaded = true;
       },
       initAudio() {
-        console.log('init');
-        this.audio = new Audio();
-        this.audio.preload = false;
-        this.audio.src = 'https://api.ampupradio.com:8443/TOP40.mp3';
         let proxy = this;
+        this.audio = null;
+        this.audio = new Howl({
+          src: ['https://api.ampupradio.com:8443/TOP40.mp3'],
+          html5: true,
+          format: ['mp3', 'aac'],
+          volume: 0,
+        });
 
-        this.audio.load();
+        if (!this.hasInitialised) {
+          this.loadingTime = 0;
+          this.canPlay = false;
+          
+          if (this.audioLoadingTimer) {
+            this.audioLoadingTimer.stop();
+          }
+          this.audioLoadingTimer = new AdjustingInterval(() => {
+            this.loadingTime++;
+          }, 1000);
+          this.audioLoadingTimer.start();
+        }
 
-        this.audio.oncanplay = function() {
+        this.$emit('loading');
+        this.audio.once('load', function(){
+          proxy.$emit('loaded');
+          proxy.audio.play();
+          proxy.audio.fade(0,1,500);
+          proxy.audioLoadingTimer.stop();
           proxy.loadingTime++;
           proxy.canPlay = true;
-          console.log(proxy.loadingTime);
-          proxy.audioLoadingTimer.stop();
-          proxy.$emit('loaded');
-          if (proxy.playing) {
-            proxy.updateTime();
-          }
-        };
+        });
+        this.audio.once('play',function(){
+          proxy.updateTime();
+        });
 
-        this.audio.onwaiting = function() {
-          if (!this.hasInitialised) {
-            proxy.loadingTime = 0;
-            proxy.canPlay = false;
-            proxy.$emit('loading');
-            if (proxy.audioLoadingTimer) {
-              proxy.audioLoadingTimer.stop();
-            }
-            proxy.audioLoadingTimer = new AdjustingInterval(() => {
-              proxy.loadingTime++;
-            }, 1000);
-            proxy.audioLoadingTimer.start();
-          }
-        };
+        // console.log('init');
+        // this.audio = new Audio();
+        // this.audio.preload = false;
+        // this.audio.src = 'https://api.ampupradio.com:8443/TOP40.mp3';
+        // let proxy = this;
+
+        // this.audio.load();
+
+        // this.audio.oncanplay = function() {
+        //   proxy.loadingTime++;
+        //   proxy.canPlay = true;
+        //   console.log(proxy.loadingTime);
+        //   proxy.audioLoadingTimer.stop();
+        //   proxy.$emit('loaded');
+        //   if (proxy.playing) {
+        //     proxy.updateTime();
+        //   }
+        // };
+
+        // this.audio.onwaiting = function() {
+          
+        // };
       },
       play() {
         console.log('play');
         if (!this.audio) {
+          console.log('init audio');
           this.initAudio();
-          if (this.pauseDate) {
-            this.audio.currentTime += (Date.now() - this.pauseDate) / 1000;
-          }
-          this.audio.play();
         } else {
-          if (this.pauseDate) {
-            this.audio.currentTime += (Date.now() - this.pauseDate) / 1000;
-          }
-          console.log(this.audio.currentTime);
-          this.audio.play();
+          this.audio.fade(0,1,500);
         }
       },
       pause() {
         console.log('pause');
         console.log(this.loadingTime);
         this.pauseDate = Date.now();
-        this.audio.pause();
+        this.audio.fade(1,0,500);
       },
       updateTime() {
         if (!this.playTimer) {
           let proxy = this;
-          this.playSeconds = 0;
-          this.playTime = '0'.toHHMMSS();
           proxy.playTimer = new AdjustingInterval(() => {
             proxy.playSeconds++;
             proxy.playTime = proxy.playSeconds.toString().toHHMMSS();
@@ -149,7 +166,7 @@
     },
     watch: {
       value: function() {
-        this.audio.volume = this.value;
+        this.audio.fade(this.audio.volume(),this.value,250);
       },
       playing: function() {
         if (!this.playing) {
@@ -157,7 +174,7 @@
           this.resetTime();
         } else {
           this.play();
-          if (this.audio.readyState >= 2) {
+          if (this.audio.playing()) {
             this.updateTime();
           }
         }

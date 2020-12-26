@@ -53,7 +53,11 @@
         updatedCover: null,
         playTime: null,
         playSeconds: 0,
-        audio: null,
+        audio: {
+          state:() => {
+            return 'unloaded'
+          }
+        },
         playing: false,
         pauseDate: null,
         loadingTime: 7,
@@ -131,7 +135,10 @@
       },
       play() {
         console.log('play');
-        if (!this.audio) {
+        let state = this.audio.state();
+        let pausedMs = this.pauseDate > 0 ? Date.now() - this.pauseDate : 0;
+        console.log(pausedMs);
+        if (!this.audio || state == 'unloaded' || pausedMs > 60000) {
           console.log('init audio');
           this.initAudio();
         } else {

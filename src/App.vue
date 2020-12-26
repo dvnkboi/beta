@@ -52,70 +52,42 @@
           }
           let cover;
           let equalCheck;
-          for (var i = 0; i < this.covers; i++) {
-            cover = await this.request(
-              this.artUrl +
-                `&entity=${res.response.history[i].artist
-                  .trim()
-                  .split(',')[0]
-                  .split(' ')
-                  .join('_')
-                  .toLowerCase()}&identifier=${res.response.history[i].album
-                  .trim()
-                  .split(' ')
-                  .join('_')
-                  .toLowerCase()}`
-            );  
-            console.log('processing art',i);
 
-            equalCheck = _.get(cover, 'response[0].images[0].thumbnails.small') || _.get(cover, 'response[0].images[0].thumbnails["250"]') || _.get(cover, 'response[0].images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png';
-            let redundant = this.previousDesc == _.get(cover, 'response[0].desc') && this.previousDesc && _.get(cover, 'response[0].desc');
-            console.log(this.previousDesc, _.get(cover, 'response[0].desc'));
-            if (redundant) {
-              console.log('break lol');
-              return setTimeout(() => {
-                this.queueOpen = true;
-              }, 2500);
-            } else {
-              this.art[i] = _.get(cover, 'response[0].images[0]') || Math.random() * Math.random() * 1000;
-              if (i == 0) {
-                this.previousCover = equalCheck;
-                this.previousDesc = _.get(cover, 'response[0].desc');
-              }
-            }
+          cover = await this.request(this.artUrl);
+          this.art = _.get(cover,'response');
+
+          equalCheck = _.get(this.art[0][0], 'images[0].thumbnails.small') || _.get(this.art[0][0], 'images[0].thumbnails["250"]') || _.get(this.art[0][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png';
+          let redundant = this.previousDesc == _.get(this.art[0][0], 'desc') && this.previousDesc && _.get(this.art[0][0], 'desc');
+          if (redundant) {
+            console.log('break lol');
+            return setTimeout(() => {
+              this.queueOpen = true;
+            }, 3000);
+          } else {
+            this.previousCover = equalCheck;
+            this.previousDesc = _.get(this.art[0][0], 'desc');
           }
 
           console.log('finished getting art');
 
-          this.previousCover = _.get(this.art[0], 'image');
+          this.previousCover = _.get(this.art[0][0], 'image');
           this.art = _.uniqWith(this.art, _.isEqual);
           let tmpCover;
           setTimeout(
             async () => {
-              for (i = 0; i < this.covers; i++) {
+              for (var i = 0; i < this.covers; i++) {
                 console.log('components', i);
-                if (!this.art[i]) {
+                if (!this.art[i][0]) {
                   console.log('failed art class :c');
-                  this.art[i] = await this.request(
-                    this.artUrl +
-                      `&entity=${res.response.history[i].artist
-                        .trim()
-                        .split(',')[0]
-                        .split(' ')
-                        .join('_')
-                        .toLowerCase()}&identifier=${res.response.history[i].album
-                        .trim()
-                        .split(' ')
-                        .join('_')
-                        .toLowerCase()}`
-                  );
+                  cover = await this.request(this.artUrl);
+                  this.art = cover.response;
                 }
                 this.queue[i].changed = !this.queue[i].changed;
 
                 this.queue[i].title = res.response.history[i].title.split('(')[0];
                 this.queue[i].artist = res.response.history[i].artist;
 
-                tmpCover = _.get(this.art[i], 'thumbnails.small') || _.get(this.art[i], 'thumbnails["250"]') || _.get(this.art[i], 'image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png';
+                tmpCover = _.get(this.art[i][0], 'images[0].thumbnails.small') || _.get(this.art[i][0], 'images[0].thumbnails["250"]') || _.get(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png';
 
                 if (tmpCover !== this.queue[i].cover && tmpCover) {
                   this.queue[i].cover = tmpCover;

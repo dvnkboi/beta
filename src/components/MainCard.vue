@@ -1,12 +1,12 @@
 <template>
   <div class="mainCard h-120 w-100 bg-black rounded-3xl flex flex-col justify-between items-center shadow-2xl p-3 flex-none">
-    <div :key="key" class="flex flex-col justify-center items-center">
+    <div class="flex flex-col justify-center items-center">
       <div  class="h-64 w-64 relative mt-2">
         <transition name="fade-up" appear>
-          <img ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover rounded-4xl ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute" alt="" />
+          <img :key="Date.now()" ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover rounded-4xl ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute" alt="" />
         </transition>
         <transition name="fade-up" appear>
-          <div v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad rounded-4xl ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute"></div>
+          <div :key="Date.now() - 9999" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad rounded-4xl ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute"></div>
         </transition>
       </div>
       <transition name="fade-up" appear>
@@ -66,7 +66,6 @@
         loadingTime: 7,
         canPlay: false,
         audioLoadingTimer: null,
-        key: Date.now(),
         sliderShown: false,
         value: 1,
         hasInitialised: false,
@@ -75,7 +74,6 @@
     },
     methods: {
       loaded() {
-        this.key = this.updatedCover;
         this.hasLoaded = true;
       },
       initAudio() {
@@ -166,9 +164,11 @@
           }
         }
       },
+      updatedCover: function(){
+        this.hasLoaded = false;
+      },
       cover: function() {
         if (this.cover != this.updatedCover && this.cover) {
-          this.hasLoaded = false;
           this.updatedCover = null;
           this.updatedCover = this.cover;
         } else {

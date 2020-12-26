@@ -136,6 +136,7 @@
           console.log(msg);
           proxy.state = msg;
           if (proxy.state == 'song changed') {
+            console.log('load them songs rn');
             try {
               await proxy.getQueue(false);
             } catch (e) {
@@ -145,6 +146,7 @@
             proxy.songChangeTimer = null;
           }
           else if(proxy.state == 'unsafePreload'){
+            console.log('preloading for consistancy');
             if(proxy.songChangeTimer){
               clearTimeout(proxy.songChangeTimer);
               proxy.songChangeTimer = null;
@@ -152,6 +154,7 @@
             proxy.songChangeTimer = setTimeout(proxy.getQueue,5000,false);
           }
           else if(proxy.state == 'preload'){
+            console.log('preloading');
             if(proxy.songChangeTimer){
               clearTimeout(proxy.songChangeTimer);
               proxy.songChangeTimer = null;
@@ -159,6 +162,7 @@
             proxy.songChangeTimer = setTimeout(proxy.getQueue,10000,false);
           }
           else if(proxy.state == 'safePreload'){
+            console.log('preloading safely');
             if(proxy.songChangeTimer){
               clearTimeout(proxy.songChangeTimer);
               proxy.songChangeTimer = null;

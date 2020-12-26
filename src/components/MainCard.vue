@@ -1,18 +1,18 @@
 <template>
-  <div :key="key" class="mainCard h-120 w-100 bg-black rounded-3xl flex flex-col justify-between items-center shadow-2xl p-3 flex-none">
-    <div class="flex flex-col justify-center items-center">
-      <div class="h-64 w-64 relative mt-2">
-        <transition name="fade-up" mode="out-in" appear>
+  <div class="mainCard h-120 w-100 bg-black rounded-3xl flex flex-col justify-between items-center shadow-2xl p-3 flex-none">
+    <div :key="key" class="flex flex-col justify-center items-center">
+      <div  class="h-64 w-64 relative mt-2">
+        <transition name="fade-up" appear>
           <img ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover rounded-4xl ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute" alt="" />
         </transition>
-        <transition name="fade-up" mode="out-in" appear>
-          <div v-if="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad rounded-4xl ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute"></div>
+        <transition name="fade-up" appear>
+          <div v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad rounded-4xl ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute"></div>
         </transition>
       </div>
-      <transition name="fade-up" mode="out-in" appear>
+      <transition name="fade-up" appear>
         <h1 v-show="showTitle" class="font-sans text-gray-300 text-3xl pt-1 font-bold truncate w-80 text-center capitalize transition duration-300">{{ updatedTitle }}</h1>
       </transition>
-      <transition name="fade-up" mode="out-in" appear>
+      <transition name="fade-up" appear>
         <h2 v-show="showArtist" class="font-sans text-gray-400 text-xl truncate w-40 text-center capitalize transition duration-300">{{ updatedArtist }}</h2>
       </transition>
       <h2 class="font-sans text-gray-400 text-base mt-2">{{ playTime || '00:00:00' }}</h2>
@@ -75,6 +75,7 @@
     },
     methods: {
       loaded() {
+        this.key = this.updatedCover;
         this.hasLoaded = true;
       },
       initAudio() {
@@ -87,18 +88,16 @@
           volume: 0,
         });
 
-        if (!this.hasInitialised) {
-          this.loadingTime = 0;
-          this.canPlay = false;
-          
-          if (this.audioLoadingTimer) {
-            this.audioLoadingTimer.stop();
-          }
-          this.audioLoadingTimer = new AdjustingInterval(() => {
-            this.loadingTime++;
-          }, 1000);
-          this.audioLoadingTimer.start();
+        this.loadingTime = 0;
+        this.canPlay = false;
+        
+        if (this.audioLoadingTimer) {
+          this.audioLoadingTimer.stop();
         }
+        this.audioLoadingTimer = new AdjustingInterval(() => {
+          this.loadingTime++;
+        }, 1000);
+        this.audioLoadingTimer.start();
 
         this.$emit('loading');
         this.audio.once('load', function(){
@@ -112,29 +111,6 @@
         this.audio.once('play',function(){
           proxy.updateTime();
         });
-
-        // console.log('init');
-        // this.audio = new Audio();
-        // this.audio.preload = false;
-        // this.audio.src = 'https://api.ampupradio.com:8443/TOP40.mp3';
-        // let proxy = this;
-
-        // this.audio.load();
-
-        // this.audio.oncanplay = function() {
-        //   proxy.loadingTime++;
-        //   proxy.canPlay = true;
-        //   console.log(proxy.loadingTime);
-        //   proxy.audioLoadingTimer.stop();
-        //   proxy.$emit('loaded');
-        //   if (proxy.playing) {
-        //     proxy.updateTime();
-        //   }
-        // };
-
-        // this.audio.onwaiting = function() {
-          
-        // };
       },
       play() {
         console.log('play');
@@ -152,7 +128,7 @@
         console.log('pause');
         console.log(this.loadingTime);
         this.pauseDate = Date.now();
-        this.audio.fade(1,0,500);
+        this.audio.fade(1,0,100);
       },
       updateTime() {
         if (!this.playTimer) {
@@ -242,14 +218,14 @@
     },
     mounted() {},
     beforeUnmount() {
-      this.audio.src = '';
+      this.audio.unload();
       this.audio = null;
     },
     directives: {
       loadedifcomplete: function(el, binding) {
-        if (el.complete) {
+        if (el.complete || el.naturalHeight > 0 || el.naturalWidth > 0) {
           console.log('completed main', binding.instance.hasLoaded);
-          binding.instance.hasLoaded = true;
+          binding.instance.loaded();
         }
       },
     },

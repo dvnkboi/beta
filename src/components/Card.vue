@@ -1,5 +1,5 @@
 <template>
-  <div :key="Date.now()" class="card h-80 w-64 bg-black rounded-3xl relative flex justify-start items-center flex-col shadow-2xl overflow-hidden p-3 flex-none transition duration-300">
+  <div :key="key" class="card h-80 w-64 bg-black rounded-3xl relative flex justify-start items-center flex-col shadow-2xl overflow-hidden p-3 flex-none transition duration-300">
     <div class="h-44 w-44 relative mt-2">
       <transition name="fade-up" appear>
         <img ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="artistImg h-full w-full object-cover rounded-4xl ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute" alt="" />
@@ -32,11 +32,13 @@
         updatedTitle: null,
         updatedArtist: null,
         updatedMin: null,
-        updatedCover: null
+        updatedCover: null,
+        key:Date.now()
       };
     },
     methods: {
       loaded() {
+        this.key = this.updatedCover;
         this.hasLoaded = true;
       },
     },
@@ -79,7 +81,7 @@
       loadedifcomplete: function(el, binding) {
         if (el.complete) {
           console.log('completed', binding.instance.hasLoaded);
-          binding.instance.hasLoaded = true;
+          binding.instance.loaded();
         }
       },
     },

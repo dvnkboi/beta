@@ -42,6 +42,11 @@ body {
   opacity: 0 !important;
 }
 
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0 !important;
+}
+
 .loaderCont:hover {
   transform: translateY(-4px);
   box-shadow: 0 15px 70px -20px rgba(0, 0, 0, 0.3);

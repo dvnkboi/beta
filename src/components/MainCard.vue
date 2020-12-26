@@ -27,10 +27,13 @@
         </div>
       </div>
       <div @click.self="sliderShown = !sliderShown" class="cursor-pointer flex justify-center items-center h-full w-16 flex-none relative">
-        <box-icon @click="sliderShown = !sliderShown" name="volume-low" type="solid" size="cssSize" class="w-12 h-12 fill-current stroke-current text-gray-300 stroke-0 absolute z-40"></box-icon>
-        <div v-show="sliderShown" class="h-64 w-16 bg-black-light mb-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-start pt-4">
-          <input type="range" min="0" max="1" step="0.01" name="volume" v-model="value" orient="vertical" id="volumeSlider" class="w-2 h-40" />
-        </div>
+        <box-icon @click="sliderShown = !sliderShown" v-if="value >= 0.7" name="volume-full" type="solid" size="cssSize" class="w-12 h-12 fill-current -ml-2 stroke-current text-gray-300 stroke-0 absolute z-40"></box-icon>
+        <box-icon @click="sliderShown = !sliderShown" v-else name="volume-low" type="solid" size="cssSize" class="w-12 h-12 fill-current stroke-current text-gray-300 stroke-0 absolute z-40"></box-icon>
+        <transition name="fade" appear>
+          <div v-show="sliderShown" class="h-64 w-16 bg-black-light mb-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-start pt-4 transition duration-150">
+            <input type="range" min="0" max="1" step="0.01" name="volume" v-model="value" orient="vertical" id="volumeSlider" class="w-2 h-40" />
+          </div>
+        </transition>
       </div>
     </div>
   </div>

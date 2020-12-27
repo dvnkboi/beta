@@ -61,7 +61,7 @@
               this.queueOpen = true;
             }, 3000);
           } else {
-            for(var i = 0; i<this.art.length;i++){
+            for(var i = 0; i<this.covers;i++){
               this.previousID = {
                 index:i,
                 value:_.get(this.art[i][0],'_id')

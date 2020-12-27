@@ -10,10 +10,10 @@
         </transition>
       </div>
       <transition name="fade-up" appear>
-        <h1 :key="Date.now() - 99999" v-show="showTitle" class="font-sans text-gray-300 text-3xl pt-1 font-bold truncate w-80 text-center capitalize transition duration-300">{{ updatedTitle }}</h1>
+        <h1 :key="'mainTitle'" v-show="showTitle" class="font-sans text-gray-300 text-3xl pt-1 font-bold truncate w-80 text-center capitalize transition duration-300">{{ updatedTitle }}</h1>
       </transition>
       <transition name="fade-up" appear>
-        <h2 :key="Date.now() - 88888" v-show="showArtist" class="font-sans text-gray-400 text-xl truncate w-40 text-center capitalize transition duration-300">{{ updatedArtist }}</h2>
+        <h2 :key="'mainArtist'" v-show="showArtist" class="font-sans text-gray-400 text-xl truncate w-40 text-center capitalize transition duration-300">{{ updatedArtist }}</h2>
       </transition>
       <h2 class="font-sans text-gray-400 text-base mt-2">{{ playTime || '00:00:00' }}</h2>
     </div>

@@ -13,12 +13,10 @@
     "core-js": "^3.6.5",
     "howler": "^2.2.1",
     "lodash": "^4.17.20",
-    "socket.io": "^3.0.4",
+    "sass-loader": "^10.1.0",
     "socket.io-client": "^3.0.4",
-    "soundmanager2": "^2.97.20170602",
     "vue": "^3.0.0",
-    "vue-loading-spinner": "^1.0.11",
-    "ws": "^7.4.1"
+    "vue-loading-spinner": "^1.0.11"
   },
   "devDependencies": {
     "@tailwindcss/postcss7-compat": "^2.0.2",

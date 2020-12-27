@@ -38,7 +38,11 @@
         previousTitle: null,
         songChangeTimer:null,
         socket:null,
-        request: bent('GET', 'json')
+        request: bent('GET', 'json'),
+        previousID:{
+          index:-1,
+          value:1
+        }
       };
     },
     methods: {
@@ -47,25 +51,23 @@
           this.queueOpen = false;
           console.log('get queue');
           let res = await this.request(this.queueUrl);
-          if (this.art.length < 1) {
-            this.art = [];
-          }
           let cover;
-          let equalCheck;
 
           cover = await this.request(this.artUrl);
           this.art = _.get(cover,'response');
-
-          equalCheck = _.get(this.art[0][0], 'images[0].thumbnails.small') || _.get(this.art[0][0], 'images[0].thumbnails["250"]') || _.get(this.art[0][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png';
-          let redundant = this.previousDesc == _.get(this.art[0][0], 'desc') && this.previousDesc && _.get(this.art[0][0], 'desc');
-          if (redundant) {
+          if (this.previousID.value == _.get(this.art[this.previousID.index],'[0]._id')) {
             console.log('break lol');
             return setTimeout(() => {
               this.queueOpen = true;
             }, 3000);
           } else {
-            this.previousCover = equalCheck;
-            this.previousDesc = _.get(this.art[0][0], 'desc');
+            for(var i = 0; i<this.art.length;i++){
+              this.previousID = {
+                index:i,
+                value:_.get(this.art[i][0],'_id')
+              }
+              if(this.previousID.value) break;
+            }
           }
 
           console.log('finished getting art');
@@ -73,14 +75,9 @@
           this.previousCover = _.get(this.art[0][0], 'image');
           let tmpCover;
           setTimeout(
-            async () => {
+            () => {
               for (var i = 0; i < this.covers; i++) {
                 console.log('components', i);
-                if (!this.art[i][0]) {
-                  console.log('failed art class :c');
-                  cover = await this.request(this.artUrl);
-                  this.art = cover.response;
-                }
                 this.queue[i].changed = !this.queue[i].changed;
 
                 this.queue[i].title = res.response.history[i].title.split('(')[0];

@@ -21,13 +21,14 @@ body {
 }
 
 .mainCard:hover,
-.card:hover {
-  /* padding: 5px 5px;
-    transform: translateY(-4px) scale(1.03); */
-  box-shadow: 0 15px 70px -20px rgba(0, 0, 0, 0.3);
+.card:hover,
+.loaderCont:hover {
+  --tw-shadow: 0 20px 70px -18px rgba(0, 0, 0, 0.35);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
-.card:hover {
+.card:hover,
+.loaderCont:hover {
   transform: translateY(-4px);
 }
 
@@ -45,11 +46,6 @@ body {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0 !important;
-}
-
-.loaderCont:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 15px 70px -20px rgba(0, 0, 0, 0.3);
 }
 
 input[type='range'] {

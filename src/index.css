@@ -22,13 +22,15 @@ body {
 
 .mainCard:hover,
 .card:hover,
-.loaderCont:hover {
-  --tw-shadow: 0 20px 70px -18px rgba(0, 0, 0, 0.35);
+.loaderCont:hover,
+.connectivity:hover {
+  --tw-shadow: 0 20px 70px -30px rgba(0, 0, 0, 0.35);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
 .card:hover,
-.loaderCont:hover {
+.loaderCont:hover,
+.connectivity:hover {
   transform: translateY(-4px);
 }
 

@@ -162,8 +162,6 @@
           proxy.playTimer.start();
         } else {
           if (!this.playTimer.running) {
-            this.playSeconds = 0;
-            this.playTime = '0'.toHHMMSS();
             this.playTimer.start();
           }
         }
@@ -174,7 +172,9 @@
     },
     watch: {
       value: function() {
-        this.audio.fade(this.audio.volume(), this.value, 250);
+        if(this.audio){
+          this.audio.fade(this.audio.volume(), this.value, 250);
+        }
       },
       playing: function() {
         if (!this.playing) {

@@ -47,19 +47,27 @@
     },
     methods: {
       async getQueue(immediate) {
+        const failTimer = setTimeout(() =>{
+            console.log('failed getting art >:c');
+            return false;
+        },10000);
         if (this.queueOpen) {
           this.queueOpen = false;
           console.log('get queue');
-          let res = await this.request(this.queueUrl);
-          let cover;
-
-          cover = await this.request(this.artUrl);
+          const resPromise = this.request(this.queueUrl);
+          const coverPromise = this.request(this.artUrl);
+          
+          const [res,cover] = await Promise.all([resPromise,coverPromise]);
+          
           this.art = _.get(cover,'response');
+
           if (this.previousID.value == _.get(this.art[this.previousID.index],'[0]._id')) {
             console.log('break lol');
-            return setTimeout(() => {
+            setTimeout(() => {
               this.queueOpen = true;
             }, 3000);
+            clearTimeout(failTimer);
+            return true;
           } else {
             for(var i = 0; i<this.covers;i++){
               this.previousID = {
@@ -93,12 +101,14 @@
 
                 this.queue[i].minutes = Math.floor((new Date().getTime() - new Date(res.response.history[i].date_played).getTime()) / 60000);
               }
-              setTimeout(() => {
-                this.queueOpen = true;
-              }, 3000);
             },
             immediate ? 0 : this.$refs.mainCard.loadingTime * 1000
           );
+          setTimeout(() => {
+            this.queueOpen = true;
+          }, 3000);
+          clearTimeout(failTimer);
+          return true;
         }
       },
       reconnectSocket() {

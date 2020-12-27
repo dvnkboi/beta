@@ -1,7 +1,7 @@
 <template>
   <div class="mainCard h-120 w-100 bg-black rounded-3xl flex flex-col justify-between items-center shadow-2xl p-3 flex-none transition duration-300">
     <div class="flex flex-col justify-center items-center">
-      <div  class="h-64 w-64 relative mt-2">
+      <div class="h-64 w-64 relative mt-2">
         <transition name="fade-up" appear>
           <img :key="Date.now()" ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover rounded-4xl ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute" alt="" />
         </transition>
@@ -42,7 +42,7 @@
 <script>
   import AdjustingInterval from '../utils.js';
   // eslint-disable-next-line no-unused-vars
-  import {Howl, Howler} from 'howler';
+  import { Howl, Howler } from 'howler';
 
   export default {
     name: 'MainCard',
@@ -51,15 +51,17 @@
         hasLoaded: false,
         showTitle: true,
         showArtist: true,
+        showAlbum: true,
         updatedTitle: 'whoa',
         updatedArtist: 'whoa',
+        updatedAlbum: 'Whoa',
         updatedCover: null,
         playTime: null,
         playSeconds: 0,
         audio: {
-          state:() => {
-            return 'unloaded'
-          }
+          state: () => {
+            return 'unloaded';
+          },
         },
         playing: false,
         pauseDate: null,
@@ -74,7 +76,24 @@
     },
     methods: {
       loaded() {
+        let proxy = this;
         this.hasLoaded = true;
+        if ('mediaSession' in navigator) {
+          // eslint-disable-next-line no-undef
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title: this.updatedTitle,
+            artist: this.updatedArtist,
+            album: this.updatedAlbum,
+            artwork: [
+              { src: proxy.updatedCover, sizes: '96x96', type: 'image/png' },
+              { src: proxy.updatedCover, sizes: '128x128', type: 'image/png' },
+              { src: proxy.updatedCover, sizes: '192x192', type: 'image/png' },
+              { src: proxy.updatedCover, sizes: '256x256', type: 'image/png' },
+              { src: proxy.updatedCover, sizes: '384x384', type: 'image/png' },
+              { src: proxy.updatedCover, sizes: '512x512', type: 'image/png' },
+            ],
+          });
+        }
       },
       initAudio() {
         let proxy = this;
@@ -88,7 +107,7 @@
 
         this.loadingTime = 0;
         this.canPlay = false;
-        
+
         if (this.audioLoadingTimer) {
           this.audioLoadingTimer.stop();
         }
@@ -98,17 +117,21 @@
         this.audioLoadingTimer.start();
 
         this.$emit('loading');
-        this.audio.once('load', function(){
+        this.audio.once('load', function() {
           proxy.$emit('loaded');
           proxy.audio.play();
-          proxy.audio.fade(0,1,500);
+          proxy.audio.fade(0, 1, 500);
           proxy.audioLoadingTimer.stop();
           proxy.loadingTime++;
           proxy.canPlay = true;
         });
-        this.audio.once('play',function(){
+        this.audio.once('play', function() {
           proxy.updateTime();
         });
+        if (navigator && navigator.mediaSession) {
+          navigator.mediaSession.setActionHandler('play', () => (proxy.playing = !proxy.playing));
+          navigator.mediaSession.setActionHandler('pause', () => (proxy.playing = !proxy.playing));
+        }
       },
       play() {
         console.log('play');
@@ -120,14 +143,14 @@
           console.log('init audio');
           this.initAudio();
         } else {
-          this.audio.fade(0,1,500);
+          this.audio.fade(0, 1, 500);
         }
       },
       pause() {
         console.log('pause');
         console.log(this.loadingTime);
         this.pauseDate = Date.now();
-        this.audio.fade(1,0,100);
+        this.audio.fade(1, 0, 100);
       },
       updateTime() {
         if (!this.playTimer) {
@@ -151,7 +174,7 @@
     },
     watch: {
       value: function() {
-        this.audio.fade(this.audio.volume(),this.value,250);
+        this.audio.fade(this.audio.volume(), this.value, 250);
       },
       playing: function() {
         if (!this.playing) {
@@ -164,7 +187,7 @@
           }
         }
       },
-      updatedCover: function(){
+      updatedCover: function() {
         this.hasLoaded = false;
       },
       cover: function() {
@@ -188,6 +211,13 @@
           this.showArtist = false;
           this.updatedArtist = this.artist;
           this.showArtist = true;
+        }
+      },
+      album: function() {
+        if (this.album != this.updatedAlbum && this.album) {
+          this.showAlbum = false;
+          this.updatedAlbum = this.album;
+          this.showAlbum = true;
         }
       },
       minutes: function() {
@@ -235,6 +265,7 @@
       title: String,
       artist: String,
       changed: Boolean,
+      album: String,
     },
   };
 </script>

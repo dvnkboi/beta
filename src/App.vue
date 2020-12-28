@@ -159,7 +159,7 @@
                   this.queue[i].artist = this.res.response.history[i].artist;
                   this.queue[i].album = this.res.response.history[i].album;
 
-                  tmpCover = _get(this.art[i][0], 'images[0].thumbnails.small') || _get(this.art[i][0], 'images[0].thumbnails["250"]') || _get(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png';
+                  tmpCover = (_get(this.art[i][0], 'images[0].thumbnails.small') || _get(this.art[i][0], 'images[0].thumbnails["250"]') || _get(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png').replace('http://','https://');
 
                   if (tmpCover !== this.queue[i].cover && tmpCover) {
                     this.queue[i].cover = tmpCover;

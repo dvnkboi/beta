@@ -68,6 +68,9 @@
         })
         .delay(500)
         .timeout(3000,'api call was poopi')
+        .catch(Promise.TimeoutError, function() {
+            Promise.reject(null);
+        });
       },
       async getArt() {
         const proxy = this;
@@ -86,15 +89,32 @@
         })
         .delay(500)
         .timeout(3000,'api call was poopi')
+        .catch(Promise.TimeoutError, function() {
+            Promise.reject(null);
+        });
       },
       async getQueue(immediate) {
         if (this.queueOpen) {
           this.queueOpen = false;
           console.log('get queue');
+          // eslint-disable-next-line no-unused-vars
           let cover = await Promise.retry(3,this.getArt,1000);
           this.res = await Promise.retry(3,this.getHistory,1000);
-          
           this.art = _.get(cover, 'response');
+          if(!this.art || !this.res || this.art.length < 1 || this.res.length < 1){
+            console.log('failed');
+            this.queueOpen = true;
+            if(this.artTries < 3){
+              this.artTries++;
+              setTimeout(()=>{(async () => await this.getQueue(true))()},1000);
+              return;
+            }
+            else{
+              location.reload();
+              return;
+            }
+          }
+          
           console.log('finished getting art');
 
           this.setComponentInfo(immediate);
@@ -245,7 +265,6 @@
 
       await this.getQueue(true);
       this.reconnectSocket();
-      this.socketTimeout = setTimeout(this.reconnectSocket, 40000);
 
       navigator.connection.onchange = function() {
         if (this.downlink == 0) {

@@ -24,7 +24,7 @@
 
   require('dotenv').config();
   const axios = Promise.promisifyAll(require('axios'));
-  var _ = require('lodash');
+  var _get = require('lodash.get');
 
   export default {
     name: 'App',
@@ -102,7 +102,7 @@
           // eslint-disable-next-line no-unused-vars
           let cover = await Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message));
           this.res = await Promise.retry(3, this.getHistory, 1000).catch((e) => console.log(e.message));
-          this.art = _.get(cover, 'response');
+          this.art = _get(cover, 'response');
           if (!this.art || !this.res || this.art.length < 1 || this.res.length < 1) {
             console.log('failed');
             this.queueOpen = true;
@@ -131,7 +131,7 @@
       },
       setComponentInfo(immediate) {
         try {
-          if (this.previousID.value == _.get(this.art[this.previousID.index][0], '_id')) {
+          if (this.previousID.value == _get(this.art[this.previousID.index][0], '_id')) {
             console.log('break lol');
             setTimeout(() => {
               this.queueOpen = true;
@@ -141,7 +141,7 @@
             for (var i = 0; i < this.covers; i++) {
               this.previousID = {
                 index: i,
-                value: _.get(this.art[i][0], '_id'),
+                value: _get(this.art[i][0], '_id'),
               };
               if (this.previousID.value) break;
             }
@@ -159,7 +159,7 @@
                   this.queue[i].artist = this.res.response.history[i].artist;
                   this.queue[i].album = this.res.response.history[i].album;
 
-                  tmpCover = _.get(this.art[i][0], 'images[0].thumbnails.small') || _.get(this.art[i][0], 'images[0].thumbnails["250"]') || _.get(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png';
+                  tmpCover = _get(this.art[i][0], 'images[0].thumbnails.small') || _get(this.art[i][0], 'images[0].thumbnails["250"]') || _get(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png';
 
                   if (tmpCover !== this.queue[i].cover && tmpCover) {
                     this.queue[i].cover = tmpCover;

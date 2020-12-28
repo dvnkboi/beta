@@ -15,9 +15,15 @@
   import Connectivity from './components/connectivity.vue';
   import Loading from './components/loading.vue';
   import { io } from 'socket.io-client';
+  import * as Promise from 'bluebird';
+  Promise.config({
+    cancellation: true,
+  });
+  Promise.wait = (time) => new Promise((resolve) => setTimeout(resolve, time || 0));
+  Promise.retry = (cont, fn, delay) => fn().catch(() => (cont > 0 ? Promise.wait(delay).then(() => Promise.retry(cont - 1, fn, delay)) : Promise.reject('failed')));
 
   require('dotenv').config();
-  const bent = require('bent');
+  const axios = Promise.promisifyAll(require('axios'));
   var _ = require('lodash');
 
   export default {
@@ -32,55 +38,90 @@
         art: [],
         pongOpen: true,
         queueOpen: true,
-        previousCover: null,
         connected: true,
         loading: false,
         previousTitle: null,
-        songChangeTimer:null,
-        socket:null,
-        request: bent('GET', 'json'),
-        previousID:{
-          index:-1,
-          value:1
-        }
+        songChangeTimer: null,
+        socket: null,
+        previousID: {
+          index: 0,
+          value: 1,
+        },
+        artTries: 0,
       };
     },
     methods: {
+      async getHistory() {
+        const proxy = this;
+        return new Promise((resolve,reject) => {
+          axios.get(proxy.queueUrl,{
+            responseType: 'json'
+          })
+          .then((res) => {
+            resolve(res.data);
+            return res.data;
+          })
+          .catch(e => {
+            reject(null);
+            console.log(e);
+          });
+        })
+        .delay(500)
+        .timeout(3000,'api call was poopi')
+      },
+      async getArt() {
+        const proxy = this;
+        return new Promise((resolve,reject) => {
+          axios.get(proxy.artUrl,{
+            responseType: 'json'
+          })
+          .then((res) => {
+            resolve(res.data);
+            return res.data;
+          })
+          .catch(e => {
+            reject(null);
+            console.log(e);
+          });
+        })
+        .delay(500)
+        .timeout(3000,'api call was poopi')
+      },
       async getQueue(immediate) {
-        const failTimer = setTimeout(() =>{
-            console.log('failed getting art >:c');
-            return false;
-        },10000);
         if (this.queueOpen) {
           this.queueOpen = false;
           console.log('get queue');
-          const resPromise = this.request(this.queueUrl);
-          const coverPromise = this.request(this.artUrl);
+          let cover = await Promise.retry(3,this.getArt,1000);
+          this.res = await Promise.retry(3,this.getHistory,1000);
           
-          const [res,cover] = await Promise.all([resPromise,coverPromise]);
-          
-          this.art = _.get(cover,'response');
+          this.art = _.get(cover, 'response');
+          console.log('finished getting art');
 
-          if (this.previousID.value == _.get(this.art[this.previousID.index],'[0]._id')) {
+          this.setComponentInfo(immediate);
+
+          return setTimeout(() => {
+            this.queueOpen = true;
+          }, 3000);
+        }
+      },
+      setComponentInfo(immediate) {
+        try {
+          if (this.previousID.value == _.get(this.art[this.previousID.index][0], '_id')) {
             console.log('break lol');
             setTimeout(() => {
               this.queueOpen = true;
-            }, 3000);
-            clearTimeout(failTimer);
+            }, 1000);
             return true;
           } else {
-            for(var i = 0; i<this.covers;i++){
+            for (var i = 0; i < this.covers; i++) {
               this.previousID = {
-                index:i,
-                value:_.get(this.art[i][0],'_id')
-              }
-              if(this.previousID.value) break;
+                index: i,
+                value: _.get(this.art[i][0], '_id'),
+              };
+              if (this.previousID.value) break;
             }
           }
 
-          console.log('finished getting art');
-
-          this.previousCover = _.get(this.art[0][0], 'image');
           let tmpCover;
           setTimeout(
             () => {
@@ -88,9 +129,9 @@
                 console.log('components', i);
                 this.queue[i].changed = !this.queue[i].changed;
 
-                this.queue[i].title = res.response.history[i].title.split('(')[0];
-                this.queue[i].artist = res.response.history[i].artist;
-                this.queue[i].album = res.response.history[i].album;
+                this.queue[i].title = this.res.response.history[i].title.split('(')[0];
+                this.queue[i].artist = this.res.response.history[i].artist;
+                this.queue[i].album = this.res.response.history[i].album;
 
                 tmpCover = _.get(this.art[i][0], 'images[0].thumbnails.small') || _.get(this.art[i][0], 'images[0].thumbnails["250"]') || _.get(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png';
 
@@ -99,84 +140,78 @@
                 }
                 this.queue[i].cover = this.queue[i].cover == this.queue[i].cover ? this.queue[i].cover : tmpCover;
 
-                this.queue[i].minutes = Math.floor((new Date().getTime() - new Date(res.response.history[i].date_played).getTime()) / 60000);
+                this.queue[i].minutes = Math.floor((new Date().getTime() - new Date(this.res.response.history[i].date_played).getTime()) / 60000);
               }
             },
-            immediate ? 0 : this.$refs.mainCard.loadingTime * 1000
+            immediate || !this.$refs.mainCard ? 0 : this.$refs.mainCard.loadingTime * 1000
           );
-          setTimeout(() => {
-            this.queueOpen = true;
-          }, 3000);
-          clearTimeout(failTimer);
-          return true;
+        } catch (e) {
+          console.log(e.message);
         }
       },
       reconnectSocket() {
         let proxy = this;
-        if(this.socket == null){
+        if (this.socket == null) {
           this.socket = new io('https://api.ampupradio.com:8080', { secure: true, rejectUnauthorized: false });
           this.socket.connect();
-          
-          this.socket.on('message',(msg) => { 
+
+          this.socket.on('message', (msg) => {
             console.log(msg);
           });
 
-          this.socket.on('songChanged',async () => {
+          this.socket.on('songChanged', async () => {
             console.log('load them songs rn');
-              await proxy.getQueue(false);
+            await proxy.getQueue(false);
 
+            clearTimeout(proxy.songChangeTimer);
+            proxy.songChangeTimer = null;
+          });
+
+          this.socket.on('unsafePreload', async () => {
+            console.log('preloading for consistancy');
+            if (proxy.songChangeTimer) {
               clearTimeout(proxy.songChangeTimer);
               proxy.songChangeTimer = null;
+            }
+            proxy.songChangeTimer = setTimeout(() => {
+              proxy.getQueue(false);
+            }, 6000);
           });
 
-          this.socket.on('unsafePreload',async () => {
-            console.log('preloading for consistancy');
-              if(proxy.songChangeTimer){
-                clearTimeout(proxy.songChangeTimer);
-                proxy.songChangeTimer = null;
-              }
-              proxy.songChangeTimer = setTimeout(() => {
-                proxy.getQueue(false);
-              },6000);
-          });
-          
-          this.socket.on('preload',async () => {
+          this.socket.on('preload', async () => {
             console.log('preloading');
-              if(proxy.songChangeTimer){
-                clearTimeout(proxy.songChangeTimer);
-                proxy.songChangeTimer = null;
-              }
-              proxy.songChangeTimer = setTimeout(() => {
-                proxy.getQueue(false);
-              },11000);
+            if (proxy.songChangeTimer) {
+              clearTimeout(proxy.songChangeTimer);
+              proxy.songChangeTimer = null;
+            }
+            proxy.songChangeTimer = setTimeout(() => {
+              proxy.getQueue(false);
+            }, 11000);
           });
 
-          this.socket.on('safePreload',async () => {
+          this.socket.on('safePreload', async () => {
             console.log('preloading safely');
-              if(proxy.songChangeTimer){
-                clearTimeout(proxy.songChangeTimer);
-                proxy.songChangeTimer = null;
-              }
-              proxy.songChangeTimer = setTimeout(() => {
-                proxy.getQueue(false);
-              },26000);
+            if (proxy.songChangeTimer) {
+              clearTimeout(proxy.songChangeTimer);
+              proxy.songChangeTimer = null;
+            }
+            proxy.songChangeTimer = setTimeout(() => {
+              proxy.getQueue(false);
+            }, 26000);
           });
 
-          proxy.socket.on("connect_error", () => {
+          proxy.socket.on('connect_error', () => {
             setTimeout(() => {
               proxy.socket.connect();
             }, 1000);
           });
-          
-        }
-        else{
+        } else {
           console.log('reconnected');
           this.socket.disconnect();
           setTimeout(() => {
             proxy.socket.connect();
           }, 1000);
         }
-        
       },
     },
     beforeUnmount() {},

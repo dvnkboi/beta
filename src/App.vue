@@ -94,24 +94,30 @@
         });
       },
       async getQueue(immediate) {
-        if (this.queueOpen) {
+        if (this.queueOpen && this.connected) {
           this.queueOpen = false;
           console.log('get queue');
           // eslint-disable-next-line no-unused-vars
-          let cover = await Promise.retry(3,this.getArt,1000);
-          this.res = await Promise.retry(3,this.getHistory,1000);
+          let cover = await Promise
+          .retry(3,this.getArt,1000)
+          .catch(e => console.log(e.message));
+          this.res = await Promise
+          .retry(3,this.getHistory,1000)
+          .catch(e => console.log(e.message));
           this.art = _.get(cover, 'response');
           if(!this.art || !this.res || this.art.length < 1 || this.res.length < 1){
             console.log('failed');
             this.queueOpen = true;
-            if(this.artTries < 3){
-              this.artTries++;
-              setTimeout(()=>{(async () => await this.getQueue(true))()},1000);
-              return;
-            }
-            else{
-              location.reload();
-              return;
+            if(this.connected){
+              if(this.artTries < 3){
+                this.artTries++;
+                setTimeout(()=>{(async () => await this.getQueue(true))()},1000);
+                return;
+              }
+              else{
+                location.reload();
+                return;
+              }
             }
           }
           
@@ -269,6 +275,7 @@
       navigator.connection.onchange = function() {
         if (this.downlink == 0) {
           console.log('OFFLINE');
+          proxy.socket.disconnect();
           proxy.connected = false;
         } else {
           console.log('BACK ONLINE');

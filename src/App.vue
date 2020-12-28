@@ -34,7 +34,7 @@
         queueUrl: `https://api.ampupradio.com:3000/v2?apikey=${process.env.VUE_APP_API_KEY}&action=get_queue`,
         artUrl: `https://api.ampupradio.com:3000/v2?apikey=${process.env.VUE_APP_API_KEY}&action=get_art`,
         covers: 4,
-        queue: [{}, {}, {}, {}],
+        queue: [],
         art: [],
         pongOpen: true,
         queueOpen: true,
@@ -53,74 +53,73 @@
     methods: {
       async getHistory() {
         const proxy = this;
-        return new Promise((resolve,reject) => {
-          axios.get(proxy.queueUrl,{
-            responseType: 'json'
-          })
-          .then((res) => {
-            resolve(res.data);
-            return res.data;
-          })
-          .catch(e => {
-            reject(null);
-            console.log(e);
-          });
+        return new Promise((resolve, reject) => {
+          axios
+            .get(proxy.queueUrl, {
+              responseType: 'json',
+            })
+            .then((res) => {
+              resolve(res.data);
+              return res.data;
+            })
+            .catch((e) => {
+              reject(null);
+              console.log(e);
+            });
         })
-        .delay(500)
-        .timeout(3000,'api call was poopi')
-        .catch(Promise.TimeoutError, function() {
+          .delay(500)
+          .timeout(3000, 'api call was poopi')
+          .catch(Promise.TimeoutError, function() {
             Promise.reject(null);
-        });
+          });
       },
       async getArt() {
         const proxy = this;
-        return new Promise((resolve,reject) => {
-          axios.get(proxy.artUrl,{
-            responseType: 'json'
-          })
-          .then((res) => {
-            resolve(res.data);
-            return res.data;
-          })
-          .catch(e => {
-            reject(null);
-            console.log(e);
-          });
+        return new Promise((resolve, reject) => {
+          axios
+            .get(proxy.artUrl, {
+              responseType: 'json',
+            })
+            .then((res) => {
+              resolve(res.data);
+              return res.data;
+            })
+            .catch((e) => {
+              reject(null);
+              console.log(e);
+            });
         })
-        .delay(500)
-        .timeout(3000,'api call was poopi')
-        .catch(Promise.TimeoutError, function() {
+          .delay(500)
+          .timeout(3000, 'api call was poopi')
+          .catch(Promise.TimeoutError, function() {
             Promise.reject(null);
-        });
+          });
       },
       async getQueue(immediate) {
         if (this.queueOpen && this.connected) {
           this.queueOpen = false;
           console.log('get queue');
           // eslint-disable-next-line no-unused-vars
-          let cover = await Promise
-          .retry(3,this.getArt,1000)
-          .catch(e => console.log(e.message));
-          this.res = await Promise
-          .retry(3,this.getHistory,1000)
-          .catch(e => console.log(e.message));
+          let cover = await Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message));
+          this.res = await Promise.retry(3, this.getHistory, 1000).catch((e) => console.log(e.message));
           this.art = _.get(cover, 'response');
-          if(!this.art || !this.res || this.art.length < 1 || this.res.length < 1){
+          if (!this.art || !this.res || this.art.length < 1 || this.res.length < 1) {
             console.log('failed');
             this.queueOpen = true;
-            if(this.connected){
-              if(this.artTries < 3){
+            if (this.connected) {
+              if (this.artTries < 3) {
                 this.artTries++;
-                setTimeout(()=>{(async () => await this.getQueue(true))()},1000);
+                setTimeout(() => {
+                  (async () => await this.getQueue(true))();
+                }, 1000);
                 return;
-              }
-              else{
+              } else {
                 location.reload();
                 return;
               }
             }
           }
-          
+
           console.log('finished getting art');
 
           this.setComponentInfo(immediate);
@@ -151,24 +150,29 @@
           let tmpCover;
           setTimeout(
             () => {
-              for (var i = 0; i < this.covers; i++) {
-                console.log('components', i);
-                this.queue[i].changed = !this.queue[i].changed;
+              try {
+                for (var i = 0; i < this.covers; i++) {
+                  console.log('components', i);
+                  this.queue[i].changed = !this.queue[i].changed;
 
-                this.queue[i].title = this.res.response.history[i].title.split('(')[0];
-                this.queue[i].artist = this.res.response.history[i].artist;
-                this.queue[i].album = this.res.response.history[i].album;
+                  this.queue[i].title = this.res.response.history[i].title.split('(')[0];
+                  this.queue[i].artist = this.res.response.history[i].artist;
+                  this.queue[i].album = this.res.response.history[i].album;
 
-                tmpCover = _.get(this.art[i][0], 'images[0].thumbnails.small') || _.get(this.art[i][0], 'images[0].thumbnails["250"]') || _.get(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png';
+                  tmpCover = _.get(this.art[i][0], 'images[0].thumbnails.small') || _.get(this.art[i][0], 'images[0].thumbnails["250"]') || _.get(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png';
 
-                if (tmpCover !== this.queue[i].cover && tmpCover) {
-                  this.queue[i].cover = tmpCover;
+                  if (tmpCover !== this.queue[i].cover && tmpCover) {
+                    this.queue[i].cover = tmpCover;
+                  }
+                  this.queue[i].cover = this.queue[i].cover == this.queue[i].cover ? this.queue[i].cover : tmpCover;
+
+                  this.queue[i].minutes = Math.floor((new Date().getTime() - new Date(this.res.response.history[i].date_played).getTime()) / 60000);
                 }
-                this.queue[i].cover = this.queue[i].cover == this.queue[i].cover ? this.queue[i].cover : tmpCover;
-
-                this.queue[i].minutes = Math.floor((new Date().getTime() - new Date(this.res.response.history[i].date_played).getTime()) / 60000);
+                this.mediaSystemMeta();
               }
-              this.mediaSystemMeta();
+              catch(e){
+                console.log('empty meta objects');
+              }
             },
             immediate || !this.$refs.mainCard ? 0 : this.$refs.mainCard.loadingTime * 1000
           );
@@ -240,7 +244,7 @@
           }, 1000);
         }
       },
-      mediaSystemMeta(){
+      mediaSystemMeta() {
         let proxy = this;
         if ('mediaSession' in navigator) {
           // eslint-disable-next-line no-undef
@@ -258,9 +262,36 @@
             ],
           });
         }
-      }
+      },
+      emptyQueue() {
+        this.queue = [];
+        for (var i = 0; i < this.covers; i++) {
+          this.queue.push({});
+        }
+      },
     },
     beforeUnmount() {},
+    beforeMount() {
+      const proxy = this;
+      this.reconnectSocket();
+      this.emptyQueue();
+      window.addEventListener('online', () => {
+        console.log('BACK ONLINE');
+        proxy.connected = true;
+        proxy.downlink = navigator.connection.downlink;
+        proxy.emptyQueue();
+        proxy.reconnectSocket();
+        proxy.getQueue(true);
+        console.log(proxy.downlink, proxy.connected);
+      });
+      window.addEventListener('offline', () => {
+        console.log('OFFLINE');
+        proxy.connected = false;
+        proxy.downlink = navigator.connection.downlink;
+        proxy.socket.disconnect();
+        console.log(proxy.downlink, proxy.connected);
+      });
+    },
     async mounted() {
       let proxy = this;
       document.addEventListener('visibilitychange', async function() {
@@ -268,22 +299,7 @@
           await proxy.getQueue(true);
         }
       });
-
       await this.getQueue(true);
-      this.reconnectSocket();
-
-      navigator.connection.onchange = function() {
-        if (this.downlink == 0) {
-          console.log('OFFLINE');
-          proxy.socket.disconnect();
-          proxy.connected = false;
-        } else {
-          console.log('BACK ONLINE');
-          proxy.connected = true;
-          proxy.reconnectSocket();
-          proxy.getQueue(true);
-        }
-      };
     },
     components: {
       MainCard,

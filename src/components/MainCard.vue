@@ -82,7 +82,7 @@
         let proxy = this;
         this.audio = null;
         this.audio = new Howl({
-          src: ['https://api.ampupradio.com:8443/TOP40.mp3'],
+          src: ['https://api.ampupradio.com:8443/TOP40.mp3?nocache=' + Date.now()],
           html5: true,
           format: ['mp3', 'aac'],
           volume: 0,

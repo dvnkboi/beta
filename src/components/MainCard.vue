@@ -76,24 +76,7 @@
     },
     methods: {
       loaded() {
-        let proxy = this;
         this.hasLoaded = true;
-        if ('mediaSession' in navigator) {
-          // eslint-disable-next-line no-undef
-          navigator.mediaSession.metadata = new MediaMetadata({
-            title: this.updatedTitle,
-            artist: this.updatedArtist,
-            album: this.updatedAlbum,
-            artwork: [
-              { src: proxy.updatedCover, sizes: '96x96', type: 'image/png' },
-              { src: proxy.updatedCover, sizes: '128x128', type: 'image/png' },
-              { src: proxy.updatedCover, sizes: '192x192', type: 'image/png' },
-              { src: proxy.updatedCover, sizes: '256x256', type: 'image/png' },
-              { src: proxy.updatedCover, sizes: '384x384', type: 'image/png' },
-              { src: proxy.updatedCover, sizes: '512x512', type: 'image/png' },
-            ],
-          });
-        }
       },
       initAudio() {
         let proxy = this;

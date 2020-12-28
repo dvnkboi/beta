@@ -142,6 +142,7 @@
 
                 this.queue[i].minutes = Math.floor((new Date().getTime() - new Date(this.res.response.history[i].date_played).getTime()) / 60000);
               }
+              this.mediaSystemMeta();
             },
             immediate || !this.$refs.mainCard ? 0 : this.$refs.mainCard.loadingTime * 1000
           );
@@ -213,6 +214,25 @@
           }, 1000);
         }
       },
+      mediaSystemMeta(){
+        let proxy = this;
+        if ('mediaSession' in navigator) {
+          // eslint-disable-next-line no-undef
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title: proxy.queue[0].title,
+            artist: proxy.queue[0].artist,
+            album: proxy.queue[0].album,
+            artwork: [
+              { src: proxy.queue[0].cover, sizes: '96x96', type: 'image/png' },
+              { src: proxy.queue[0].cover, sizes: '128x128', type: 'image/png' },
+              { src: proxy.queue[0].cover, sizes: '192x192', type: 'image/png' },
+              { src: proxy.queue[0].cover, sizes: '256x256', type: 'image/png' },
+              { src: proxy.queue[0].cover, sizes: '384x384', type: 'image/png' },
+              { src: proxy.queue[0].cover, sizes: '512x512', type: 'image/png' },
+            ],
+          });
+        }
+      }
     },
     beforeUnmount() {},
     async mounted() {

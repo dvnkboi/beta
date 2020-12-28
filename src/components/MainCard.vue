@@ -44,9 +44,7 @@
 </template>
 
 <script>
-  import AdjustingInterval from '../utils.js';
   // eslint-disable-next-line no-unused-vars
-  import { Howl, Howler } from 'howler';
 
   export default {
     name: 'MainCard',
@@ -72,6 +70,9 @@
         value: 1,
         hasInitialised: false,
         playTimer: null,
+        AdjustingInterval:null,
+        Howl:null,
+        Howler:null
       };
     },
     methods: {
@@ -81,7 +82,7 @@
       initAudio() {
         let proxy = this;
         this.audio = null;
-        this.audio = new Howl({
+        this.audio = new this.Howl({
           src: ['https://api.ampupradio.com:8443/TOP40.mp3?nocache=' + Date.now()],
           html5: true,
           format: ['mp3', 'aac'],
@@ -94,7 +95,7 @@
         if (this.audioLoadingTimer) {
           this.audioLoadingTimer.stop();
         }
-        this.audioLoadingTimer = new AdjustingInterval(() => {
+        this.audioLoadingTimer = new this.AdjustingInterval(() => {
           this.loadingTime++;
         }, 1000);
         this.audioLoadingTimer.start();
@@ -116,11 +117,12 @@
           navigator.mediaSession.setActionHandler('pause', () => (proxy.playing = !proxy.playing));
         }
       },
-      play() {
+      async play() {
         console.log('play');
         let pausedMs = this.pauseDate > 0 ? Date.now() - this.pauseDate : 0;
         console.log(pausedMs);
         if (!this.audio || this.audio.state() == 'unloaded' || pausedMs > 60000) {
+          await this.requireStack();
           this.$emit('reloadStream');
           console.log('init audio');
           this.initAudio();
@@ -137,7 +139,7 @@
       updateTime() {
         if (!this.playTimer) {
           let proxy = this;
-          proxy.playTimer = new AdjustingInterval(() => {
+          proxy.playTimer = new this.AdjustingInterval(() => {
             proxy.playSeconds++;
             proxy.playTime = proxy.playSeconds.toString().toHHMMSS();
           }, 1000);
@@ -151,6 +153,17 @@
       resetTime() {
         this.playTimer.stop();
       },
+      async requireStack(){
+        if(!this.Howl || !this.Howler){
+          this.Howl = await import(/* webpackChunkName: "Howler" */ 'howler');
+          this.Howler = this.Howl.Howler;
+          this.Howl = this.Howl.Howl;
+        }
+        if(!this.AdjustingInterval){
+          this.AdjustingInterval = await import(/* webpackChunkName: "utils" */ '../utils.js');
+          this.AdjustingInterval = this.AdjustingInterval.AdjustingInterval;
+        }
+      }
     },
     watch: {
       value: function() {
@@ -158,12 +171,12 @@
           this.audio.fade(this.audio.volume(), this.value, 250);
         }
       },
-      playing: function() {
+      playing: async function() {
         if (!this.playing) {
           this.pause();
           this.resetTime();
         } else {
-          this.play();
+          await this.play();
           if (this.audio.playing()) {
             this.updateTime();
           }
@@ -228,6 +241,8 @@
         }
         return hours + ':' + minutes + ':' + seconds;
       };
+    },
+    beforeMount(){
     },
     mounted() {},
     beforeUnmount() {

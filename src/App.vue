@@ -14,17 +14,6 @@
   import Card from './components/Card.vue';
   import Connectivity from './components/connectivity.vue';
   import Loading from './components/loading.vue';
-  import { io } from 'socket.io-client';
-  import * as Promise from 'bluebird';
-  Promise.config({
-    cancellation: true,
-  });
-  Promise.wait = (time) => new Promise((resolve) => setTimeout(resolve, time || 0));
-  Promise.retry = (cont, fn, delay) => fn().catch(() => (cont > 0 ? Promise.wait(delay).then(() => Promise.retry(cont - 1, fn, delay)) : Promise.reject('failed')));
-
-  require('dotenv').config();
-  const axios = Promise.promisifyAll(require('axios'));
-  var _get = require('lodash.get');
 
   export default {
     name: 'App',
@@ -48,13 +37,42 @@
           value: 1,
         },
         artTries: 0,
+        queueReqOK: false,
+        Promise:null,
+        axios:null,
+        lodashGet:null,
+        io:null
       };
     },
     methods: {
+      async queueReqStack() {
+        if (!this.Promise) {
+          this.Promise = await import(/* webpackChunkName: "bluebird" */ 'bluebird');
+          this.Promise = this.Promise.default;
+          this.Promise.config({
+            cancellation: true,
+          });
+          this.Promise.wait = (time) => new this.Promise((resolve) => setTimeout(resolve, time || 0));
+          this.Promise.retry = (cont, fn, delay) => fn().catch(() => (cont > 0 ? this.Promise.wait(delay).then(() => this.Promise.retry(cont - 1, fn, delay)) : this.Promise.reject('failed')));
+        }
+
+        if (!this.axios) {
+          this.axios = await import(/* webpackChunkName: "axios" */ 'axios');
+          this.axios = this.axios.default;
+          this.axios = this.Promise.promisifyAll(this.axios);
+        }
+        require('dotenv').config();
+
+        if (!this.lodashGet) {
+          this.lodashGet = await import(/* webpackChunkName: "lodashGet" */ 'lodash.get');
+          this.lodashGet = this.lodashGet.default;
+        }
+        this.queueReqOK = true;
+      },
       async getHistory() {
         const proxy = this;
-        return new Promise((resolve, reject) => {
-          axios
+        return new this.Promise((resolve, reject) => {
+          this.axios
             .get(proxy.queueUrl, {
               responseType: 'json',
             })
@@ -69,14 +87,14 @@
         })
           .delay(500)
           .timeout(3000, 'api call was poopi')
-          .catch(Promise.TimeoutError, function() {
-            Promise.reject(null);
+          .catch(this.Promise.TimeoutError, function() {
+            this.Promise.reject(null);
           });
       },
       async getArt() {
         const proxy = this;
-        return new Promise((resolve, reject) => {
-          axios
+        return new this.Promise((resolve, reject) => {
+          this.axios
             .get(proxy.artUrl, {
               responseType: 'json',
             })
@@ -91,8 +109,8 @@
         })
           .delay(500)
           .timeout(3000, 'api call was poopi')
-          .catch(Promise.TimeoutError, function() {
-            Promise.reject(null);
+          .catch(this.Promise.TimeoutError, function() {
+            this.Promise.reject(null);
           });
       },
       async getQueue(immediate) {
@@ -100,9 +118,9 @@
           this.queueOpen = false;
           console.log('get queue');
           // eslint-disable-next-line no-unused-vars
-          let cover = await Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message));
-          this.res = await Promise.retry(3, this.getHistory, 1000).catch((e) => console.log(e.message));
-          this.art = _get(cover, 'response');
+          let cover = await this.Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message));
+          this.res = await this.Promise.retry(3, this.getHistory, 1000).catch((e) => console.log(e.message));
+          this.art = this.lodashGet(cover, 'response');
           if (!this.art || !this.res || this.art.length < 1 || this.res.length < 1) {
             console.log('failed');
             this.queueOpen = true;
@@ -131,7 +149,7 @@
       },
       setComponentInfo(immediate) {
         try {
-          if (this.previousID.value == _get(this.art[this.previousID.index][0], '_id')) {
+          if (this.previousID.value == this.lodashGet(this.art[this.previousID.index][0], '_id')) {
             console.log('break lol');
             setTimeout(() => {
               this.queueOpen = true;
@@ -141,7 +159,7 @@
             for (var i = 0; i < this.covers; i++) {
               this.previousID = {
                 index: i,
-                value: _get(this.art[i][0], '_id'),
+                value: this.lodashGet(this.art[i][0], '_id'),
               };
               if (this.previousID.value) break;
             }
@@ -159,7 +177,7 @@
                   this.queue[i].artist = this.res.response.history[i].artist;
                   this.queue[i].album = this.res.response.history[i].album;
 
-                  tmpCover = (_get(this.art[i][0], 'images[0].thumbnails.small') || _get(this.art[i][0], 'images[0].thumbnails["250"]') || _get(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png').replace('http://','https://');
+                  tmpCover = (this.lodashGet(this.art[i][0], 'images[0].thumbnails.small') || this.lodashGet(this.art[i][0], 'images[0].thumbnails["250"]') || this.lodashGet(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png').replace('http://', 'https://');
 
                   if (tmpCover !== this.queue[i].cover && tmpCover) {
                     this.queue[i].cover = tmpCover;
@@ -169,8 +187,7 @@
                   this.queue[i].minutes = Math.floor((new Date().getTime() - new Date(this.res.response.history[i].date_played).getTime()) / 60000);
                 }
                 this.mediaSystemMeta();
-              }
-              catch(e){
+              } catch (e) {
                 console.log('empty meta objects');
               }
             },
@@ -180,10 +197,16 @@
           console.log(e.message);
         }
       },
-      reconnectSocket() {
+      async reconnectSocket() {
         let proxy = this;
+
+        if(!this.io){
+          this.io = await import(/* webpackChunkName: "socketIO.client" */ 'socket.io-client');
+          this.io = this.io.default;
+        }
+
         if (this.socket == null) {
-          this.socket = new io('https://api.ampupradio.com:8080', { secure: true, rejectUnauthorized: false });
+          this.socket = new this.io('https://api.ampupradio.com:8080', { secure: true, rejectUnauthorized: false });
           this.socket.connect();
 
           this.socket.on('message', (msg) => {
@@ -271,10 +294,10 @@
       },
     },
     beforeUnmount() {},
-    beforeMount() {
+    async beforeMount() {
       const proxy = this;
-      this.reconnectSocket();
       this.emptyQueue();
+      this.reconnectSocket();
       window.addEventListener('online', () => {
         console.log('BACK ONLINE');
         proxy.connected = true;
@@ -294,6 +317,7 @@
     },
     async mounted() {
       let proxy = this;
+      await this.queueReqStack();
       document.addEventListener('visibilitychange', async function() {
         if (!document.hidden) {
           await proxy.getQueue(true);

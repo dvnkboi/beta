@@ -36,4 +36,6 @@ function AdjustingInterval(workFunc, interval, errorFunc) {
     }
 }
 
-module.exports = AdjustingInterval;
+module.exports = {
+    AdjustingInterval
+};

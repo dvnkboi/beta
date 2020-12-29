@@ -215,10 +215,12 @@
 
           this.socket.on('songChanged', async () => {
             console.log('load them songs rn');
+            proxy.queueOpen = true;
+            if (proxy.songChangeTimer) {
+              clearTimeout(proxy.songChangeTimer);
+              proxy.songChangeTimer = null;
+            }
             await proxy.getQueue(false);
-
-            clearTimeout(proxy.songChangeTimer);
-            proxy.songChangeTimer = null;
           });
 
           this.socket.on('unsafePreload', async () => {
@@ -228,7 +230,10 @@
               proxy.songChangeTimer = null;
             }
             proxy.songChangeTimer = setTimeout(() => {
-              proxy.getQueue(false);
+              (async () => {
+                proxy.queueOpen = true;
+                await proxy.getQueue(false);
+              })();
             }, 6000);
           });
 
@@ -239,7 +244,10 @@
               proxy.songChangeTimer = null;
             }
             proxy.songChangeTimer = setTimeout(() => {
-              proxy.getQueue(false);
+              (async () => {
+                proxy.queueOpen = true;
+                await proxy.getQueue(false);
+              })();
             }, 11000);
           });
 
@@ -250,7 +258,10 @@
               proxy.songChangeTimer = null;
             }
             proxy.songChangeTimer = setTimeout(() => {
-              proxy.getQueue(false);
+              (async () => {
+                proxy.queueOpen = true;
+                await proxy.getQueue(false);
+              })();
             }, 26000);
           });
 

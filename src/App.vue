@@ -22,14 +22,15 @@
         oof: 'wuw',
         queueUrl: `https://api.ampupradio.com:3000/v2?apikey=${process.env.VUE_APP_API_KEY}&action=get_queue`,
         artUrl: `https://api.ampupradio.com:3000/v2?apikey=${process.env.VUE_APP_API_KEY}&action=get_art`,
-        nextArtUrl:`https://api.ampupradio.com:3000/v2?apikey=${process.env.VUE_APP_API_KEY}&action=get_next_art`,
+        nextArtUrl: `https://api.ampupradio.com:3000/v2?apikey=${process.env.VUE_APP_API_KEY}&action=get_next_art`,
         covers: 4,
         queue: [],
         art: [],
-        nextArt:null,
+        nextArt: null,
         pongOpen: true,
         queueOpen: true,
         connected: true,
+        audioLatency: (943718 * 8 / 256000) * 1000,
         loading: false,
         previousTitle: null,
         songChangeTimer: null,
@@ -40,10 +41,10 @@
         },
         artTries: 0,
         queueReqOK: false,
-        Promise:null,
-        axios:null,
-        lodashGet:null,
-        io:null
+        Promise: null,
+        axios: null,
+        lodashGet: null,
+        io: null,
       };
     },
     methods: {
@@ -86,7 +87,7 @@
               reject(null);
               console.log(e);
             });
-          })
+        })
           .delay(500)
           .timeout(3000, 'api call was poopi')
           .catch(this.Promise.TimeoutError, function() {
@@ -108,14 +109,14 @@
               reject(null);
               console.log(e);
             });
-          })
+        })
           .delay(500)
           .timeout(3000, 'api call was poopi')
           .catch(this.Promise.TimeoutError, function() {
             this.Promise.reject(null);
           });
       },
-      async getNextArt(){
+      async getNextArt() {
         const proxy = this;
         return new this.Promise((resolve, reject) => {
           this.axios
@@ -130,7 +131,7 @@
               reject(null);
               console.log(e);
             });
-          })
+        })
           .delay(500)
           .timeout(3000, 'api call was poopi')
           .catch(this.Promise.TimeoutError, function() {
@@ -188,33 +189,30 @@
             }
           }
           let tmpCover;
-          setTimeout(
-            () => {
-              try {
-                for (var i = 0; i < this.covers; i++) {
-                  console.log('components', i);
-                  this.queue[i].changed = !this.queue[i].changed;
+          setTimeout(() => {
+            try {
+              for (var i = 0; i < this.covers; i++) {
+                console.log('components', i);
+                this.queue[i].changed = !this.queue[i].changed;
 
-                  this.queue[i].title = this.res.response.history[i].title.split('(')[0];
-                  this.queue[i].artist = this.res.response.history[i].artist;
-                  this.queue[i].album = this.res.response.history[i].album;
+                this.queue[i].title = this.res.response.history[i].title.split('(')[0];
+                this.queue[i].artist = this.res.response.history[i].artist;
+                this.queue[i].album = this.res.response.history[i].album;
 
-                  tmpCover = (this.lodashGet(this.art[i][0], 'images[0].thumbnails.small') || this.lodashGet(this.art[i][0], 'images[0].thumbnails["250"]') || this.lodashGet(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png').replace('http://', 'https://');
+                tmpCover = (this.lodashGet(this.art[i][0], 'images[0].thumbnails.small') || this.lodashGet(this.art[i][0], 'images[0].thumbnails["250"]') || this.lodashGet(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png').replace('http://', 'https://');
 
-                  if (tmpCover !== this.queue[i].cover && tmpCover) {
-                    this.queue[i].cover = tmpCover;
-                  }
-                  this.queue[i].cover = this.queue[i].cover == this.queue[i].cover ? this.queue[i].cover : tmpCover;
-
-                  this.queue[i].minutes = Math.floor((new Date().getTime() - new Date(this.res.response.history[i].date_played).getTime()) / 60000);
+                if (tmpCover !== this.queue[i].cover && tmpCover) {
+                  this.queue[i].cover = tmpCover;
                 }
-                this.mediaSystemMeta();
-              } catch (e) {
-                console.log('empty meta objects');
+                this.queue[i].cover = this.queue[i].cover == this.queue[i].cover ? this.queue[i].cover : tmpCover;
+
+                this.queue[i].minutes = Math.floor((new Date().getTime() - new Date(this.res.response.history[i].date_played).getTime()) / 60000);
               }
-            },
-            immediate || 30000
-          );
+              this.mediaSystemMeta();
+            } catch (e) {
+              console.log('empty meta objects');
+            }
+          }, immediate || this.audioLatency );
         } catch (e) {
           console.log(e.message);
         }
@@ -222,7 +220,7 @@
       async reconnectSocket() {
         let proxy = this;
 
-        if(!this.io){
+        if (!this.io) {
           this.io = await import(/* webpackChunkName: "socketIO.client" */ 'socket.io-client');
           this.io = this.io.default;
         }
@@ -237,6 +235,7 @@
 
           this.socket.on('songChanged', async () => {
             console.log('load them songs rn');
+
             proxy.queueOpen = true;
             if (proxy.songChangeTimer) {
               clearTimeout(proxy.songChangeTimer);
@@ -327,26 +326,28 @@
       },
     },
     beforeUnmount() {},
-    async beforeMount() {
-      const proxy = this;
-      this.emptyQueue();
-      this.reconnectSocket();
+    created() {
+      let proxy = this;
+      this.connected = window.navigator.onLine || navigator.connection.downlink > 0;
+      console.log('connection state: ', this.connected);
       window.addEventListener('online', () => {
         console.log('BACK ONLINE');
-        proxy.connected = true;
-        proxy.downlink = navigator.connection.downlink;
+        proxy.connected = window.navigator.onLine || navigator.connection.downlink > 0;
+        proxy.downlink = navigator.connection.downlink ? navigator.connection.downlink : null;
         proxy.emptyQueue();
         proxy.reconnectSocket();
         proxy.getQueue(true);
-        console.log(proxy.downlink, proxy.connected);
       });
       window.addEventListener('offline', () => {
         console.log('OFFLINE');
-        proxy.connected = false;
-        proxy.downlink = navigator.connection.downlink;
+        proxy.connected = window.navigator.onLine || navigator.connection.downlink > 0;
+        proxy.downlink = navigator.connection.downlink ? navigator.connection.downlink : null;
         proxy.socket.disconnect();
-        console.log(proxy.downlink, proxy.connected);
       });
+    },
+    async beforeMount() {
+      this.emptyQueue();
+      this.reconnectSocket();
     },
     async mounted() {
       let proxy = this;

@@ -248,7 +248,7 @@
                 proxy.queueOpen = true;
                 await proxy.getQueue(false);
               })();
-            }, 11000);
+            }, 12000);
           });
 
           this.socket.on('safePreload', async () => {
@@ -262,7 +262,7 @@
                 proxy.queueOpen = true;
                 await proxy.getQueue(false);
               })();
-            }, 26000);
+            }, 27000);
           });
 
           proxy.socket.on('connect_error', () => {

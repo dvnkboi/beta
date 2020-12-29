@@ -22,9 +22,11 @@
         oof: 'wuw',
         queueUrl: `https://api.ampupradio.com:3000/v2?apikey=${process.env.VUE_APP_API_KEY}&action=get_queue`,
         artUrl: `https://api.ampupradio.com:3000/v2?apikey=${process.env.VUE_APP_API_KEY}&action=get_art`,
+        nextArtUrl:`https://api.ampupradio.com:3000/v2?apikey=${process.env.VUE_APP_API_KEY}&action=get_next_art`,
         covers: 4,
         queue: [],
         art: [],
+        nextArt:null,
         pongOpen: true,
         queueOpen: true,
         connected: true,
@@ -84,7 +86,7 @@
               reject(null);
               console.log(e);
             });
-        })
+          })
           .delay(500)
           .timeout(3000, 'api call was poopi')
           .catch(this.Promise.TimeoutError, function() {
@@ -106,7 +108,29 @@
               reject(null);
               console.log(e);
             });
-        })
+          })
+          .delay(500)
+          .timeout(3000, 'api call was poopi')
+          .catch(this.Promise.TimeoutError, function() {
+            this.Promise.reject(null);
+          });
+      },
+      async getNextArt(){
+        const proxy = this;
+        return new this.Promise((resolve, reject) => {
+          this.axios
+            .get(proxy.nextArtUrl, {
+              responseType: 'json',
+            })
+            .then((res) => {
+              resolve(res.data);
+              return res.data;
+            })
+            .catch((e) => {
+              reject(null);
+              console.log(e);
+            });
+          })
           .delay(500)
           .timeout(3000, 'api call was poopi')
           .catch(this.Promise.TimeoutError, function() {
@@ -118,9 +142,8 @@
           this.queueOpen = false;
           console.log('get queue');
           // eslint-disable-next-line no-unused-vars
-          let cover = await this.Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message));
           this.res = await this.Promise.retry(3, this.getHistory, 1000).catch((e) => console.log(e.message));
-          this.art = this.lodashGet(cover, 'response');
+          this.art = this.lodashGet(await this.Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message)), 'response');
           if (!this.art || !this.res || this.art.length < 1 || this.res.length < 1) {
             console.log('failed');
             this.queueOpen = true;
@@ -164,7 +187,6 @@
               if (this.previousID.value) break;
             }
           }
-
           let tmpCover;
           setTimeout(
             () => {
@@ -191,7 +213,7 @@
                 console.log('empty meta objects');
               }
             },
-            immediate || !this.$refs.mainCard ? 0 : this.$refs.mainCard.loadingTime * 1000
+            immediate || 30000
           );
         } catch (e) {
           console.log(e.message);

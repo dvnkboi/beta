@@ -145,6 +145,8 @@
           // eslint-disable-next-line no-unused-vars
           this.res = await this.Promise.retry(3, this.getHistory, 1000).catch((e) => console.log(e.message));
           this.art = this.lodashGet(await this.Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message)), 'response');
+          console.log();
+          
           if (!this.art || !this.res || this.art.length < 1 || this.res.length < 1) {
             console.log('failed');
             this.queueOpen = true;
@@ -160,6 +162,14 @@
                 return;
               }
             }
+          }
+
+          if(Date.now() - new Date(this.res.response.history[0].date_played).getTime() < this.audioLatency && this.previousID.value == 1){
+            let playDate = this.audioLatency - Date.now() + new Date(this.res.response.history[0].date_played).getTime();
+            console.log('first load',playDate);
+            this.art.splice(0,1);
+            this.res.response.next = this.res.response.history.splice(0,1);
+            setTimeout(this.getQueue,playDate,true);
           }
 
           console.log('finished getting art');
@@ -334,6 +344,10 @@
         console.log('BACK ONLINE');
         proxy.connected = window.navigator.onLine || navigator.connection.downlink > 0;
         proxy.downlink = navigator.connection.downlink ? navigator.connection.downlink : null;
+        proxy.previousID = {
+          index:0,
+          value:1
+        }
         proxy.emptyQueue();
         proxy.reconnectSocket();
         proxy.getQueue(true);

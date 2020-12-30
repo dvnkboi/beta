@@ -314,7 +314,7 @@
             //     proxy.queueOpen = true;
             //     await proxy.getQueue(false);
             //   })();
-            }, 6000);
+            // }, 6000);
           });
 
           this.socket.on('preload', async () => {
@@ -328,7 +328,7 @@
             //     proxy.queueOpen = true;
             //     await proxy.getQueue(false);
             //   })();
-            }, 12000);
+            // }, 12000);
           });
 
           this.socket.on('safePreload', async () => {
@@ -342,7 +342,7 @@
             //     proxy.queueOpen = true;
             //     await proxy.getQueue(false);
             //   })();
-            }, 27000);
+            // }, 27000);
           });
 
           proxy.socket.on('connect_error', () => {

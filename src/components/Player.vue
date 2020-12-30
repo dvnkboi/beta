@@ -1,12 +1,12 @@
 <template>
   <div class="w-full flex justify-center items-center space-y-10 flex-col xl:flex-row xl:h-full pt-16 pb-16 xl:space-x-10 xl:space-y-0">
     <connectivity class="z-20" :show="!connected" />
-    <MainCard class="z-10" ref="mainCard" @reloadStream="getQueue(true)" @failed="getQueue(true)" @loading="loading = true" @loaded="loading = false" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].cover" :changed="queue[0].changed" />
+    <MainCard class="z-10" ref="mainCard" @reloadStream="getQueue(true)" @failed="getQueue(true)" @loading="audioLoading = true" @loaded="audioLoading = false" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].cover" :changed="queue[0].changed" />
     <Card class="z-10" @failed="getQueue(true)" :title="queue[1].title" :artist="queue[1].artist" :cover="queue[1].cover" :minutes="queue[1].minutes" :changed="queue[1].changed" />
     <Card class="z-10" @failed="getQueue(true)" :title="queue[2].title" :artist="queue[2].artist" :cover="queue[2].cover" :minutes="queue[2].minutes" :changed="queue[2].changed" />
     <Card class="z-10" @failed="getQueue(true)" :title="queue[3].title" :artist="queue[3].artist" :cover="queue[3].cover" :minutes="queue[3].minutes" :changed="queue[3].changed" />
     <SongBg class="z-0 -left-10 overflow-hidden" :changed="queue[0].changed" :percent="currentSongTimer.percent" />
-    <Loading class="z-20" :show="loading" />
+    <Loading class="z-20" :show="audioLoading || metaLoading" />
   </div>
 </template>
 
@@ -33,19 +33,25 @@
         queueOpen: true,
         connected: true,
         audioLatency: ((943718 * 8) / 256000) * 1000,
-        loading: false,
+        audioLoading: false,
+        metaLoading:false,
         previousTitle: null,
         songChangeTimer: null,
         currentSongTimer: {
           timer: new AdjustingInterval(
             () => {
-              if (Date.now() - new Date(this.res.response.history[0].date_played).getTime() - this.audioLatency < 0) {
-                this.currentSongTimer.index = 1;
-              } else {
-                this.currentSongTimer.index = 0;
+              try{
+                if (Date.now() - new Date(this.res.response.history[0].date_played).getTime() - this.audioLatency < 0) {
+                  this.currentSongTimer.index = 1;
+                } else {
+                  this.currentSongTimer.index = 0;
+                }
+                this.currentSongTimer.time = (Date.now() - new Date(this.res.response.history[this.currentSongTimer.index].date_played).getTime() - this.audioLatency - 1000) / 1000;
+                this.currentSongTimer.percent = this.currentSongTimer.time / this.res.response.history[this.currentSongTimer.index].duration;
               }
-              this.currentSongTimer.time = (Date.now() - new Date(this.res.response.history[this.currentSongTimer.index].date_played).getTime() - this.audioLatency - 1000) / 1000;
-              this.currentSongTimer.percent = this.currentSongTimer.time / this.res.response.history[this.currentSongTimer.index].duration;
+              // eslint-disable-next-line no-empty
+              catch(e){
+              }
             },
             1000,
             () => this.currentSongTimer.init()
@@ -167,7 +173,7 @@
           this.queueOpen = false;
           console.log('get queue');
 
-          // eslint-disable-next-line no-unused-vars
+          let loadingTimer = setTimeout(() => this.metaLoading = true,3000);
           this.res = await this.Promise.retry(3, this.getHistory, 1000).catch((e) => console.log(e.message));
           this.art = this.lodashGet(await this.Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message)), 'response');
 
@@ -198,6 +204,8 @@
             setTimeout(this.getQueue, playDate, true);
           }
 
+          clearTimeout(loadingTimer);
+          this.metaLoading = false;
           console.log('finished getting art');
 
           this.setComponentInfo(immediate);

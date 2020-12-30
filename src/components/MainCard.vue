@@ -1,5 +1,5 @@
 <template>
-  <div class="mainCard bg-black-dark flex w-full xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300">
+  <div class="mainCard bg-black-dark bg-opacity-95 flex w-full xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300">
     <div class="flex flex-col justify-start items-start mt-4 flex-auto w-full">
       <div class="h-64 w-64 xl:w-96 xl:h-96 relative mx-8">
         <transition name="fade-up" appear>

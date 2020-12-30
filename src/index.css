@@ -143,3 +143,37 @@ how to remove the virtical space around the range input in IE*/
     /*Edge starts the margin from the thumb, not the track as other browsers do*/
   }
 }
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+::-webkit-scrollbar-button {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+  border: 0px none #ffffff;
+  border-radius: 50px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #5e5e5e;
+}
+::-webkit-scrollbar-thumb:active {
+  background: #6b6b6b;
+}
+::-webkit-scrollbar-track {
+  background: #2b2b2b;
+  border: 0px none #ffffff;
+  border-radius: 50px;
+}
+::-webkit-scrollbar-track:hover {
+  background: #2e2e2e;
+}
+::-webkit-scrollbar-track:active {
+  background: #2e2e2e;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}

@@ -172,11 +172,10 @@
         if (this.queueOpen && this.connected) {
           this.queueOpen = false;
           console.log('get queue');
-
-          let loadingTimer = setTimeout(() => this.metaLoading = true,3000);
+          let loadTime = performance.now();
+          let loadingTimer = setTimeout(() => this.metaLoading = true,5000);
           this.res = await this.Promise.retry(3, this.getHistory, 1000).catch((e) => console.log(e.message));
           this.art = this.lodashGet(await this.Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message)), 'response');
-
           if (!this.currentSongTimer.timer.running) this.currentSongTimer.init();
 
           if (!this.art || !this.res || this.art.length < 1 || this.res.length < 1) {
@@ -190,6 +189,7 @@
                 }, 1000);
                 return;
               } else {
+                this.metaLoading = false;
                 this.connected = false;
                 return;
               }
@@ -206,7 +206,8 @@
 
           clearTimeout(loadingTimer);
           this.metaLoading = false;
-          console.log('finished getting art');
+          loadTime = performance.now() - loadTime;
+          console.log('finished getting meta in',loadTime);
 
           this.setComponentInfo(immediate);
 
@@ -256,7 +257,7 @@
             } catch (e) {
               console.log('empty meta objects');
             }
-          }, immediate || this.audioLatency);
+          }, immediate || this.audioLatency );
         } catch (e) {
           console.log(e.message);
         }

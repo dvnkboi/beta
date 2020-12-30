@@ -296,54 +296,52 @@
 
           this.socket.on('songChanged', async () => {
             console.log('load them songs rn');
-
-            proxy.queueOpen = true;
-            if (proxy.songChangeTimer) {
-              clearTimeout(proxy.songChangeTimer);
-              proxy.songChangeTimer = null;
-            }
+            // if (proxy.songChangeTimer) {
+            //   clearTimeout(proxy.songChangeTimer);
+            //   proxy.songChangeTimer = null;
+            // }
             await proxy.getQueue(false);
           });
 
           this.socket.on('unsafePreload', async () => {
             console.log('preloading for consistancy');
-            if (proxy.songChangeTimer) {
-              clearTimeout(proxy.songChangeTimer);
-              proxy.songChangeTimer = null;
-            }
-            proxy.songChangeTimer = setTimeout(() => {
-              (async () => {
-                proxy.queueOpen = true;
-                await proxy.getQueue(false);
-              })();
+            // if (proxy.songChangeTimer) {
+            //   clearTimeout(proxy.songChangeTimer);
+            //   proxy.songChangeTimer = null;
+            // }
+            // proxy.songChangeTimer = setTimeout(() => {
+            //   (async () => {
+            //     proxy.queueOpen = true;
+            //     await proxy.getQueue(false);
+            //   })();
             }, 6000);
           });
 
           this.socket.on('preload', async () => {
             console.log('preloading');
-            if (proxy.songChangeTimer) {
-              clearTimeout(proxy.songChangeTimer);
-              proxy.songChangeTimer = null;
-            }
-            proxy.songChangeTimer = setTimeout(() => {
-              (async () => {
-                proxy.queueOpen = true;
-                await proxy.getQueue(false);
-              })();
+            // if (proxy.songChangeTimer) {
+            //   clearTimeout(proxy.songChangeTimer);
+            //   proxy.songChangeTimer = null;
+            // }
+            // proxy.songChangeTimer = setTimeout(() => {
+            //   (async () => {
+            //     proxy.queueOpen = true;
+            //     await proxy.getQueue(false);
+            //   })();
             }, 12000);
           });
 
           this.socket.on('safePreload', async () => {
             console.log('preloading safely');
-            if (proxy.songChangeTimer) {
-              clearTimeout(proxy.songChangeTimer);
-              proxy.songChangeTimer = null;
-            }
-            proxy.songChangeTimer = setTimeout(() => {
-              (async () => {
-                proxy.queueOpen = true;
-                await proxy.getQueue(false);
-              })();
+            // if (proxy.songChangeTimer) {
+            //   clearTimeout(proxy.songChangeTimer);
+            //   proxy.songChangeTimer = null;
+            // }
+            // proxy.songChangeTimer = setTimeout(() => {
+            //   (async () => {
+            //     proxy.queueOpen = true;
+            //     await proxy.getQueue(false);
+            //   })();
             }, 27000);
           });
 

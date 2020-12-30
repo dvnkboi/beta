@@ -20,9 +20,9 @@
     data() {
       return {
         oof: 'wuw',
-        queueUrl: `https://api.ampupradio.com:3000/v2?apikey=${process.env.VUE_APP_API_KEY}&action=get_queue`,
-        artUrl: `https://api.ampupradio.com:3000/v2?apikey=${process.env.VUE_APP_API_KEY}&action=get_art`,
-        nextArtUrl: `https://api.ampupradio.com:3000/v2?apikey=${process.env.VUE_APP_API_KEY}&action=get_next_art`,
+        queueUrl: `https://api.ampupradio.com:3000/v2?action=get_queue`,
+        artUrl: `https://api.ampupradio.com:3000/v2?action=get_art`,
+        nextArtUrl: `https://api.ampupradio.com:3000/v2?action=get_next_art`,
         covers: 4,
         queue: [],
         art: [],

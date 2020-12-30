@@ -1,23 +1,23 @@
 <template>
-  <div class="mainCard h-120 w-100 bg-black rounded-3xl flex flex-col justify-between items-center shadow-2xl p-3 flex-none transition duration-300">
-    <div class="flex flex-col justify-center items-center">
-      <div class="h-64 w-64 relative mt-2">
+  <div class="mainCard bg-black-dark flex w-full xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300">
+    <div class="flex flex-col justify-start items-start mt-4 flex-auto w-full">
+      <div class="h-64 w-64 xl:w-96 xl:h-96 relative mx-8">
         <transition name="fade-up" appear>
-          <img :key="Date.now()" ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover rounded-4xl ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute" alt="" />
+          <img :key="Date.now()" ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute" alt="" />
         </transition>
         <transition name="fade-up" appear>
-          <div :key="Date.now() - 9999" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad rounded-4xl ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute"></div>
+          <div :key="Date.now() - 9999" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute"></div>
         </transition>
       </div>
       <transition name="fade-up" appear>
-        <h1 :key="'mainTitle'" v-show="showTitle" class="font-sans text-gray-300 text-3xl pt-1 font-bold truncate w-80 text-center capitalize transition duration-300">{{ updatedTitle }}</h1>
+        <h1 :key="'mainTitle'" v-show="showTitle" class="font-sans px-7 text-gray-300 text-6xl xl:text-8xl pt-1 font-bold w-full text-left capitalize transition-all duration-300">{{ updatedTitle }}</h1>
       </transition>
       <transition name="fade-up" appear>
-        <h2 :key="'mainArtist'" v-show="showArtist" class="font-sans text-gray-400 text-xl truncate w-40 text-center capitalize transition duration-300">{{ updatedArtist }}</h2>
+        <h2 :key="'mainArtist'" v-show="showArtist" class="font-sans px-7 mt-3 flex-auto text-gray-400 text-4xl xl:text-6xl w-full text-left capitalize transition transition-all duration-300">{{ updatedArtist }}</h2>
       </transition>
-      <h2 class="font-sans text-gray-400 text-base mt-2">{{ playTime || '00:00:00' }}</h2>
+      <h2 class="font-sans text-gray-400 text-2xl mt-2 w-full text-center">{{ playTime || '00:00:00' }}</h2>
     </div>
-    <div class="h-16 w-full flex justify-between items-center">
+    <div class="h-24 w-full px-3 flex justify-between items-center">
       <div @click="playing = !playing" class="cursor-pointer flex justify-center items-center h-full w-16 flex-none">
         <div v-if="!playing">
           <box-icon name="play" size="cssSize" class="w-16 h-16 fill-current stroke-current text-gray-300" v-pre></box-icon>

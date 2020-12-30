@@ -2,6 +2,13 @@ module.exports = {
   purge: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   darkMode: false, // or 'media' or 'class'
   theme: {
+    aspectRatio: { // defaults to {}
+      'none': 0,
+      'square': [1, 1], // or 1 / 1, or simply 1
+      '16/9': [16, 9],  // or 16 / 9
+      '4/3': [4, 3],    // or 4 / 3
+      '21/9': [21, 9],  // or 21 / 9
+    },
     boxShadow: {
       sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
       DEFAULT: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
@@ -46,7 +53,10 @@ module.exports = {
     },
   },
   variants: {
+    aspectRatio: ['responsive'], // defaults to ['responsive']
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('tailwindcss-aspect-ratio'),
+  ],
 }

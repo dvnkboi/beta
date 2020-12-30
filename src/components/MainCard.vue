@@ -9,12 +9,12 @@
           <div :key="Date.now() - 9999" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute"></div>
         </transition>
       </div>
-      <div class="px-7 w-full">
+      <div class="px-7 w-full flex-auto">
         <transition name="fade-up" appear>
           <h1 :key="'mainTitle'" v-show="showTitle" class="font-sans break-words text-gray-300 text-6xl xl:text-8xl pt-1 font-bold w-full text-left capitalize transition-all duration-300">{{ updatedTitle }}</h1>
         </transition>
         <transition name="fade-up" appear>
-          <h2 :key="'mainArtist'" v-show="showArtist" class="font-sans break-words mt-3 flex-auto text-gray-400 text-4xl xl:text-6xl w-full text-left capitalize transition-all duration-300">{{ updatedArtist }}</h2>
+          <h2 :key="'mainArtist'" v-show="showArtist" class="font-sans break-words mt-3 text-gray-400 text-4xl xl:text-6xl w-full text-left capitalize transition-all duration-300">{{ updatedArtist }}</h2>
         </transition>
       </div>
 

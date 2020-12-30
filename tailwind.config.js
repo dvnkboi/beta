@@ -25,6 +25,9 @@ module.exports = {
       full: '9999px',
     },
     extend: {
+      transitionDuration:{
+        2000: '2000ms'
+      },
       height: {
         '100': '365px',
         '120': '450px'

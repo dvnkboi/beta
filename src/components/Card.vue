@@ -33,7 +33,7 @@
         updatedArtist: null,
         updatedMin: null,
         updatedCover: null,
-        key:Date.now()
+        key: Date.now(),
       };
     },
     methods: {
@@ -73,7 +73,7 @@
           this.updatedMin = this.minutes;
           this.showMin = true;
         }
-      }
+      },
     },
     mounted() {},
     beforeUnmount() {},

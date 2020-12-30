@@ -5,8 +5,8 @@
     <Card class="z-10" @failed="getQueue(true)" :title="queue[1].title" :artist="queue[1].artist" :cover="queue[1].cover" :minutes="queue[1].minutes" :changed="queue[1].changed" />
     <Card class="z-10" @failed="getQueue(true)" :title="queue[2].title" :artist="queue[2].artist" :cover="queue[2].cover" :minutes="queue[2].minutes" :changed="queue[2].changed" />
     <Card class="z-10" @failed="getQueue(true)" :title="queue[3].title" :artist="queue[3].artist" :cover="queue[3].cover" :minutes="queue[3].minutes" :changed="queue[3].changed" />
-    <SongBg class="z-0 -left-10 overflow-hidden" :changed="queue[0].changed" :percent="currentSongTimer.percent"/>
-    <Loading class="z-20" :show="loading"/>
+    <SongBg class="z-0 -left-10 overflow-hidden" :changed="queue[0].changed" :percent="currentSongTimer.percent" />
+    <Loading class="z-20" :show="loading" />
   </div>
 </template>
 
@@ -15,7 +15,7 @@
   import Card from './Card';
   import Connectivity from './connectivity';
   import Loading from './loading';
-  import SongBg from './background'
+  import SongBg from './background';
   import { AdjustingInterval } from '../utils';
 
   export default {
@@ -32,28 +32,31 @@
         pongOpen: true,
         queueOpen: true,
         connected: true,
-        audioLatency: (943718 * 8 / 256000) * 1000,
+        audioLatency: ((943718 * 8) / 256000) * 1000,
         loading: false,
         previousTitle: null,
         songChangeTimer: null,
-        currentSongTimer:{
-          timer: new AdjustingInterval(() => {
-            if(Date.now() - new Date(this.res.response.history[0].date_played).getTime() - this.audioLatency < 0){
-              this.currentSongTimer.index = 1;
-            }
-            else{
-              this.currentSongTimer.index = 0;
-            }
-            this.currentSongTimer.time = (Date.now() - new Date(this.res.response.history[this.currentSongTimer.index].date_played).getTime() - this.audioLatency - 1000) / 1000;
-            this.currentSongTimer.percent =  (this.currentSongTimer.time / this.res.response.history[this.currentSongTimer.index].duration);
-          },1000,() => this.currentSongTimer.init()),
+        currentSongTimer: {
+          timer: new AdjustingInterval(
+            () => {
+              if (Date.now() - new Date(this.res.response.history[0].date_played).getTime() - this.audioLatency < 0) {
+                this.currentSongTimer.index = 1;
+              } else {
+                this.currentSongTimer.index = 0;
+              }
+              this.currentSongTimer.time = (Date.now() - new Date(this.res.response.history[this.currentSongTimer.index].date_played).getTime() - this.audioLatency - 1000) / 1000;
+              this.currentSongTimer.percent = this.currentSongTimer.time / this.res.response.history[this.currentSongTimer.index].duration;
+            },
+            1000,
+            () => this.currentSongTimer.init()
+          ),
           time: null,
-          index:0,
-          percent:0,
-          init : () => {
-            if(this.currentSongTimer.timer.running) this.currentSongTimer.timer.stop();
+          index: 0,
+          percent: 0,
+          init: () => {
+            if (this.currentSongTimer.timer.running) this.currentSongTimer.timer.stop();
             this.currentSongTimer.timer.start();
-          }
+          },
         },
         socket: null,
         previousID: {
@@ -66,7 +69,7 @@
         axios: null,
         lodashGet: null,
         io: null,
-      }
+      };
     },
     methods: {
       async queueReqStack() {
@@ -163,12 +166,13 @@
         if (this.queueOpen && this.connected) {
           this.queueOpen = false;
           console.log('get queue');
+
           // eslint-disable-next-line no-unused-vars
           this.res = await this.Promise.retry(3, this.getHistory, 1000).catch((e) => console.log(e.message));
           this.art = this.lodashGet(await this.Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message)), 'response');
 
-          if(!this.currentSongTimer.timer.running) this.currentSongTimer.init();
-          
+          if (!this.currentSongTimer.timer.running) this.currentSongTimer.init();
+
           if (!this.art || !this.res || this.art.length < 1 || this.res.length < 1) {
             console.log('failed');
             this.queueOpen = true;
@@ -186,12 +190,12 @@
             }
           }
 
-          if(Date.now() - new Date(this.res.response.history[0].date_played).getTime() < this.audioLatency && this.previousID.value == 1){
+          if (Date.now() - new Date(this.res.response.history[0].date_played).getTime() < this.audioLatency && this.previousID.value == 1) {
             let playDate = this.audioLatency - Date.now() + new Date(this.res.response.history[0].date_played).getTime();
-            console.log('first load',playDate);
-            this.art.splice(0,1);
-            this.res.response.next = this.res.response.history.splice(0,1);
-            setTimeout(this.getQueue,playDate,true);
+            console.log('first load', playDate);
+            this.art.splice(0, 1);
+            this.res.response.next = this.res.response.history.splice(0, 1);
+            setTimeout(this.getQueue, playDate, true);
           }
 
           console.log('finished getting art');
@@ -244,7 +248,7 @@
             } catch (e) {
               console.log('empty meta objects');
             }
-          }, immediate || this.audioLatency );
+          }, immediate || this.audioLatency);
         } catch (e) {
           console.log(e.message);
         }
@@ -368,9 +372,9 @@
         this.connected = navigator.connection.downlink > 0.5 || window.navigator.onLine;
         proxy.downlink = navigator.connection.downlink ? navigator.connection.downlink : null;
         proxy.previousID = {
-          index:0,
-          value:1
-        }
+          index: 0,
+          value: 1,
+        };
         proxy.emptyQueue();
         proxy.reconnectSocket();
         proxy.getQueue(true);
@@ -402,7 +406,7 @@
       Card,
       Connectivity,
       Loading,
-      SongBg
+      SongBg,
     },
   };
 </script>

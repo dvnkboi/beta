@@ -70,9 +70,9 @@
         value: 1,
         hasInitialised: false,
         playTimer: null,
-        AdjustingInterval:null,
-        Howl:null,
-        Howler:null
+        AdjustingInterval: null,
+        Howl: null,
+        Howler: null,
       };
     },
     methods: {
@@ -153,17 +153,17 @@
       resetTime() {
         this.playTimer.stop();
       },
-      async requireStack(){
-        if(!this.Howl || !this.Howler){
+      async requireStack() {
+        if (!this.Howl || !this.Howler) {
           this.Howl = await import(/* webpackChunkName: "Howler" */ 'howler');
           this.Howler = this.Howl.Howler;
           this.Howl = this.Howl.Howl;
         }
-        if(!this.AdjustingInterval){
+        if (!this.AdjustingInterval) {
           this.AdjustingInterval = await import(/* webpackChunkName: "utils" */ '../utils.js');
           this.AdjustingInterval = this.AdjustingInterval.AdjustingInterval;
         }
-      }
+      },
     },
     watch: {
       value: function() {
@@ -242,8 +242,7 @@
         return hours + ':' + minutes + ':' + seconds;
       };
     },
-    beforeMount(){
-    },
+    beforeMount() {},
     mounted() {},
     beforeUnmount() {
       this.audio.unload();

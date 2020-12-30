@@ -4,37 +4,34 @@
   </transition>
 </template>
 
-
 <script>
   export default {
     name: 'Connectivity',
-    data(){
-      return{
-        shown:false,
-        showTimer:null
-      }
+    data() {
+      return {
+        shown: false,
+        showTimer: null,
+      };
     },
-    props:{
-        show: Boolean,
+    props: {
+      show: Boolean,
     },
-    watch:{
-      show: function(){
+    watch: {
+      show: function() {
         let proxy = this;
-        if(this.show){
+        if (this.show) {
           this.shown = true;
-          if(this.showTimer){
+          if (this.showTimer) {
             clearTimeout(this.showTimer);
             this.showTimer = null;
           }
           this.showTimer = setTimeout(() => {
-            proxy.shown= false;
-          },15000);
-        }
-        else{
+            proxy.shown = false;
+          }, 15000);
+        } else {
           this.shown = false;
         }
-        
-      }
-    }
+      },
+    },
   };
 </script>

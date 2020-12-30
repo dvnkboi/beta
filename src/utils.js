@@ -13,13 +13,13 @@ function AdjustingInterval(workFunc, interval, errorFunc) {
     this.interval = interval;
     this.running = false;
 
-    this.start = function() {
+    this.start = function () {
         expected = Date.now() + this.interval;
         timeout = setTimeout(step, this.interval);
         this.running = true;
     }
 
-    this.stop = function() {
+    this.stop = function () {
         clearTimeout(timeout);
         this.running = false;
     }
@@ -32,7 +32,7 @@ function AdjustingInterval(workFunc, interval, errorFunc) {
         }
         workFunc();
         expected += that.interval;
-        timeout = setTimeout(step, Math.max(0, that.interval-drift));
+        timeout = setTimeout(step, Math.max(0, that.interval - drift));
     }
 }
 

@@ -116,7 +116,7 @@
         require('dotenv').config();
 
         if (!this.lodashGet) {
-          this.lodashGet = await import(/* webpackChunkName: "lodashGet" */ 'lodash.get');
+          this.lodashGet = await import(/* webpackChunkName: "lodash-get" */ 'lodash.get');
           this.lodashGet = this.lodashGet.default;
         }
 

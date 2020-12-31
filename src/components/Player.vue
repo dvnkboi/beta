@@ -29,7 +29,7 @@
         queueUrl: `https://api.ampupradio.com:3000/v2?action=get_queue`,
         artUrl: `https://api.ampupradio.com:3000/v2?action=get_art`,
         nextArtUrl: `https://api.ampupradio.com:3000/v2?action=get_next_art`,
-        covers: 8,
+        covers: 10,
         queue: [
           {
             changed: true,
@@ -236,9 +236,10 @@
           }, 3000);
         }
       },
-      setComponentInfo(immediate) {
+      setComponentInfo(immediate,noCheckDup,startIndex) {
         try {
-          if (this.previousID.value == this.lodashGet(this.art[this.previousID.index][0], '_id')) {
+          startIndex = startIndex > 0 ? startIndex : 0;
+          if (this.previousID.value == this.lodashGet(this.art[this.previousID.index][0], '_id') && !noCheckDup) {
             console.log('break lol');
             setTimeout(() => {
               this.queueOpen = true;
@@ -255,7 +256,7 @@
           }
           setTimeout(() => {
             try {
-              for (var i = 0; i < this.covers; i++) {
+              for (var i = startIndex; i < this.covers; i++) {
                 console.log('components', i);
                 this.queue[i].id = this.uuid.v4();
                 this.queue[i].changed = !this.queue[i].changed;
@@ -379,9 +380,13 @@
       },
       emptyQueue() {
         this.queue = [];
-        for (var i = 0; i < this.covers; i++) {
-          this.queue.push({});
-        }
+        for (var i = 0; i < this.covers; i++) this.queue.push({});
+      },
+      fillQueue(){
+        let queueLength = this.queue.length;
+        for(var i = 0; i < this.covers - this.queue.length;i++) this.queue.push({});
+        this.covers = 10;
+        this.setComponentInfo(true,true,queueLength);
       },
     },
     async beforeCreate() {},

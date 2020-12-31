@@ -16,7 +16,7 @@
         <h2 v-show="showArtist" class="font-sans text-gray-400 w-32 xxs:w-44 xs:w-full truncate text-sm sm:text-2xl md:text-3xl lg:text-3xl capitalize transition-all duration-300">{{ updatedArtist }}</h2>
       </transition>
       <transition name="fade-up" appear>
-        <h2 v-show="showMin" class="font-sans text-gray-400 text-xxs md:text-xl absolute bottom-2 right-2 md:right-5 capitalize transition-all duration-300">{{ updatedMin >= 1 ? minutes + ' min ago' : 'just now' }}</h2>
+        <h2 v-show="showMin" class="font-sans text-gray-400 text-xxs md:text-xl absolute bottom-2 right-4 sm:right-2 md:right-5 capitalize transition-all duration-300">{{ updatedMin >= 1 ? minutes + ' min ago' : 'just now' }}</h2>
       </transition>
     </div>
   </div>

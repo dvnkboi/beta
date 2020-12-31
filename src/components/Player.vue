@@ -1,7 +1,7 @@
 <template>
   <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full">
     <connectivity class="z-20" :show="!connected" />
-    <MainCard class="z-10" ref="mainCard" @reloadStream="getQueue(true)" @failed="getQueue(true)" @loading="audioLoading = true" @loaded="audioLoading = false" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" />
+    <MainCard class="z-10" ref="mainCard" @failed="getQueue(true)" @loading="audioLoading = true" @loaded="audioLoading = false" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" />
     <div class="w-full overflow-auto xl:h-full">
       <!-- <div v-for="(val) in queue" :key="val.id" class="z-10 w-full" > {{`${val.artist} - ${val.title}`}}</div> -->
       <Card v-for="(val) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue(true)" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" />
@@ -221,7 +221,7 @@
             console.log('first load', playDate);
             this.art.splice(0, 1);
             this.res.response.next = this.res.response.history.splice(0, 1);
-            setTimeout(this.getQueue, playDate, true);
+            setTimeout(this.setComponentInfo, playDate, true);
           }
 
           clearTimeout(loadingTimer);

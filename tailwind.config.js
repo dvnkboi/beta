@@ -2,8 +2,29 @@ module.exports = {
   purge: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   darkMode: false, // or 'media' or 'class'
   theme: {
+    fontFamily: {
+      sans: [
+        'Atkinson',
+        'ui-sans-serif',
+        'system-ui',
+        '-apple-system',
+        'BlinkMacSystemFont',
+        '"Segoe UI"',
+      ],
+      serif: ['ui-serif', 'Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
+      mono: [
+        'ui-monospace',
+        'SFMono-Regular',
+        'Menlo',
+        'Monaco',
+        'Consolas',
+        '"Liberation Mono"',
+        '"Courier New"',
+        'monospace',
+      ],
+    },
     fontSize: {
-      'xxs':'.675rem',
+      'xxs': '.675rem',
       'xs': '.75rem',
       'sm': '.875rem',
       'tiny': '.875rem',
@@ -18,7 +39,7 @@ module.exports = {
       '7xl': '5rem',
     },
     screens: {
-      'xxs':'367px',
+      'xxs': '367px',
       'xs': '420px',
       'sm': '640px',
       'md': '768px',
@@ -78,8 +99,7 @@ module.exports = {
   },
   variants: {
     aspectRatio: ['responsive'], // defaults to ['responsive']
-    extend: {
-    },
+    extend: {},
   },
   plugins: [
     require('tailwindcss-aspect-ratio'),

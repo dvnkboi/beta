@@ -100,7 +100,9 @@
         this.audio.once('load', function() {
           proxy.$emit('loaded');
           proxy.loadingTime = (performance.now() - proxy.loadingTime) / 1000;
-          proxy.audio.seek(proxy.loadingTime);
+          if(proxy.loadingTime < 4){
+            proxy.audio.seek(proxy.loadingTime);
+          }
           console.log('audio loaded in', proxy.loadingTime);
           proxy.audio.play();
           proxy.audio.fade(0, 1, 500);

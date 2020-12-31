@@ -2,6 +2,29 @@ module.exports = {
   purge: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   darkMode: false, // or 'media' or 'class'
   theme: {
+    fontSize: {
+      'xxs':'.675rem',
+      'xs': '.75rem',
+      'sm': '.875rem',
+      'tiny': '.875rem',
+      'base': '1rem',
+      'lg': '1.125rem',
+      'xl': '1.25rem',
+      '2xl': '1.5rem',
+      '3xl': '1.875rem',
+      '4xl': '2.25rem',
+      '5xl': '3rem',
+      '6xl': '4rem',
+      '7xl': '5rem',
+    },
+    screens: {
+      'xs': '420px',
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1536px',
+    },
     aspectRatio: { // defaults to {}
       'none': 0,
       'square': [1, 1], // or 1 / 1, or simply 1
@@ -32,7 +55,7 @@ module.exports = {
       full: '9999px',
     },
     extend: {
-      transitionDuration:{
+      transitionDuration: {
         2000: '2000ms'
       },
       height: {
@@ -43,8 +66,8 @@ module.exports = {
         '100': '365px',
         '120': '450px'
       },
-      colors:{
-        black :{
+      colors: {
+        black: {
           dark: '#1b1b1b',
           DEFAULT: '#2b2b2b',
           light: '#303030',
@@ -54,7 +77,8 @@ module.exports = {
   },
   variants: {
     aspectRatio: ['responsive'], // defaults to ['responsive']
-    extend: {},
+    extend: {
+    },
   },
   plugins: [
     require('tailwindcss-aspect-ratio'),

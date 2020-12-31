@@ -20,6 +20,9 @@ body {
   background: #1b1b1b;
 }
 
+.click{
+  -webkit-tap-highlight-color: transparent;
+}
 /* .mainCard:hover,
 .card:hover,
 .loaderCont:hover,

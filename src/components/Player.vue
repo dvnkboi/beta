@@ -261,7 +261,7 @@
                 console.log('components', i);
                 this.queue[i].id = this.uuid.v4();
                 this.queue[i].changed = !this.queue[i].changed;
-                this.queue[i].title = this.res.response.history[i].title.split('(')[0];
+                this.queue[i].title = this.res.response.history[i].title;
                 this.queue[i].artist = this.res.response.history[i].artist;
                 this.queue[i].album = this.res.response.history[i].album;
                 this.queue[i].date = this.res.response.history[i].date_played;

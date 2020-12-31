@@ -8,7 +8,7 @@
         <div :key="Date.now() * Math.random()" v-show="!hasLoaded" class="box-border h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute"></div>
       </transition>
     </div>
-    <div class="col-span-3 flex justify-items-start items-start flex-auto flex-col space-y-2 p-3 h-full">
+    <div class="col-span-3 flex justify-items-start items-start flex-auto flex-col space-y-0 p-3 h-full">
       <transition name="fade-up" appear>
       <h1 v-show="showTitle" class="font-sans text-gray-300 w-52 xxs:w-64 xs:w-full truncate text-2xl sm:text-3xl md:text-5xl lg:text-5xl font-bold capitalize transition-all duration-300">{{ updatedTitle }}</h1>
       </transition>

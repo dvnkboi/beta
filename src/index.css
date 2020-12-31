@@ -31,19 +31,27 @@ body {
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 } */
 
+
+
 /* .card:hover,
 .loaderCont:hover,
 .connectivity:hover {
   transform: translateY(-4px);
 } */
 
-.artistImg:hover{
-  transform: translateY(-4px);
-}
-
 .fade-up-enter-from,
 .fade-up-leave-to {
   transform: translateY(-10px) !important;
+  opacity: 0 !important;
+}
+
+.fade-left-enter-from{
+  transform: translateX(-50px) !important;
+  opacity: 0 !important;
+}
+
+.fade-left-leave-to {
+  transform: translateX(50px) !important;
   opacity: 0 !important;
 }
 

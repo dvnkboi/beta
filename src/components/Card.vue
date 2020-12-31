@@ -10,7 +10,7 @@
     </div>
     <div class="col-span-3 flex justify-items-start items-start flex-auto flex-col py-3 px-3 md:px-6 h-full">
       <transition name="fade-up" appear>
-      <h1 v-show="showTitle" class="font-sans text-gray-300 w-52 xxs:w-64 xs:w-full truncate text-2xl sm:text-3xl md:text-5xl lg:text-5xl font-bold capitalize transition-all duration-300">{{ updatedTitle }}</h1>
+        <h1 v-show="showTitle" class="font-sans text-gray-300 w-52 xxs:w-64 xs:w-full truncate text-2xl sm:text-3xl md:text-5xl lg:text-5xl font-bold capitalize transition-all duration-300">{{ updatedTitle }}</h1>
       </transition>
       <transition name="fade-up" appear>
         <h2 v-show="showArtist" class="font-sans text-gray-400 md:-mt-2 w-32 xxs:w-44 xs:w-full truncate text-sm sm:text-2xl md:text-3xl lg:text-3xl capitalize transition-all duration-300">{{ updatedArtist }}</h2>

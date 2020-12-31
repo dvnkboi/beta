@@ -75,6 +75,10 @@
         AdjustingInterval: null,
         Howl: null,
         Howler: null,
+        navigator: navigator,
+        audioPos:0,
+        hasStopped:null,
+        hasDied:null,
       };
     },
     methods: {
@@ -95,7 +99,6 @@
         this.canPlay = false;
 
         this.loadingTime = performance.now();
-
         this.$emit('loading');
         this.audio.once('load', function() {
           proxy.$emit('loaded');
@@ -104,16 +107,22 @@
             proxy.audio.seek(proxy.loadingTime);
           }
           console.log('audio loaded in', proxy.loadingTime);
-          proxy.audio.play();
-          proxy.audio.fade(0, 1, 500);
+          if(proxy.playing){
+            proxy.audio.play();
+            proxy.audio.fade(0, 1, 500);
+          }
           proxy.canPlay = true;
         });
-        this.audio.once('play', function() {
+        this.audio.on('play', function() {
           proxy.updateTime();
         });
-        if (navigator && navigator.mediaSession) {
-          navigator.mediaSession.setActionHandler('play', () => (proxy.playing = !proxy.playing));
-          navigator.mediaSession.setActionHandler('pause', () => (proxy.playing = !proxy.playing));
+        
+        this.audio.onpos = function(pos){
+          console.log(pos);
+        };
+        if (this.navigator && this.navigator.mediaSession) {
+          this.navigator.mediaSession.setActionHandler('play', () => (proxy.playing = !proxy.playing));
+          this.navigator.mediaSession.setActionHandler('pause', () => (proxy.playing = !proxy.playing));
         }
       },
       async play() {
@@ -139,7 +148,7 @@
         if (!this.playTimer) {
           let proxy = this;
           proxy.playTimer = new this.AdjustingInterval(() => {
-            proxy.playSeconds++;
+            proxy.playSeconds = proxy.audio.seek();
             proxy.playTime = proxy.playSeconds.toString().toHHMMSS();
           }, 1000);
           proxy.playTimer.start();
@@ -165,6 +174,21 @@
       },
     },
     watch: {
+      playSeconds: function(){
+        if(this.playing){
+          console.log(this.playSeconds);
+          this.$emit('loaded');
+          clearTimeout(this.stopped);
+          this.stopped = null;
+          this.stopped = setTimeout(() => this.$emit('loading'),1000);
+          this.hasDied = setTimeout(() => {
+            this.$emit('reloadStream');
+            console.log('init audio');
+            this.initAudio();
+          },8000);
+        }
+
+      },
       value: function() {
         if (this.audio) {
           this.audio.fade(this.audio.volume(), this.value, 250);

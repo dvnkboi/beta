@@ -1,7 +1,7 @@
 <template>
   <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full">
     <connectivity class="z-20" :show="!connected" />
-    <MainCard class="z-10" ref="mainCard" @failed="getQueue(true)" @loading="audioLoading = true" @loaded="audioLoading = false" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" />
+    <MainCard class="z-10" ref="mainCard" @failed="getQueue(true)" @reloaded="loadLatency = $refs.mainCard.loadingTime" @loading="audioLoading = true" @loaded="audioLoading = false" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" />
     <div class="w-full overflow-auto xl:h-full">
       <!-- <div v-for="(val) in queue" :key="val.id" class="z-10 w-full" > {{`${val.artist} - ${val.title}`}}</div> -->
       <Card v-for="(val) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue(true)" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" />
@@ -47,6 +47,7 @@
         queueOpen: true,
         connected: true,
         audioLatency: ((943718 * 8) / 256000) * 1000,
+        loadLatency:0,
         audioLoading: false,
         metaLoading: false,
         previousTitle: null,
@@ -421,6 +422,8 @@
     },
     async mounted() {
       let proxy = this;
+      this.loadLatency = this.$refs.mainCard.loadingTime;
+      this.audioLatency = (((943718 * 8) / 256000) + this.loadLatency) * 1000;
       await this.queueReqStack();
       document.addEventListener('visibilitychange', async function() {
         if (!document.hidden) {

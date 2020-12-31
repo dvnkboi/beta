@@ -68,7 +68,7 @@ body {
   opacity: 0 !important;
 }
 
-.fade-left-leave-to {
+.fade-left-leave-to{
   transform: translateX(50px) !important;
   opacity: 0 !important;
 }

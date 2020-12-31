@@ -68,7 +68,6 @@
         pauseDate: null,
         loadingTime: 0,
         canPlay: false,
-        audioLoadingTimer: null,
         sliderShown: false,
         value: 1,
         hasInitialised: false,
@@ -95,21 +94,16 @@
         this.loadingTime = 0;
         this.canPlay = false;
 
-        if (this.audioLoadingTimer) {
-          this.audioLoadingTimer.stop();
-        }
-        this.audioLoadingTimer = new this.AdjustingInterval(() => {
-          this.loadingTime++;
-        }, 1000);
-        this.audioLoadingTimer.start();
+        this.loadingTime = performance.now();
 
         this.$emit('loading');
         this.audio.once('load', function() {
           proxy.$emit('loaded');
+          proxy.loadingTime = (performance.now() - proxy.loadingTime) / 1000;
+          proxy.audio.seek(proxy.loadingTime);
+          console.log('audio loaded in', proxy.loadingTime);
           proxy.audio.play();
           proxy.audio.fade(0, 1, 500);
-          proxy.audioLoadingTimer.stop();
-          proxy.loadingTime++;
           proxy.canPlay = true;
         });
         this.audio.once('play', function() {
@@ -123,7 +117,7 @@
       async play() {
         console.log('play');
         let pausedMs = this.pauseDate > 0 ? Date.now() - this.pauseDate : 0;
-        console.log(pausedMs);
+        console.log('paused for ',pausedMs);
         if (!this.audio || this.audio.state() == 'unloaded' || pausedMs > 60000) {
           await this.requireStack();
           this.$emit('reloadStream');

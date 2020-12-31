@@ -18,6 +18,7 @@ module.exports = {
       '7xl': '5rem',
     },
     screens: {
+      'xxs':'367px',
       'xs': '420px',
       'sm': '640px',
       'md': '768px',

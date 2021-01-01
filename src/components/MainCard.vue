@@ -175,7 +175,6 @@
     watch: {
       playSeconds: function(){
         if(this.playing){
-          console.log(this.playSeconds);
           this.$emit('loaded');
           clearTimeout(this.stopped);
           this.stopped = null;

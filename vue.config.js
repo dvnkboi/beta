@@ -21,10 +21,10 @@ module.exports = {
         chunks: "async",
         minSize: 10000,
         maxSize:30000,
-        minChunks: 1,
+        minChunks: 2,
         maxAsyncRequests: 5,
         maxInitialRequests: 3,
-        automaticNameMaxLength:8,
+        automaticNameMaxLength:5,
         hidePathInfo:true,
         automaticNameDelimiter:'-',
         cacheGroups: {
@@ -40,6 +40,7 @@ module.exports = {
           }
         }
       },
+      minimize: false,
       minimizer: [
         /* config.optimization.minimizer('terser') */
         new CssMinimizerPlugin(),
@@ -47,6 +48,7 @@ module.exports = {
           {
             terserOptions: {
               compress: {
+                ecma: 6,
                 arrows: true,
                 collapse_vars: true,
                 comparisons: true,
@@ -71,18 +73,16 @@ module.exports = {
                 dead_code: true,
                 evaluate: true
               },
-              mangle: {
-                safari10: true
-              }
-            },
-            sourceMap: true,
-            cache: true,
-            parallel: true,
-            extractComments: false
+              mangle: true,
+              sourceMap: true,
+              cache: true,
+              parallel: true,
+              extractComments: false
+            }
           }
         )
       ]
-    },
+    }
   }
 }
 

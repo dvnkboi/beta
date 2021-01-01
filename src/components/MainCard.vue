@@ -87,6 +87,7 @@
       },
       initAudio() {
         let proxy = this;
+        if(this.audio) this.audio.unload();
         this.audio = null;
         this.audio = new this.Howl({
           src: ['https://api.ampupradio.com:8443/TOP40.mp3?nocache=' + Date.now()],
@@ -107,8 +108,8 @@
             proxy.audio.seek(proxy.loadingTime);
           }
           console.log('audio loaded in', proxy.loadingTime);
+          proxy.audio.play();
           if(proxy.playing){
-            proxy.audio.play();
             proxy.audio.fade(0, 1, 500);
           }
           proxy.canPlay = true;
@@ -117,9 +118,7 @@
           proxy.updateTime();
         });
         
-        this.audio.onpos = function(pos){
-          console.log(pos);
-        };
+
         if (this.navigator && this.navigator.mediaSession) {
           this.navigator.mediaSession.setActionHandler('play', () => (proxy.playing = !proxy.playing));
           this.navigator.mediaSession.setActionHandler('pause', () => (proxy.playing = !proxy.playing));
@@ -181,13 +180,14 @@
           clearTimeout(this.stopped);
           this.stopped = null;
           this.stopped = setTimeout(() => this.$emit('loading'),1000);
+          clearTimeout(this.hasDied);
+          this.hasDied = null;
           this.hasDied = setTimeout(() => {
             this.$emit('reloadStream');
             console.log('init audio');
             this.initAudio();
           },8000);
         }
-
       },
       value: function() {
         if (this.audio) {
@@ -198,6 +198,11 @@
         if (!this.playing) {
           this.pause();
           this.resetTime();
+          this.$emit('loaded');
+          clearTimeout(this.stopped);
+          this.stopped = null;
+          clearTimeout(this.hasDied);
+          this.hasDied = null;
         } else {
           await this.play();
           if (this.audio.playing()) {

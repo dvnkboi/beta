@@ -8,7 +8,7 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 module.exports = {
   lintOnSave: process.env.NODE_ENV !== 'production',
   configureWebpack: {
-    mode: 'production',
+    mode: process.env.NODE_ENV == 'production' ? 'production' : 'development',
     loader: {
       test: /\.css(\?.*)?$/i,
       use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
@@ -40,7 +40,7 @@ module.exports = {
           }
         }
       },
-      minimize: false,
+      minimize: process.env.NODE_ENV == 'production',
       minimizer: [
         /* config.optimization.minimizer('terser') */
         new CssMinimizerPlugin(),

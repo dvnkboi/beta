@@ -1,13 +1,13 @@
 <template>
   <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full">
     <connectivity class="z-20" :show="!connected" />
-    <MainCard class="z-10" ref="mainCard" @failed="getQueue(true)" @reloaded="loadLatency = $refs.mainCard.loadingTime" @loading="audioLoading = true" @loaded="audioLoading = false" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" />
+    <MainCard class="z-10" ref="mainCard" @failed="getQueue()" @reloadStream="loadLatency = $refs.mainCard.loadingTime" @loading="audioLoading = true" @loaded="audioLoading = false" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" />
     <div class="w-full overflow-auto xl:h-full">
       <!-- <div v-for="(val) in queue" :key="val.id" class="z-10 w-full" > {{`${val.artist} - ${val.title}`}}</div> -->
-      <Card v-for="(val) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue(true)" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" />
-      <!-- <Card class="z-10 w-full" @failed="getQueue(true)" :title="queue[1].title" :artist="queue[1].artist" :cover="queue[1].cover" :minutes="queue[1].minutes" :changed="queue[1].changed" />
-      <Card class="z-10 w-full" @failed="getQueue(true)" :title="queue[2].title" :artist="queue[2].artist" :cover="queue[2].cover" :minutes="queue[2].minutes" :changed="queue[2].changed" />
-      <Card class="z-10 w-full" @failed="getQueue(true)" :title="queue[3].title" :artist="queue[3].artist" :cover="queue[3].cover" :minutes="queue[3].minutes" :changed="queue[3].changed" /> -->
+      <Card v-for="(val) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" />
+      <!-- <Card class="z-10 w-full" @failed="getQueue()" :title="queue[1].title" :artist="queue[1].artist" :cover="queue[1].cover" :minutes="queue[1].minutes" :changed="queue[1].changed" />
+      <Card class="z-10 w-full" @failed="getQueue()" :title="queue[2].title" :artist="queue[2].artist" :cover="queue[2].cover" :minutes="queue[2].minutes" :changed="queue[2].changed" />
+      <Card class="z-10 w-full" @failed="getQueue()" :title="queue[3].title" :artist="queue[3].artist" :cover="queue[3].cover" :minutes="queue[3].minutes" :changed="queue[3].changed" /> -->
     </div>
     <SongBg class="z-0 -left-10 overflow-hidden" :changed="queue[0].changed" :percent="currentSongTimer.percent" />
     <Loading class="z-20" :show="audioLoading || metaLoading" />
@@ -29,7 +29,7 @@
         queueUrl: `https://api.ampupradio.com:3000/v2?action=get_queue`,
         artUrl: `https://api.ampupradio.com:3000/v2?action=get_art`,
         nextArtUrl: `https://api.ampupradio.com:3000/v2?action=get_next_art`,
-        covers: 10,
+        covers: 11,
         queue: [
           {
             changed: true,
@@ -48,6 +48,7 @@
         connected: true,
         audioLatency: ((943718 * 8) / 256000) * 1000,
         loadLatency:0,
+        totalLatency:0,
         audioLoading: false,
         metaLoading: false,
         previousTitle: null,
@@ -56,24 +57,23 @@
           timer: new AdjustingInterval(
             () => {
               try {
-                if (Date.now() - new Date(this.res.response.history[0].date_played).getTime() - this.audioLatency < 0) {
-                  this.currentSongTimer.index = 1;
-                } else {
-                  this.currentSongTimer.index = 0;
-                }
-                this.currentSongTimer.time = (Date.now() - new Date(this.res.response.history[this.currentSongTimer.index].date_played).getTime() - this.audioLatency - 1000) / 1000;
+                this.currentSongTimer.time+=0.25;
                 this.currentSongTimer.percent = this.currentSongTimer.time / this.res.response.history[this.currentSongTimer.index].duration;
+                if(this.currentSongTimer.percent > 1){
+                  this.currentSongTimer.time = 0;
+                }
               } catch (e) {
                 // eslint-disable-next-line no-empty
               }
             },
-            1000,
+            250,
             () => this.currentSongTimer.init()
           ),
           time: null,
           index: 0,
           percent: 0,
           init: () => {
+            this.currentSongTimer.time = (Date.now() - new Date(this.res.response.history[this.currentSongTimer.index].date_played).getTime() - this.audioLatency - 1000) / 1000;
             if (this.currentSongTimer.timer.running) this.currentSongTimer.timer.stop();
             this.currentSongTimer.timer.start();
           },
@@ -189,7 +189,7 @@
             this.Promise.reject(null);
           });
       },
-      async getQueue(immediate) {
+      async getQueue() {
         if (this.queueOpen && this.connected) {
           this.queueOpen = false;
           console.log('get queue');
@@ -197,7 +197,7 @@
           let loadingTimer = setTimeout(() => (this.metaLoading = true), 5000);
           this.res = await this.Promise.retry(3, this.getHistory, 1000).catch((e) => console.log(e.message));
           this.art = this.lodashGet(await this.Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message)), 'response');
-          if (!this.currentSongTimer.timer.running) this.currentSongTimer.init();
+          this.currentSongTimer.init();
 
           if (!this.art || !this.res || this.art.length < 1 || this.res.length < 1) {
             console.log('failed');
@@ -206,7 +206,7 @@
               if (this.artTries < 3) {
                 this.artTries++;
                 setTimeout(() => {
-                  (async () => await this.getQueue(true))();
+                  (async () => await this.getQueue())();
                 }, 1000);
                 return;
               } else {
@@ -217,27 +217,27 @@
             }
           }
 
-          if (Date.now() - new Date(this.res.response.history[0].date_played).getTime() < this.audioLatency && this.previousID.value == 1) {
-            let playDate = this.audioLatency - Date.now() + new Date(this.res.response.history[0].date_played).getTime();
-            console.log('first load', playDate);
-            this.art.splice(0, 1);
-            this.res.response.next = this.res.response.history.splice(0, 1);
-            setTimeout(this.setComponentInfo, playDate, true);
-          }
+          // if (Date.now() - new Date(this.res.response.history[0].date_played).getTime() < this.totalLatency && this.previousID.value == 1) {
+          //   let playDate = this.totalLatency - Date.now() + new Date(this.res.response.history[0].date_played).getTime();
+          //   console.log('first load', playDate);
+          //   this.art.splice(0, 1);
+          //   this.res.response.next = this.res.response.history.splice(0, 1);
+          //   setTimeout(this.setComponentInfo, playDate, true);
+          // }
 
           clearTimeout(loadingTimer);
           this.metaLoading = false;
           loadTime = performance.now() - loadTime;
           console.log('finished getting meta in', loadTime);
 
-          this.setComponentInfo(immediate);
+          this.setComponentInfo();
 
           return setTimeout(() => {
             this.queueOpen = true;
           }, 3000);
         }
       },
-      setComponentInfo(immediate,noCheckDup,startIndex) {
+      setComponentInfo(noCheckDup,startIndex) {
         try {
           startIndex = startIndex > 0 ? startIndex : 0;
           if (this.previousID.value == this.lodashGet(this.art[this.previousID.index][0], '_id') && !noCheckDup) {
@@ -255,29 +255,51 @@
               if (this.previousID.value) break;
             }
           }
-          setTimeout(() => {
-            try {
-              for (var i = startIndex; i < this.covers; i++) {
-                console.log('components', i);
-                this.queue[i].id = this.uuid.v4();
-                this.queue[i].changed = !this.queue[i].changed;
-                this.queue[i].title = this.res.response.history[i].title;
-                this.queue[i].artist = this.res.response.history[i].artist;
-                this.queue[i].album = this.res.response.history[i].album;
-                this.queue[i].date = this.res.response.history[i].date_played;
+          try {
+            for (i = startIndex; i < this.covers; i++) {
+              this.queue[i].id = this.uuid.v4();
+              this.queue[i].changed = !this.queue[i].changed;
+              this.queue[i].title = this.res.response.history[i].title;
+              this.queue[i].artist = this.res.response.history[i].artist;
+              this.queue[i].album = this.res.response.history[i].album;
+              this.queue[i].date = this.res.response.history[i].date_played;
+              this.queue[i].minutes = Math.floor((new Date().getTime() - new Date(this.res.response.history[i].date_played).getTime()) / 60000);
 
-                this.queue[i].cover = (this.lodashGet(this.art[i][0], 'images[0].thumbnails.small') || this.lodashGet(this.art[i][0], 'images[0].thumbnails["250"]') || this.lodashGet(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png').replace('http://', 'https://');
-                this.queue[i].largeCover = (this.lodashGet(this.art[i][0], 'images[0].thumbnails.large') || this.lodashGet(this.art[i][0], 'images[0].thumbnails["500"]') || this.lodashGet(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png').replace('http://', 'https://');
-
-                this.queue[i].minutes = Math.floor((new Date().getTime() - new Date(this.res.response.history[i].date_played).getTime()) / 60000);
-              }
-              this.mediaSystemMeta();
-            } catch (e) {
-              console.log('empty meta objects');
+              this.queue[i].cover = (this.lodashGet(this.art[i][0], 'images[0].thumbnails.small') || this.lodashGet(this.art[i][0], 'images[0].thumbnails["250"]') || this.lodashGet(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png').replace('http://', 'https://');
+              this.queue[i].largeCover = (this.lodashGet(this.art[i][0], 'images[0].thumbnails.large') || this.lodashGet(this.art[i][0], 'images[0].thumbnails["500"]') || this.lodashGet(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png').replace('http://', 'https://');
+              this.preloadSuccess = false;
+              this.preloadRunning = false;
             }
-          }, immediate || this.audioLatency);
+            this.mediaSystemMeta();
+          } catch (e) {
+            console.log('empty meta objects');
+          }
         } catch (e) {
           console.log(e.message);
+        }
+      },
+      async preloadNext(){
+        let src = await this.getNextArt();
+        let preloadSrc = (this.lodashGet(src, 'response[0].images[0].thumbnails.small') || this.lodashGet(src, 'response[0].images[0].thumbnails["250"]') || this.lodashGet(src, 'response[0].images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png').replace('http://', 'https://');
+        let preloadImg = new Image();
+        if(src){
+          if(preloadSrc == this.queue[0].cover) {
+            this.preloadRunning = false;
+            this.preloadSuccess = true;
+          }
+          preloadImg.src = preloadSrc;
+          this.preloadSuccess = false;
+          this.preloadRunning = true;
+          preloadImg.onload = () => {
+            this.preloadSuccess = true;
+            this.preloadRunning = false;
+            console.log('loaded preload img')
+          };
+          preloadImg.onerror = () => {
+            this.preloadSuccess = false;
+            this.preloadRunning = false;
+            console.log('error loading preload img')
+          };
         }
       },
       async reconnectSocket() {
@@ -298,53 +320,28 @@
 
           this.socket.on('songChanged', async () => {
             console.log('load them songs rn');
-            // if (proxy.songChangeTimer) {
-            //   clearTimeout(proxy.songChangeTimer);
-            //   proxy.songChangeTimer = null;
-            // }
-            await proxy.getQueue(false);
+            await proxy.getQueue();
           });
 
           this.socket.on('unsafePreload', async () => {
             console.log('preloading for consistancy');
-            // if (proxy.songChangeTimer) {
-            //   clearTimeout(proxy.songChangeTimer);
-            //   proxy.songChangeTimer = null;
-            // }
-            // proxy.songChangeTimer = setTimeout(() => {
-            //   (async () => {
-            //     proxy.queueOpen = true;
-            //     await proxy.getQueue(false);
-            //   })();
-            // }, 6000);
+            if(!proxy.preloadRunning && !proxy.preloadSuccess){
+              proxy.preloadNext();
+            }
           });
 
           this.socket.on('preload', async () => {
             console.log('preloading');
-            // if (proxy.songChangeTimer) {
-            //   clearTimeout(proxy.songChangeTimer);
-            //   proxy.songChangeTimer = null;
-            // }
-            // proxy.songChangeTimer = setTimeout(() => {
-            //   (async () => {
-            //     proxy.queueOpen = true;
-            //     await proxy.getQueue(false);
-            //   })();
-            // }, 12000);
+            if(!proxy.preloadRunning && !proxy.preloadSuccess){
+              proxy.preloadNext();
+            }
           });
 
           this.socket.on('safePreload', async () => {
             console.log('preloading safely');
-            // if (proxy.songChangeTimer) {
-            //   clearTimeout(proxy.songChangeTimer);
-            //   proxy.songChangeTimer = null;
-            // }
-            // proxy.songChangeTimer = setTimeout(() => {
-            //   (async () => {
-            //     proxy.queueOpen = true;
-            //     await proxy.getQueue(false);
-            //   })();
-            // }, 27000);
+            if(!proxy.preloadRunning && !proxy.preloadSuccess){
+              proxy.preloadNext();
+            }
           });
 
           proxy.socket.on('connect_error', () => {
@@ -390,6 +387,17 @@
         this.setComponentInfo(true,true,queueLength);
       },
     },
+    watch:{
+      loadLatency: function(){
+        this.$nextTick(() => {
+          console.log({
+            totalLatency:this.totalLatency + 'ms',
+            serverLatency: this.audioLatency + 'ms',
+            loadLatency: this.loadLatency + 'ms',
+          });
+        });
+      }
+    },
     async beforeCreate() {},
     created() {
       let proxy = this;
@@ -406,7 +414,7 @@
         };
         proxy.emptyQueue();
         proxy.reconnectSocket();
-        proxy.getQueue(true);
+        proxy.getQueue();
       });
       window.addEventListener('offline', () => {
         this.$emit('offline');
@@ -422,15 +430,16 @@
     },
     async mounted() {
       let proxy = this;
-      this.loadLatency = this.$refs.mainCard.loadingTime;
-      this.audioLatency = (((943718 * 8) / 256000) + this.loadLatency) * 1000;
       await this.queueReqStack();
       document.addEventListener('visibilitychange', async function() {
         if (!document.hidden) {
-          await proxy.getQueue(true);
+          await proxy.getQueue();
         }
       });
-      await this.getQueue(true);
+      await this.getQueue();
+      await this.preloadNext();
+      this.preloadSuccess = false;
+      this.preloadRunning = false;
     },
     beforeUnmount() {},
     components: {

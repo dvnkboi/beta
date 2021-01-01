@@ -1,5 +1,5 @@
 <template>
-  <div class="mainCard bg-black-dark bg-opacity-95 flex w-full xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300">
+  <div class="mainCard bg-black-dark bg-opacity-90 flex w-full xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300">
     <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
       <div class="transform-gpu hover:-translate-y-2 h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300">
         <transition name="fade-up" appear>
@@ -103,11 +103,11 @@
         this.$emit('loading');
         this.audio.once('load', function() {
           proxy.$emit('loaded');
-          proxy.loadingTime = (performance.now() - proxy.loadingTime) / 1000;
+          proxy.loadingTime = performance.now() - proxy.loadingTime;
+          proxy.$emit('reloadStream');
           if(proxy.loadingTime < 4){
             proxy.audio.seek(proxy.loadingTime);
           }
-          console.log('audio loaded in', proxy.loadingTime);
           proxy.audio.play();
           if(proxy.playing){
             proxy.audio.fade(0, 1, 500);
@@ -125,20 +125,16 @@
         }
       },
       async play() {
-        console.log('play');
         let pausedMs = this.pauseDate > 0 ? Date.now() - this.pauseDate : 0;
-        console.log('paused for ',pausedMs);
+        console.log('paused for ',pausedMs / 1000,'s');
         if (!this.audio || this.audio.state() == 'unloaded' || pausedMs > 60000) {
           await this.requireStack();
-          this.$emit('reloadStream');
-          console.log('init audio');
           this.initAudio();
         } else {
           this.audio.fade(0, 1, 500);
         }
       },
       pause() {
-        console.log('pause');
         console.log(this.loadingTime);
         this.pauseDate = Date.now();
         this.audio.fade(1, 0, 100);
@@ -170,7 +166,7 @@
           this.AdjustingInterval = await import(/* webpackChunkName: "utils" */ '../utils.js');
           this.AdjustingInterval = this.AdjustingInterval.AdjustingInterval;
         }
-      },
+      }
     },
     watch: {
       playSeconds: function(){
@@ -181,11 +177,7 @@
           this.stopped = setTimeout(() => this.$emit('loading'),1000);
           clearTimeout(this.hasDied);
           this.hasDied = null;
-          this.hasDied = setTimeout(() => {
-            this.$emit('reloadStream');
-            console.log('init audio');
-            this.initAudio();
-          },8000);
+          this.hasDied = setTimeout(this.initAudio,8000);
         }
       },
       value: function() {
@@ -278,7 +270,6 @@
     directives: {
       loadedifcomplete: function(el, binding) {
         if (el.complete || el.naturalHeight > 0 || el.naturalWidth > 0) {
-          console.log('completed main', binding.instance.hasLoaded);
           binding.instance.loaded();
         }
       },

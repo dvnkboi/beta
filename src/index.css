@@ -57,6 +57,10 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+.background{
+  filter: blur(50px);
+}
+
 .fade-up-enter-from,
 .fade-up-leave-to {
   transform: translateY(-10px) !important;

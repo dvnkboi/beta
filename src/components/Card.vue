@@ -1,5 +1,5 @@
 <template>
-  <div :key="Date.now() * Math.random()" class="card flex-auto w-full bg-black bg-opacity-95 relative grid grid-cols-4 grid-rows-1 overflow-hidden transition duration-300 border-b border-gray-600">
+  <div :key="Date.now() * Math.random()" class="card flex-auto w-full bg-black bg-opacity-90 relative grid grid-cols-4 grid-rows-1 overflow-hidden transition duration-300 border-b border-gray-600">
     <div class="col-span-1 aspect-ratio-square overflow-hidden relative">
       <transition name="fade-up" appear>
         <img :key="Date.now() * Math.random()" ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="h-full w-full object-cover bg-cover ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute" alt="" />
@@ -91,7 +91,6 @@
     directives: {
       loadedifcomplete: function(el, binding) {
         if (el.complete) {
-          console.log('completed', binding.instance.hasLoaded);
           binding.instance.loaded();
         }
       },

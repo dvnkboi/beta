@@ -75,7 +75,7 @@
           this.updatedMin = this.minutes;
           this.showMin = true;
         }
-      }
+      },
     },
     mounted() {
       this.updatedCover = this.cover;
@@ -84,7 +84,7 @@
       this.updatedMin = this.minutes;
       this.showTitle = this.showArtist = this.showMin = true;
     },
-    updated(){
+    updated() {
       this.$forceUpdate;
     },
     beforeUnmount() {},

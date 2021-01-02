@@ -22,20 +22,17 @@
   font-family: 'Atkinson';
   src: url(./assets/fonts/Atkinson-Hyperlegible-Bold-102a.woff2) format('woff2');
   font-weight: bold;
-  font-style: normal; 
+  font-style: normal;
 }
 
 @font-face {
   font-family: 'Atkinson';
   src: url(./assets/fonts/Atkinson-Hyperlegible-BoldItalic-102a.woff2) format('woff2');
   font-weight: bold;
-  font-style: italic; 
-}  
-
+  font-style: italic;
+}
 
 @tailwind utilities;
-
-
 
 body,
 html,
@@ -53,12 +50,26 @@ body {
   background: #1b1b1b;
 }
 
-.click{
+.click {
   -webkit-tap-highlight-color: transparent;
 }
 
-.background{
+.background {
   filter: blur(50px);
+}
+
+.mainTitle {
+  word-break: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  -ms-box-orient: vertical;
+  box-orient: vertical;
+  -webkit-line-clamp: 2;
+  -moz-line-clamp: 2;
+  -ms-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
 }
 
 .fade-up-enter-from,
@@ -67,12 +78,12 @@ body {
   opacity: 0 !important;
 }
 
-.fade-left-enter-from{
+.fade-left-enter-from {
   transform: translateX(-50px) !important;
   opacity: 0 !important;
 }
 
-.fade-left-leave-to{
+.fade-left-leave-to {
   transform: translateX(50px) !important;
   opacity: 0 !important;
 }

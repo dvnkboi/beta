@@ -4,10 +4,7 @@
     <MainCard class="z-10" ref="mainCard" @failed="getQueue()" @reloadStream="loadLatency = $refs.mainCard.loadingTime" @loading="audioLoading = true" @loaded="audioLoading = false" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" />
     <div class="w-full overflow-auto xl:h-full">
       <!-- <div v-for="(val) in queue" :key="val.id" class="z-10 w-full" > {{`${val.artist} - ${val.title}`}}</div> -->
-      <Card v-for="(val) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" />
-      <!-- <Card class="z-10 w-full" @failed="getQueue()" :title="queue[1].title" :artist="queue[1].artist" :cover="queue[1].cover" :minutes="queue[1].minutes" :changed="queue[1].changed" />
-      <Card class="z-10 w-full" @failed="getQueue()" :title="queue[2].title" :artist="queue[2].artist" :cover="queue[2].cover" :minutes="queue[2].minutes" :changed="queue[2].changed" />
-      <Card class="z-10 w-full" @failed="getQueue()" :title="queue[3].title" :artist="queue[3].artist" :cover="queue[3].cover" :minutes="queue[3].minutes" :changed="queue[3].changed" /> -->
+      <Card v-for="val in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" />
     </div>
     <SongBg class="z-0 -left-10 overflow-hidden" :changed="queue[0].changed" :percent="currentSongTimer.percent" />
     <Loading class="z-20" :show="audioLoading || metaLoading" />
@@ -47,8 +44,8 @@
         queueOpen: true,
         connected: true,
         audioLatency: ((943718 * 8) / 256000) * 1000,
-        loadLatency:0,
-        totalLatency:0,
+        loadLatency: 0,
+        totalLatency: 0,
         audioLoading: false,
         metaLoading: false,
         previousTitle: null,
@@ -57,23 +54,22 @@
           timer: new AdjustingInterval(
             () => {
               try {
-                this.currentSongTimer.time+=0.25;
-                this.currentSongTimer.percent = this.currentSongTimer.time / this.res.response.history[this.currentSongTimer.index].duration;
-                if(this.currentSongTimer.percent > 1){
+                this.currentSongTimer.time += 0.25;
+                this.currentSongTimer.percent = this.currentSongTimer.time / this.res.response.history[0].duration;
+                if (this.currentSongTimer.percent > 1) {
                   this.currentSongTimer.time = 0;
                 }
               } catch (e) {
-                // eslint-disable-next-line no-empty
+                console.log(e);
               }
             },
             250,
             () => this.currentSongTimer.init()
           ),
           time: null,
-          index: 0,
           percent: 0,
           init: () => {
-            this.currentSongTimer.time = (Date.now() - new Date(this.res.response.history[this.currentSongTimer.index].date_played).getTime() - this.audioLatency - 1000) / 1000;
+            this.currentSongTimer.time = (Date.now() - new Date(this.res.response.history[0].date_played).getTime() - this.audioLatency - 1000) / 1000;
             if (this.currentSongTimer.timer.running) this.currentSongTimer.timer.stop();
             this.currentSongTimer.timer.start();
           },
@@ -237,7 +233,7 @@
           }, 3000);
         }
       },
-      setComponentInfo(noCheckDup,startIndex) {
+      setComponentInfo(noCheckDup, startIndex) {
         try {
           startIndex = startIndex > 0 ? startIndex : 0;
           if (this.previousID.value == this.lodashGet(this.art[this.previousID.index][0], '_id') && !noCheckDup) {
@@ -278,12 +274,12 @@
           console.log(e.message);
         }
       },
-      async preloadNext(){
+      async preloadNext() {
         let src = await this.getNextArt();
         let preloadSrc = (this.lodashGet(src, 'response[0].images[0].thumbnails.small') || this.lodashGet(src, 'response[0].images[0].thumbnails["250"]') || this.lodashGet(src, 'response[0].images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png').replace('http://', 'https://');
         let preloadImg = new Image();
-        if(src){
-          if(preloadSrc == this.queue[0].cover) {
+        if (src) {
+          if (preloadSrc == this.queue[0].cover) {
             this.preloadRunning = false;
             this.preloadSuccess = true;
           }
@@ -293,12 +289,12 @@
           preloadImg.onload = () => {
             this.preloadSuccess = true;
             this.preloadRunning = false;
-            console.log('loaded preload img')
+            console.log('loaded preload img');
           };
           preloadImg.onerror = () => {
             this.preloadSuccess = false;
             this.preloadRunning = false;
-            console.log('error loading preload img')
+            console.log('error loading preload img');
           };
         }
       },
@@ -325,21 +321,21 @@
 
           this.socket.on('unsafePreload', async () => {
             console.log('preloading for consistancy');
-            if(!proxy.preloadRunning && !proxy.preloadSuccess){
+            if (!proxy.preloadRunning && !proxy.preloadSuccess) {
               proxy.preloadNext();
             }
           });
 
           this.socket.on('preload', async () => {
             console.log('preloading');
-            if(!proxy.preloadRunning && !proxy.preloadSuccess){
+            if (!proxy.preloadRunning && !proxy.preloadSuccess) {
               proxy.preloadNext();
             }
           });
 
           this.socket.on('safePreload', async () => {
             console.log('preloading safely');
-            if(!proxy.preloadRunning && !proxy.preloadSuccess){
+            if (!proxy.preloadRunning && !proxy.preloadSuccess) {
               proxy.preloadNext();
             }
           });
@@ -380,23 +376,23 @@
         this.queue = [];
         for (var i = 0; i < this.covers; i++) this.queue.push({});
       },
-      fillQueue(){
+      fillQueue() {
         let queueLength = this.queue.length;
-        for(var i = 0; i < this.covers - this.queue.length;i++) this.queue.push({});
+        for (var i = 0; i < this.covers - this.queue.length; i++) this.queue.push({});
         this.covers = 10;
-        this.setComponentInfo(true,true,queueLength);
+        this.setComponentInfo(true, true, queueLength);
       },
     },
-    watch:{
-      loadLatency: function(){
+    watch: {
+      loadLatency: function() {
         this.$nextTick(() => {
           console.log({
-            totalLatency:this.totalLatency + 'ms',
+            totalLatency: this.totalLatency + 'ms',
             serverLatency: this.audioLatency + 'ms',
             loadLatency: this.loadLatency + 'ms',
           });
         });
-      }
+      },
     },
     async beforeCreate() {},
     created() {

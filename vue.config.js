@@ -20,13 +20,13 @@ module.exports = {
       splitChunks: {
         chunks: "async",
         minSize: 10000,
-        maxSize:30000,
+        maxSize: 30000,
         minChunks: 2,
         maxAsyncRequests: 5,
         maxInitialRequests: 3,
-        automaticNameMaxLength:5,
-        hidePathInfo:true,
-        automaticNameDelimiter:'-',
+        automaticNameMaxLength: 5,
+        hidePathInfo: true,
+        automaticNameDelimiter: '-',
         cacheGroups: {
           default: {
             minChunks: 2,

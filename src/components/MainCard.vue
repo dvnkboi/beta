@@ -3,15 +3,15 @@
     <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
       <div class="transform-gpu hover:-translate-y-2 h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300">
         <transition name="fade-up" appear>
-          <img :key="Date.now()" ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute" alt="" />
+          <img :key="Date.now()" ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover transition duration-300 absolute" alt="" />
         </transition>
         <transition name="fade-up" appear>
-          <div :key="Date.now() - 9999" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute"></div>
+          <div :key="Date.now() - 9999" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad transition duration-300 absolute"></div>
         </transition>
       </div>
       <div class="px-7 w-full flex-auto">
         <transition name="fade-up" appear>
-          <h1 :key="'mainTitle'" v-show="showTitle" class="font-sans break-words text-gray-300 text-4xl md:text-6xl xl:text-8xl pt-1 font-bold w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedTitle }}</h1>
+          <h1 :key="'mainTitle'" v-show="showTitle" class="mainTitle font-sans overflow-ellipsis overflow-hidden break-words text-gray-300 text-4xl md:text-6xl xl:text-8xl pt-1 font-bold w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedTitle }}</h1>
         </transition>
         <transition name="fade-up" appear>
           <h2 :key="'mainArtist'" v-show="showArtist" class="font-sans break-words md:-mt-3 text-gray-400 text-2xl md:text-4xl xl:text-6xl w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedArtist }}</h2>
@@ -76,9 +76,9 @@
         Howl: null,
         Howler: null,
         navigator: navigator,
-        audioPos:0,
-        hasStopped:null,
-        hasDied:null,
+        audioPos: 0,
+        hasStopped: null,
+        hasDied: null,
       };
     },
     methods: {
@@ -87,7 +87,7 @@
       },
       initAudio() {
         let proxy = this;
-        if(this.audio) this.audio.unload();
+        if (this.audio) this.audio.unload();
         this.audio = null;
         this.audio = new this.Howl({
           src: ['https://api.ampupradio.com:8443/TOP40.mp3?nocache=' + Date.now()],
@@ -105,19 +105,18 @@
           proxy.$emit('loaded');
           proxy.loadingTime = performance.now() - proxy.loadingTime;
           proxy.$emit('reloadStream');
-          if(proxy.loadingTime < 4){
+          if (proxy.loadingTime < 4) {
             proxy.audio.seek(proxy.loadingTime);
           }
           proxy.audio.play();
-          if(proxy.playing){
-            proxy.audio.fade(0, 1, 500);
+          if (proxy.playing) {
+            proxy.audio.fade(0, this.value, 500);
           }
           proxy.canPlay = true;
         });
         this.audio.on('play', function() {
           proxy.updateTime();
         });
-        
 
         if (this.navigator && this.navigator.mediaSession) {
           this.navigator.mediaSession.setActionHandler('play', () => (proxy.playing = !proxy.playing));
@@ -126,18 +125,18 @@
       },
       async play() {
         let pausedMs = this.pauseDate > 0 ? Date.now() - this.pauseDate : 0;
-        console.log('paused for ',pausedMs / 1000,'s');
+        console.log('paused for ', pausedMs / 1000, 's');
         if (!this.audio || this.audio.state() == 'unloaded' || pausedMs > 60000) {
           await this.requireStack();
           this.initAudio();
         } else {
-          this.audio.fade(0, 1, 500);
+          this.audio.fade(0, this.value, 500);
         }
       },
       pause() {
         console.log(this.loadingTime);
         this.pauseDate = Date.now();
-        this.audio.fade(1, 0, 100);
+        this.audio.fade(this.value, 0, 100);
       },
       updateTime() {
         if (!this.playTimer) {
@@ -166,18 +165,18 @@
           this.AdjustingInterval = await import(/* webpackChunkName: "utils" */ '../utils.js');
           this.AdjustingInterval = this.AdjustingInterval.AdjustingInterval;
         }
-      }
+      },
     },
     watch: {
-      playSeconds: function(){
-        if(this.playing){
+      playSeconds: function() {
+        if (this.playing) {
           this.$emit('loaded');
           clearTimeout(this.stopped);
           this.stopped = null;
-          this.stopped = setTimeout(() => this.$emit('loading'),1000);
+          this.stopped = setTimeout(() => this.$emit('loading'), 1000);
           clearTimeout(this.hasDied);
           this.hasDied = null;
-          this.hasDied = setTimeout(this.initAudio,8000);
+          this.hasDied = setTimeout(this.initAudio, 8000);
         }
       },
       value: function() {

@@ -180,7 +180,7 @@
         }
       },
       value: function() {
-        if (this.audio) {
+        if (this.audio && this.playing) {
           this.audio.fade(this.audio.volume(), this.value, 250);
         }
       },

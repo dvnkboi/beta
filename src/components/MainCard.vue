@@ -181,8 +181,7 @@
         }
       },
       value: function() {
-        this.expVol = 0.25 * (2 + 2*Math.sin(this.value * Math.PI - Math.PI / 2));
-        console.log(this.value,this.expVol);
+        this.expVol = 0.25/(0.25+Math.pow((this.value/(1-this.value)),-2));
         if (this.audio && this.playing) {
           this.audio.fade(this.audio.volume(), this.expVol, 250);
         }

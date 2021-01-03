@@ -8,18 +8,18 @@
   import Player from './components/Player';
   export default {
     name: 'App',
-    data(){
-      return{
-        captureKeypress:true,
-      }
+    data() {
+      return {
+        captureKeypress: true,
+      };
     },
-    methods:{
-      playPause(){
-        if(this.captureKeypress) this.$refs.player.$refs.mainCard.playing = !this.$refs.player.$refs.mainCard.playing;
-      }
+    methods: {
+      playPause() {
+        if (this.captureKeypress) this.$refs.player.$refs.mainCard.playing = !this.$refs.player.$refs.mainCard.playing;
+      },
     },
     props: {},
-    created(){
+    created() {
       let proxy = this;
       document.addEventListener('keyup', function(e) {
         if (e.keyCode == 32) {

@@ -69,7 +69,7 @@
         canPlay: false,
         sliderShown: false,
         value: 1,
-        expVol:1,
+        expVol: 1,
         hasInitialised: false,
         playTimer: null,
         AdjustingInterval: null,
@@ -180,8 +180,8 @@
         }
       },
       value: function(newVal) {
-        localStorage.setItem('volume',newVal);
-        this.expVol = 0.4/(0.4+Math.pow((newVal/(1-newVal)),-1.6));
+        localStorage.setItem('volume', newVal);
+        this.expVol = 0.4 / (0.4 + Math.pow(newVal / (1 - newVal), -1.6));
         if (this.audio && this.playing) {
           this.audio.fade(this.audio.volume(), this.expVol, 250);
         }

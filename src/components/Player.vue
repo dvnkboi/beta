@@ -68,12 +68,11 @@
           time: null,
           percent: 0,
           init: () => {
-            try{
+            try {
               this.currentSongTimer.time = (Date.now() - new Date(this.res.response.history[0].date_played).getTime() - this.audioLatency - 1000) / 1000;
               if (this.currentSongTimer.timer.running) this.currentSongTimer.timer.stop();
               this.currentSongTimer.timer.start();
-            }
-            catch(e){
+            } catch (e) {
               console.log(e.message);
             }
           },

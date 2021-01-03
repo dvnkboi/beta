@@ -65,8 +65,11 @@
         audio: null,
         playing: false,
         pauseDate: null,
+        pausedMs: 0,
+        accumPause: 0,
         loadingTime: 0,
         canPlay: false,
+        slowCon:false,
         sliderShown: false,
         value: 1,
         expVol: 1,
@@ -98,35 +101,50 @@
 
         this.loadingTime = 0;
         this.canPlay = false;
+        this.slowCon =  this.slowCon ? this.slowCon : false;
+        let slowLoad = setTimeout(() => {
+          if (!this.canplay) this.slowCon = true;
+        }, 8000);
 
         this.loadingTime = performance.now();
         this.$emit('loading');
+
         this.audio.once('load', function() {
           proxy.$emit('loaded');
           proxy.loadingTime = performance.now() - proxy.loadingTime;
-          proxy.$emit('reloadStream');
-          if (proxy.loadingTime < 4) {
-            proxy.audio.seek(proxy.loadingTime);
-          }
+          proxy.audio.seek(proxy.loadingTime / 1000);
           proxy.audio.play();
           if (proxy.playing) {
             proxy.audio.fade(0, proxy.expVol, 500);
           }
           proxy.canPlay = true;
+
+          clearTimeout(slowLoad);
+          proxy.slowCon = false;
         });
+
         this.audio.on('play', function() {
           proxy.updateTime();
+        });
+
+        this.audio.on('loaderror', function() {
+          setTimeout(proxy.initAudio,1000);
+        });
+
+        this.audio.on('playerror', function() {
+          setTimeout(proxy.initAudio,1000);
         });
 
         if (this.navigator && this.navigator.mediaSession) {
           this.navigator.mediaSession.setActionHandler('play', () => (proxy.playing = !proxy.playing));
           this.navigator.mediaSession.setActionHandler('pause', () => (proxy.playing = !proxy.playing));
         }
+
       },
       async play() {
-        let pausedMs = this.pauseDate > 0 ? Date.now() - this.pauseDate : 0;
-        console.log('paused for ', pausedMs / 1000, 's');
-        if (!this.audio || this.audio.state() == 'unloaded' || pausedMs > 60000) {
+        this.pausedMs = this.pauseDate > 0 ? Date.now() - this.pauseDate : 0;
+        console.log('paused for ', this.pausedMs / 1000, 's');
+        if (!this.audio || this.audio.state() == 'unloaded' || this.pausedMs > 60000) {
           await this.requireStack();
           this.initAudio();
         } else {
@@ -142,7 +160,7 @@
         if (!this.playTimer) {
           let proxy = this;
           proxy.playTimer = new this.AdjustingInterval(() => {
-            proxy.playSeconds = proxy.audio.seek();
+            proxy.playSeconds = Math.floor(proxy.audio.seek() - proxy.accumPause / 1000);
             proxy.playTime = proxy.playSeconds.toString().toHHMMSS();
           }, 1000);
           proxy.playTimer.start();
@@ -168,6 +186,9 @@
       },
     },
     watch: {
+      pausedMs: function(val) {
+        this.accumPause += val;
+      },
       playSeconds: function() {
         if (this.playing) {
           this.$emit('loaded');

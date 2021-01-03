@@ -1,7 +1,7 @@
 <template>
   <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full">
-    <connectivity class="z-20" :show="!connected" />
-    <MainCard class="z-10" ref="mainCard" @failed="getQueue()" @reloadStream="loadLatency = $refs.mainCard.loadingTime" @loading="audioLoading = true" @loaded="audioLoading = false" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" />
+    <connectivity class="z-20" :show="!connected || ($refs.mainCard ? $refs.mainCard.slowCon : false)" />
+    <MainCard class="z-10" ref="mainCard" @failed="getQueue()" @reloadStream="loadLatency =($refs.mainCard ? $refs.mainCard.loadingTime : 0)" @loading="audioLoading = true" @loaded="audioLoading = false" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" />
     <div class="w-full overflow-auto xl:h-full">
       <Card v-for="val in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" />
     </div>
@@ -58,9 +58,8 @@
                 if (this.currentSongTimer.percent > 1) {
                   this.currentSongTimer.time = 0;
                 }
-              } catch (e) {
-                console.log(e);
-              }
+                // eslint-disable-next-line no-empty
+              } catch (e) {}
             },
             250,
             () => this.currentSongTimer.init()
@@ -72,9 +71,8 @@
               this.currentSongTimer.time = (Date.now() - new Date(this.res.response.history[0].date_played).getTime() - this.audioLatency - 1000) / 1000;
               if (this.currentSongTimer.timer.running) this.currentSongTimer.timer.stop();
               this.currentSongTimer.timer.start();
-            } catch (e) {
-              console.log(e.message);
-            }
+            // eslint-disable-next-line no-empty
+            } catch (e) {}
           },
         },
         socket: null,

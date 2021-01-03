@@ -16,7 +16,7 @@ module.exports = {
     optimization: {
       removeAvailableModules: true,
       removeEmptyChunks: true,
-      nodeEnv: process.env.NODE_ENV == 'production' ? 'production' : 'development',
+      nodeEnv: 'production',
       splitChunks: {
         chunks: "async",
         minSize: 10000,

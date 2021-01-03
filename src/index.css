@@ -58,8 +58,7 @@ body {
   filter: blur(50px);
 }
 
-.mainTitle,
-.mainArtist {
+.mainTitle{
   word-break: normal;
   display: -webkit-box;
   -webkit-box-orient: vertical;

@@ -1,7 +1,7 @@
 <template>
-  <div class="mainCard bg-black-dark bg-opacity-90 flex w-full xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300 overflow-hidden">
+  <div class="mainCard bg-black-dark bg-opacity-90 flex w-full xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300 overflow-auto">
     <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
-      <div class="transform-gpu hover:-translate-y-2 h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300">
+      <div class="transform-gpu hover:-translate-y-2 h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 ">
         <transition name="fade-up" appear>
           <img :key="Date.now()" ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
         </transition>
@@ -14,10 +14,9 @@
           <h1 :key="'mainTitle'" v-show="showTitle" class="mainTitle font-sans overflow-ellipsis overflow-hidden break-words text-gray-300 text-4xl md:text-6xl xl:text-8xl pt-1 font-bold w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedTitle }}</h1>
         </transition>
         <transition name="fade-up" appear>
-          <h2 :key="'mainArtist'" v-show="showArtist" class="mainArtist font-sans break-words md:-mt-3 text-gray-400 text-2xl md:text-4xl xl:text-6xl w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedArtist }}</h2>
+          <h2 :key="'mainArtist'" v-show="showArtist" class="mainArtist font-sans break-words truncate overflow-ellipsis max-w-full md:-mt-3 text-gray-400 text-2xl md:text-4xl xl:text-6xl w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedArtist }}</h2>
         </transition>
       </div>
-
       <h2 class="font-sans text-gray-400 text-lg md:text-2xl w-full text-center">{{ playTime || '00:00:00' }}</h2>
     </div>
     <div class="h-24 w-full px-3 flex justify-between items-center">

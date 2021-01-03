@@ -3,7 +3,6 @@
     <connectivity class="z-20" :show="!connected" />
     <MainCard class="z-10" ref="mainCard" @failed="getQueue()" @reloadStream="loadLatency = $refs.mainCard.loadingTime" @loading="audioLoading = true" @loaded="audioLoading = false" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" />
     <div class="w-full overflow-auto xl:h-full">
-      <!-- <div v-for="(val) in queue" :key="val.id" class="z-10 w-full" > {{`${val.artist} - ${val.title}`}}</div> -->
       <Card v-for="val in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" />
     </div>
     <SongBg class="z-0 -left-10 overflow-hidden" :changed="queue[0].changed" :percent="currentSongTimer.percent" />
@@ -69,9 +68,14 @@
           time: null,
           percent: 0,
           init: () => {
-            this.currentSongTimer.time = (Date.now() - new Date(this.res.response.history[0].date_played).getTime() - this.audioLatency - 1000) / 1000;
-            if (this.currentSongTimer.timer.running) this.currentSongTimer.timer.stop();
-            this.currentSongTimer.timer.start();
+            try{
+              this.currentSongTimer.time = (Date.now() - new Date(this.res.response.history[0].date_played).getTime() - this.audioLatency - 1000) / 1000;
+              if (this.currentSongTimer.timer.running) this.currentSongTimer.timer.stop();
+              this.currentSongTimer.timer.start();
+            }
+            catch(e){
+              console.log(e.message);
+            }
           },
         },
         socket: null,
@@ -137,8 +141,8 @@
         })
           .delay(500)
           .timeout(3000, 'api call was poopi')
-          .catch(this.Promise.TimeoutError, function() {
-            this.Promise.reject(null);
+          .catch(proxy.Promise.TimeoutError, function() {
+            proxy.Promise.reject(null);
           });
       },
       async getArt() {
@@ -159,8 +163,8 @@
         })
           .delay(500)
           .timeout(3000, 'api call was poopi')
-          .catch(this.Promise.TimeoutError, function() {
-            this.Promise.reject(null);
+          .catch(proxy.Promise.TimeoutError, function() {
+            proxy.Promise.reject(null);
           });
       },
       async getNextArt() {
@@ -181,8 +185,8 @@
         })
           .delay(500)
           .timeout(3000, 'api call was poopi')
-          .catch(this.Promise.TimeoutError, function() {
-            this.Promise.reject(null);
+          .catch(proxy.Promise.TimeoutError, function() {
+            proxy.Promise.reject(null);
           });
       },
       async getQueue() {

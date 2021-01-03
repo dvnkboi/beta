@@ -179,8 +179,9 @@
           this.hasDied = setTimeout(this.initAudio, 8000);
         }
       },
-      value: function() {
-        this.expVol = 0.4/(0.4+Math.pow((this.value/(1-this.value)),-1.6));
+      value: function(newVal) {
+        localStorage.setItem('volume',newVal);
+        this.expVol = 0.4/(0.4+Math.pow((newVal/(1-newVal)),-1.6));
         if (this.audio && this.playing) {
           this.audio.fade(this.audio.volume(), this.expVol, 250);
         }
@@ -262,7 +263,9 @@
       };
     },
     beforeMount() {},
-    mounted() {},
+    mounted() {
+      this.value = parseFloat(localStorage.getItem('volume') || 1);
+    },
     beforeUnmount() {
       this.audio.unload();
       this.audio = null;

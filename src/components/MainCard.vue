@@ -30,7 +30,7 @@
           </span>
         </transition>
       </div>
-      <div @focusout="sliderShown = false" @click.self="sliderShown = !sliderShown" class="click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative">
+      <div @click.self="sliderShown = !sliderShown" class="click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative">
         <transition name="fade-left" mode="out-in">
           <span key="volLarge" @click="sliderShown = !sliderShown" v-if="value >= 0.7" class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150">
             <box-icon name="volume-full" type="solid" size="cssSize" class="w-12 h-12 fill-current -ml-2 stroke-current text-gray-300 stroke-0" v-pre></box-icon>
@@ -101,7 +101,7 @@
           format: ['mp3', 'aac'],
           volume: 0,
         });
-
+        this.accumPause = 0;
         this.loadingTime = 0;
         this.canPlay = false;
         this.slowCon =  this.slowCon ? this.slowCon : false;

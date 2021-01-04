@@ -2,21 +2,21 @@
   <div :key="Date.now() * Math.random()" class="card flex-auto w-full bg-black bg-opacity-90 relative grid grid-cols-4 grid-rows-1 overflow-hidden transition duration-300 border-b border-gray-600">
     <div class="col-span-1 aspect-ratio-square overflow-hidden relative">
       <transition name="fade-up" mode="out-in" appear>
-        <img :key="Date.now() * Math.random()" ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="h-full w-full object-cover bg-cover ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute" alt="" />
+        <img :key="'cover' + index + Date.now()" ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="h-full w-full object-cover bg-cover ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute" alt="" />
       </transition>
-      <transition name="fade-up" mode="out-in" appear="">
-        <div :key="Date.now() * Math.random()" v-show="!hasLoaded" class="box-border h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute"></div>
+      <transition name="fade-up" mode="out-in" appear>
+        <div :key="'skelly' + index + Date.now()" v-show="!hasLoaded" class="box-border h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute"></div>
       </transition>
     </div>
     <div class="col-span-3 flex justify-items-start items-start flex-auto flex-col py-3 px-3 md:px-6 h-full">
       <transition name="fade-up" mode="out-in" appear>
-        <h1 v-show="showTitle" class="font-sans text-gray-300 w-52 xxs:w-64 xs:w-full truncate text-2xl sm:text-3xl md:text-5xl lg:text-5xl font-bold capitalize transition-all duration-300">{{ updatedTitle }}</h1>
+        <h1 v-show="showTitle" :key="'secondaryTitle' + index + Date.now()" class="font-sans text-gray-300 w-52 xxs:w-64 xs:w-full truncate text-2xl sm:text-3xl md:text-5xl lg:text-5xl font-bold capitalize transition-all duration-300">{{ updatedTitle }}</h1>
       </transition>
       <transition name="fade-up" mode="out-in" appear>
-        <h2 v-show="showArtist" class="font-sans text-gray-400 md:-mt-2 w-32 xxs:w-44 xs:w-full truncate text-sm sm:text-2xl md:text-3xl lg:text-3xl capitalize transition-all duration-300">{{ updatedArtist }}</h2>
+        <h2 v-show="showArtist" :key="'secondaryArtist' + index + Date.now()" class="font-sans text-gray-400 md:-mt-2 w-32 xxs:w-44 xs:w-full truncate text-sm sm:text-2xl md:text-3xl lg:text-4xl capitalize transition-all duration-300">{{ updatedArtist }}</h2>
       </transition>
       <transition name="fade-up" mode="out-in" appear>
-        <h2 v-show="showMin" class="font-sans text-gray-400 text-xxs md:text-xl absolute bottom-2 right-4 sm:right-2 md:right-5 capitalize transition-all duration-300">{{ updatedMin >= 1 ? minutes + ' min ago' : 'just now' }}</h2>
+        <h2 v-show="showMin" :key="'timePlayed' + index + Date.now()" class="font-sans text-gray-400 text-xxs md:text-xl absolute bottom-2 right-4 sm:right-2 md:right-5 capitalize transition-all duration-300">{{ updatedMin >= 1 ? minutes + ' min ago' : 'just now' }}</h2>
       </transition>
     </div>
   </div>
@@ -39,15 +39,16 @@
       };
     },
     methods: {
-      loaded() {
-        this.key = Date.now();
-        this.hasLoaded = true;
+      loaded(evt) {
+        if(evt) if(evt.path[0].naturalWidth != 0) this.hasLoaded = true;
       },
     },
     watch: {
+      updatedCover: function() {
+        this.hasLoaded = false;
+      },
       cover: function() {
         if (this.cover != this.updatedCover && this.cover) {
-          this.hasLoaded = false;
           this.updatedCover = null;
           this.updatedCover = this.cover;
         } else {
@@ -84,9 +85,6 @@
       this.updatedMin = this.minutes;
       this.showTitle = this.showArtist = this.showMin = true;
     },
-    updated() {
-      this.$forceUpdate;
-    },
     beforeUnmount() {},
     directives: {
       loadedifcomplete: function(el, binding) {
@@ -101,6 +99,7 @@
       artist: String,
       minutes: Number,
       changed: Boolean,
+      index: Number
     },
   };
 </script>

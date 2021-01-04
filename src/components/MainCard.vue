@@ -88,8 +88,8 @@
       };
     },
     methods: {
-      loaded() {
-        this.hasLoaded = true;
+      loaded(evt) {
+        if(evt) if(evt.path[0].naturalWidth != 0) this.hasLoaded = true;
       },
       initAudio() {
         let proxy = this;

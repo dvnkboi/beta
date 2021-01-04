@@ -3,7 +3,7 @@
     <connectivity class="z-20" :show="!connected || ($refs.mainCard ? $refs.mainCard.slowCon : false)" />
     <MainCard class="z-10" ref="mainCard" @failed="getQueue()" @reloadStream="loadLatency =($refs.mainCard ? $refs.mainCard.loadingTime : 0)" @loading="audioLoading = true" @loaded="audioLoading = false" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" />
     <div class="w-full overflow-auto xl:h-full">
-      <Card v-for="val in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" />
+      <Card v-for="(val,index) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :index="index" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" />
     </div>
     <SongBg class="z-0 -left-10 overflow-hidden" :changed="queue[0].changed" :percent="currentSongTimer.percent" />
     <Loading class="z-20" :show="audioLoading || metaLoading" />
@@ -405,12 +405,12 @@
       if (navigator.connection){
         conApi = true;
       }
-      this.connected = conApi ? navigator.connection.downlink > 0.5 : window.navigator.onLine;
+      this.connected = conApi ? navigator.connection.downlink > 0.2 : window.navigator.onLine;
       console.log('connection state: ', this.connected);
       window.addEventListener('online', () => {
         this.$emit('online');
         console.log('BACK ONLINE');
-        this.connected = conApi ? navigator.connection.downlink > 0.5 : window.navigator.onLine;
+        this.connected = conApi ? navigator.connection.downlink > 0.2 : window.navigator.onLine;
         proxy.downlink = conApi ? navigator.connection.downlink : null;
         proxy.previousID = {
           index: 0,
@@ -423,7 +423,7 @@
       window.addEventListener('offline', () => {
         this.$emit('offline');
         console.log('OFFLINE');
-        this.connected = conApi ? navigator.connection.downlink > 0.5 : window.navigator.onLine;
+        this.connected = conApi ? navigator.connection.downlink > 0.2 : window.navigator.onLine;
         proxy.downlink = conApi ? navigator.connection.downlink : null;
         proxy.socket.disconnect();
       });

@@ -187,9 +187,6 @@
           this.AdjustingInterval = this.AdjustingInterval.AdjustingInterval;
         }
       },
-      closeVol(){
-        this.sliderShown = false;
-      }
     },
     watch: {
       pausedMs: function(val) {

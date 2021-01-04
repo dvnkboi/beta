@@ -405,12 +405,12 @@
       if (navigator.connection){
         conApi = true;
       }
-      this.connected = conApi  ? navigator.connection.downlink > 0.5 : window.navigator.onLine;
+      this.connected = conApi ? navigator.connection.downlink > 0.5 : window.navigator.onLine;
       console.log('connection state: ', this.connected);
       window.addEventListener('online', () => {
         this.$emit('online');
         console.log('BACK ONLINE');
-        this.connected = conApi  ? navigator.connection.downlink > 0.5 : window.navigator.onLine;
+        this.connected = conApi ? navigator.connection.downlink > 0.5 : window.navigator.onLine;
         proxy.downlink = conApi ? navigator.connection.downlink : null;
         proxy.previousID = {
           index: 0,
@@ -423,7 +423,7 @@
       window.addEventListener('offline', () => {
         this.$emit('offline');
         console.log('OFFLINE');
-        this.connected = conApi  ? navigator.connection.downlink > 0.5 : window.navigator.onLine;
+        this.connected = conApi ? navigator.connection.downlink > 0.5 : window.navigator.onLine;
         proxy.downlink = conApi ? navigator.connection.downlink : null;
         proxy.socket.disconnect();
       });

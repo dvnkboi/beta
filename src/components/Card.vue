@@ -1,21 +1,21 @@
 <template>
   <div :key="Date.now() * Math.random()" class="card flex-auto w-full bg-black bg-opacity-90 relative grid grid-cols-4 grid-rows-1 overflow-hidden transition duration-300 border-b border-gray-600">
     <div class="col-span-1 aspect-ratio-square overflow-hidden relative">
-      <transition name="fade-up" appear>
+      <transition name="fade-up" mode="out-in" appear>
         <img :key="Date.now() * Math.random()" ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="h-full w-full object-cover bg-cover ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute" alt="" />
       </transition>
-      <transition name="fade-up">
+      <transition name="fade-up" mode="out-in" appear="">
         <div :key="Date.now() * Math.random()" v-show="!hasLoaded" class="box-border h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute"></div>
       </transition>
     </div>
     <div class="col-span-3 flex justify-items-start items-start flex-auto flex-col py-3 px-3 md:px-6 h-full">
-      <transition name="fade-up" appear>
+      <transition name="fade-up" mode="out-in" appear>
         <h1 v-show="showTitle" class="font-sans text-gray-300 w-52 xxs:w-64 xs:w-full truncate text-2xl sm:text-3xl md:text-5xl lg:text-5xl font-bold capitalize transition-all duration-300">{{ updatedTitle }}</h1>
       </transition>
-      <transition name="fade-up" appear>
+      <transition name="fade-up" mode="out-in" appear>
         <h2 v-show="showArtist" class="font-sans text-gray-400 md:-mt-2 w-32 xxs:w-44 xs:w-full truncate text-sm sm:text-2xl md:text-3xl lg:text-3xl capitalize transition-all duration-300">{{ updatedArtist }}</h2>
       </transition>
-      <transition name="fade-up" appear>
+      <transition name="fade-up" mode="out-in" appear>
         <h2 v-show="showMin" class="font-sans text-gray-400 text-xxs md:text-xl absolute bottom-2 right-4 sm:right-2 md:right-5 capitalize transition-all duration-300">{{ updatedMin >= 1 ? minutes + ' min ago' : 'just now' }}</h2>
       </transition>
     </div>

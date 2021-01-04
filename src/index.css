@@ -48,6 +48,7 @@ html,
   -ms-user-select: none;
   user-select: none;
   @apply bg-black-dark;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -78,17 +79,17 @@ body {
 
 .fade-up-enter-from,
 .fade-up-leave-to {
-  transform: translateY(-10px) !important;
+  transform: translateY(-25px) scale(0.95) !important;
   opacity: 0 !important;
 }
 
 .fade-left-enter-from {
-  transform: translateX(-50px) !important;
+  transform: translateX(-15px) scale(0.8) !important;
   opacity: 0 !important;
 }
 
 .fade-left-leave-to {
-  transform: translateX(50px) !important;
+  transform: translateX(15px) scale(0.8) !important;
   opacity: 0 !important;
 }
 
@@ -99,6 +100,7 @@ body {
 
 input[type='range'] {
   writing-mode: bt-lr; /* IE */
+  -webkit-appearance: none;
   -webkit-appearance: slider-vertical; /* WebKit */
   margin: 0 7.55px;
   background-color: transparent;
@@ -125,7 +127,6 @@ input[type='range']::-webkit-slider-thumb {
   border: 0;
   border-radius: 50px;
   cursor: pointer;
-  -webkit-appearance: none;
 }
 input[type='range']:focus::-webkit-slider-runnable-track {
   background: #b8c1cf;
@@ -160,12 +161,14 @@ input[type='range']::-ms-track {
   cursor: pointer;
 }
 input[type='range']::-ms-fill-lower {
+  -webkit-appearance: none;
   background: #000000;
   border: 0px solid rgba(1, 1, 1, 0);
   border: 0;
   border-radius: 50px;
 }
 input[type='range']::-ms-fill-upper {
+  -webkit-appearance: none;
   background: #374151;
   border: 0px solid rgba(1, 1, 1, 0);
   border: 0;
@@ -183,9 +186,11 @@ input[type='range']::-ms-thumb {
   /*Needed to keep the Edge thumb centred*/
 }
 input[type='range']:focus::-ms-fill-lower {
+  -webkit-appearance: none;
   background: #374151;
 }
 input[type='range']:focus::-ms-fill-upper {
+  -webkit-appearance: none;
   background: #b8c1cf;
 }
 /*TODO: Use one of the selectors from https://stackoverflow.com/a/20541859/7077589 and figure out

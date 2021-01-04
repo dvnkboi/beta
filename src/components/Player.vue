@@ -394,17 +394,24 @@
           });
         });
       },
+      downlink: function(oldVal,newVal){
+        console.log('connection changed',{oldVal,newVal});
+      }
     },
     async beforeCreate() {},
     created() {
       let proxy = this;
-      this.connected = navigator.connection.downlink > 0.5 || window.navigator.onLine;
+      let conApi;
+      if (navigator.connection){
+        conApi = true;
+      }
+      this.connected = conApi  ? navigator.connection.downlink > 0.5 : window.navigator.onLine;
       console.log('connection state: ', this.connected);
       window.addEventListener('online', () => {
         this.$emit('online');
         console.log('BACK ONLINE');
-        this.connected = navigator.connection.downlink > 0.5 || window.navigator.onLine;
-        proxy.downlink = navigator.connection.downlink ? navigator.connection.downlink : null;
+        this.connected = conApi  ? navigator.connection.downlink > 0.5 : window.navigator.onLine;
+        proxy.downlink = conApi ? navigator.connection.downlink : null;
         proxy.previousID = {
           index: 0,
           value: 1,
@@ -416,8 +423,8 @@
       window.addEventListener('offline', () => {
         this.$emit('offline');
         console.log('OFFLINE');
-        this.connected = navigator.connection.downlink > 0.5 || window.navigator.onLine;
-        proxy.downlink = navigator.connection.downlink ? navigator.connection.downlink : null;
+        this.connected = conApi  ? navigator.connection.downlink > 0.5 : window.navigator.onLine;
+        proxy.downlink = conApi ? navigator.connection.downlink : null;
         proxy.socket.disconnect();
       });
     },

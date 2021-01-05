@@ -72,39 +72,58 @@
         accumPause: 0,
         loadingTime: 0,
         canPlay: false,
-        slowCon:false,
+        slowCon: false,
         sliderShown: false,
         value: 1,
         expVol: 1,
         hasInitialised: false,
         playTimer: null,
         AdjustingInterval: null,
-        Howl: null,
-        Howler: null,
-        navigator: navigator,
         audioPos: 0,
         hasStopped: null,
         hasDied: null,
+        analyser: null,
+        analyzerFrame: null,
+        context:null,
+        nodeSource:null,
       };
     },
     methods: {
       loaded(evt) {
-        if(evt) if(evt.path[0].naturalWidth != 0) this.hasLoaded = true;
+        if (evt) if (evt.path[0].naturalWidth != 0) this.hasLoaded = true;
       },
       initAudio() {
         let proxy = this;
         if (this.audio) this.audio.unload();
-        this.audio = null;
-        this.audio = new this.Howl({
-          src: ['https://api.ampupradio.com:8443/TOP40.mp3?nocache=' + Date.now()],
-          html5: true,
-          format: ['mp3', 'aac'],
-          volume: 0,
-        });
+        if(!this.audio) this.audio = new Audio();
+        this.audio.src = 'https://api.ampupradio.com:8443/TOP40.mp3?nocache=' + Date.now();
+        this.audio.volume = 0 ;
+        this.audio.crossOrigin = 'anonymous';
+        this.pausedMs = 0;
         this.accumPause = 0;
         this.loadingTime = 0;
         this.canPlay = false;
-        this.slowCon =  this.slowCon ? this.slowCon : false;
+        
+        if(!this.context){
+          this.context = new (window.AudioContext || window.webkitAudioContext)();
+          this.analyser = this.context.createAnalyser();
+          this.analyser.fftSize = 2048;
+          this.nodeSource = this.context.createMediaElementSource(this.audio);
+          this.nodeSource.connect(this.analyser);
+          this.analyser.connect(this.context.destination);
+        }
+        
+        var bufferLength = this.analyser.frequencyBinCount;
+        var dataArray = new Uint8Array(bufferLength);
+
+        setInterval(() => {
+          if(this.playing){
+            this.analyser.getByteFrequencyData(dataArray);
+            navigator.vibrate((dataArray[0] + dataArray[1] + dataArray[2]) / 3 > 130 ? 80 : 0);
+          }
+        },25);
+        
+        this.slowCon = this.slowCon ? this.slowCon : false;
         let slowLoad = setTimeout(() => {
           if (!this.canplay) this.slowCon = true;
         }, 8000);
@@ -112,10 +131,10 @@
         this.loadingTime = performance.now();
         this.$emit('loading');
 
-        this.audio.once('load', function() {
+        this.audio.oncanplaythrough =  function() {
           proxy.$emit('loaded');
           proxy.loadingTime = performance.now() - proxy.loadingTime;
-          proxy.audio.seek(proxy.loadingTime / 1000);
+          proxy.audio.currentTime = proxy.loadingTime / 1000;
           proxy.audio.play();
           if (proxy.playing) {
             proxy.audio.fade(0, proxy.expVol, 500);
@@ -124,30 +143,27 @@
 
           clearTimeout(slowLoad);
           proxy.slowCon = false;
-        });
+          proxy.audio.oncanplaythrough = null;
+        };
 
-        this.audio.on('play', function() {
+        this.audio.onplay = function() {
           proxy.updateTime();
-        });
+        };
 
-        this.audio.on('loaderror', function() {
-          setTimeout(proxy.initAudio,1000);
-        });
+        this.audio.onerror = function() {
+          setTimeout(proxy.initAudio, 1000);
+        };
 
-        this.audio.on('playerror', function() {
-          setTimeout(proxy.initAudio,1000);
-        });
-
-        if (this.navigator && this.navigator.mediaSession) {
-          this.navigator.mediaSession.setActionHandler('play', () => (proxy.playing = !proxy.playing));
-          this.navigator.mediaSession.setActionHandler('pause', () => (proxy.playing = !proxy.playing));
+        if (navigator)
+          if(navigator.mediaSession) {
+          navigator.mediaSession.setActionHandler('play', () => (proxy.playing = !proxy.playing));
+          navigator.mediaSession.setActionHandler('pause', () => (proxy.playing = !proxy.playing));
         }
-
       },
       async play() {
         this.pausedMs = this.pauseDate > 0 ? Date.now() - this.pauseDate : 0;
         console.log('paused for ', this.pausedMs / 1000, 's');
-        if (!this.audio || this.audio.state() == 'unloaded' || this.pausedMs > 60000) {
+        if (!this.audio || !this.audio.readyState < 3 || this.pausedMs > 60000) {
           await this.requireStack();
           this.initAudio();
         } else {
@@ -163,7 +179,7 @@
         if (!this.playTimer) {
           let proxy = this;
           proxy.playTimer = new this.AdjustingInterval(() => {
-            proxy.playSeconds = Math.floor(proxy.audio.seek() - proxy.accumPause / 1000);
+            proxy.playSeconds = Math.floor(proxy.audio.currentTime - proxy.accumPause / 1000);
             proxy.playTime = proxy.playSeconds.toString().toHHMMSS();
           }, 1000);
           proxy.playTimer.start();
@@ -177,11 +193,6 @@
         this.playTimer.stop();
       },
       async requireStack() {
-        if (!this.Howl || !this.Howler) {
-          this.Howl = await import(/* webpackChunkName: "Howler" */ 'howler');
-          this.Howler = this.Howl.Howler;
-          this.Howl = this.Howl.Howl;
-        }
         if (!this.AdjustingInterval) {
           this.AdjustingInterval = await import(/* webpackChunkName: "utils" */ '../utils.js');
           this.AdjustingInterval = this.AdjustingInterval.AdjustingInterval;
@@ -207,7 +218,7 @@
         localStorage.setItem('volume', newVal);
         this.expVol = 0.4 / (0.4 + Math.pow(newVal / (1 - newVal), -1.6));
         if (this.audio && this.playing) {
-          this.audio.fade(this.audio.volume(), this.expVol, 250);
+          this.audio.fade(this.audio.volume, this.expVol, 250);
         }
       },
       playing: async function() {
@@ -221,7 +232,7 @@
           this.hasDied = null;
         } else {
           await this.play();
-          if (this.audio.playing()) {
+          if (!this.audio.paused) {
             this.updateTime();
           }
         }
@@ -285,6 +296,43 @@
         }
         return hours + ':' + minutes + ':' + seconds;
       };
+
+      Audio.prototype.fade = function(from, to, len) {
+        if(this._fadeInterval) clearInterval(this._fadeInterval);
+        this._fadeInterval = null;
+        let proxy = this;
+        let vol = from;
+        let diff = to - from;
+        let steps = Math.abs(diff / 0.01);
+        let stepLen = Math.max(4, steps > 0 ? len / steps : len);
+        var lastTick = Date.now();
+
+        this._fadeTo = to;
+        var tick;
+
+        this._fadeInterval = setInterval(() => {
+          tick = (Date.now() - lastTick) / len;
+          lastTick = Date.now();
+          vol += diff * tick;
+
+          vol = Math.round(vol * 100) / 100;
+
+          vol = diff < 0 ? Math.max(to, vol) : Math.min(to, vol);
+
+          proxy.volume = vol;
+
+          if ((to < from && vol <= to) || (to > from && vol >= to)) {
+            clearInterval(proxy._fadeInterval);
+            proxy._fadeInterval = null;
+            proxy._fadeTo = null;
+            proxy.volume = to;
+          }
+        }, stepLen);
+      };
+      Audio.prototype.unload = function(){
+        this.pause();
+        this.src = "";
+      }
     },
     beforeMount() {},
     mounted() {
@@ -299,7 +347,7 @@
         if (el.complete || el.naturalHeight > 0 || el.naturalWidth > 0) {
           binding.instance.loaded();
         }
-      }
+      },
     },
     props: {
       cover: String,

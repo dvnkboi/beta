@@ -50,7 +50,6 @@
 </template>
 
 <script>
-
   export default {
     name: 'MainCard',
     data() {
@@ -84,8 +83,8 @@
         hasDied: null,
         analyser: null,
         analyzerFrame: null,
-        context:null,
-        nodeSource:null,
+        context: null,
+        nodeSource: null,
       };
     },
     methods: {
@@ -95,34 +94,37 @@
       initAudio() {
         let proxy = this;
         if (this.audio) this.audio.unload();
-        if(!this.audio) this.audio = new Audio();
+        if (!this.audio) this.audio = new Audio();
         this.audio.src = 'https://api.ampupradio.com:8443/TOP40.mp3?nocache=' + Date.now();
-        this.audio.volume = 0 ;
+        this.audio.volume = 0;
         this.audio.crossOrigin = 'anonymous';
         this.pausedMs = 0;
         this.accumPause = 0;
         this.loadingTime = 0;
         this.canPlay = false;
-        
-        if(!this.context){
+
+        if (!this.context) {
           this.context = new (window.AudioContext || window.webkitAudioContext)();
           this.analyser = this.context.createAnalyser();
           this.analyser.fftSize = 2048;
+          this.analyser.smoothingTimeConstant = 0;
           this.nodeSource = this.context.createMediaElementSource(this.audio);
           this.nodeSource.connect(this.analyser);
           this.analyser.connect(this.context.destination);
         }
-        
+
         var bufferLength = this.analyser.frequencyBinCount;
         var dataArray = new Uint8Array(bufferLength);
 
         setInterval(() => {
-          if(this.playing){
+          if (this.playing) {
             this.analyser.getByteFrequencyData(dataArray);
-            navigator.vibrate((dataArray[0] + dataArray[1] + dataArray[2]) / 3 > 130 ? 80 : 0);
+            var expData = (0.001 / (0.001 + Math.pow((dataArray[0] / 255) / (1 - (dataArray[0] / 255)), -6))) * 25; 
+            if(expData < 10) expData = 0;
+            navigator.vibrate(expData);
           }
-        },25);
-        
+        }, 25);
+
         this.slowCon = this.slowCon ? this.slowCon : false;
         let slowLoad = setTimeout(() => {
           if (!this.canplay) this.slowCon = true;
@@ -131,7 +133,7 @@
         this.loadingTime = performance.now();
         this.$emit('loading');
 
-        this.audio.oncanplaythrough =  function() {
+        this.audio.oncanplaythrough = function() {
           proxy.$emit('loaded');
           proxy.loadingTime = performance.now() - proxy.loadingTime;
           proxy.audio.currentTime = proxy.loadingTime / 1000;
@@ -155,10 +157,10 @@
         };
 
         if (navigator)
-          if(navigator.mediaSession) {
-          navigator.mediaSession.setActionHandler('play', () => (proxy.playing = !proxy.playing));
-          navigator.mediaSession.setActionHandler('pause', () => (proxy.playing = !proxy.playing));
-        }
+          if (navigator.mediaSession) {
+            navigator.mediaSession.setActionHandler('play', () => (proxy.playing = !proxy.playing));
+            navigator.mediaSession.setActionHandler('pause', () => (proxy.playing = !proxy.playing));
+          }
       },
       async play() {
         this.pausedMs = this.pauseDate > 0 ? Date.now() - this.pauseDate : 0;
@@ -298,7 +300,7 @@
       };
 
       Audio.prototype.fade = function(from, to, len) {
-        if(this._fadeInterval) clearInterval(this._fadeInterval);
+        if (this._fadeInterval) clearInterval(this._fadeInterval);
         this._fadeInterval = null;
         let proxy = this;
         let vol = from;
@@ -329,10 +331,10 @@
           }
         }, stepLen);
       };
-      Audio.prototype.unload = function(){
+      Audio.prototype.unload = function() {
         this.pause();
-        this.src = "";
-      }
+        this.src = '';
+      };
     },
     beforeMount() {},
     mounted() {

@@ -30,12 +30,12 @@
           </span>
         </transition>
       </div>
-      <div @click.self="sliderShown = !sliderShown" class="click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative">
+      <div @click.stop.self="sliderShown = !sliderShown" class="click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative">
         <transition name="fade-left" mode="out-in">
-          <span key="volLarge" @click="sliderShown = !sliderShown" v-if="value >= 0.7" class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150">
+          <span key="volLarge" @click.stop="sliderShown = !sliderShown" v-if="value >= 0.7" class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150">
             <box-icon name="volume-full" type="solid" size="cssSize" class="w-12 h-12 fill-current -ml-2 stroke-current text-gray-300 stroke-0" v-pre></box-icon>
           </span>
-          <span key="volSmol" @click="sliderShown = !sliderShown" v-else class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150">
+          <span key="volSmol" @click.stop="sliderShown = !sliderShown" v-else class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150">
             <box-icon name="volume-low" type="solid" size="cssSize" class="w-12 h-12 fill-current stroke-current text-gray-300 stroke-0" v-pre></box-icon>
           </span>
         </transition>
@@ -63,6 +63,7 @@
         updatedAlbum: '____',
         updatedCover: null,
         playing: false,
+        sliderShown:false,
         value: 1,
         aurLogo:'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png',
         scale: 0
@@ -126,6 +127,10 @@
       },
     },
     created() {
+      let proxy = this;
+      document.addEventListener('click',() => {
+        proxy.sliderShown = false;
+      });
     },
     beforeMount() {},
     mounted() {

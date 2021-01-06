@@ -171,7 +171,6 @@
         this.analyserInterval = setInterval(() => {
           this.analyser.getByteFrequencyData(this.analyserData);
           this.normalizedBassData = (this.analyserData[0] + this.analyserData[1] + this.analyserData[2]) / (3 * 255);
-          this.normalizedBassData = 1 / (1 + Math.pow(this.normalizedBassData / (1 - this.normalizedBassData), -1.5));
         },this.analyserTickLen);
 
         this.slowCon = this.slowCon ? this.slowCon : false;

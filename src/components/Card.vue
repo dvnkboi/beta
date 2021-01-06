@@ -1,11 +1,11 @@
 <template>
-  <div :key="Date.now() * Math.random()" class="card flex-auto w-full bg-black bg-opacity-90 relative grid grid-cols-4 grid-rows-1 overflow-hidden transition duration-300 border-b border-gray-600">
+  <div :key="'recent' + index" class="card flex-auto w-full bg-black bg-opacity-90 relative grid grid-cols-4 grid-rows-1 overflow-hidden transition duration-300 border-b border-gray-600">
     <div class="col-span-1 aspect-ratio-square overflow-hidden relative">
       <transition name="fade-up" mode="out-in" appear>
-        <img :key="'cover' + index + Date.now()" ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="h-full w-full object-cover bg-cover ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute" alt="" />
+        <img :key="'cover' + index" ref="coverArt" v-show="hasLoaded" @load="loaded" @error='updatedCover = aurLogo' v-loadedifcomplete :src="updatedCover" class="h-full w-full object-cover bg-cover ring-2 ring-purple-200 ring-opacity-25 transition-transform duration-300 absolute" alt="" />
       </transition>
       <transition name="fade-up" mode="out-in" appear>
-        <div :key="'skelly' + index + Date.now()" v-show="!hasLoaded" class="box-border h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute"></div>
+        <div :key="'skelly' + index" v-show="!hasLoaded" class="box-border h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute"></div>
       </transition>
     </div>
     <div class="col-span-3 flex justify-items-start items-start flex-auto flex-col py-3 px-3 md:px-6 h-full">
@@ -36,6 +36,8 @@
         updatedMin: null,
         updatedCover: null,
         key: Date.now(),
+        aurLogo:'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png',
+        scale: 0
       };
     },
     methods: {
@@ -44,6 +46,9 @@
       },
     },
     watch: {
+      soundData: function(newVal){
+        this.scale = newVal;
+      },
       updatedCover: function() {
         this.hasLoaded = false;
       },
@@ -99,7 +104,8 @@
       artist: String,
       minutes: Number,
       changed: Boolean,
-      index: Number
+      index: Number,
+      soundData: Number,
     },
   };
 </script>

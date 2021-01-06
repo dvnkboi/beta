@@ -1,11 +1,37 @@
 <template>
   <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full">
-    <connectivity class="z-20" :show="!connected || ($refs.mainCard ? $refs.mainCard.slowCon : false)" />
-    <MainCard class="z-10" ref="mainCard" @failed="getQueue()" @reloadStream="loadLatency =($refs.mainCard ? $refs.mainCard.loadingTime : 0)" @loading="audioLoading = true" @loaded="audioLoading = false" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" />
+    <connectivity class="z-20" :show="!connected || slowCon" />
+    <MainCard class="z-10" ref="mainCard" 
+      @volume="volume = $event" 
+      @playPause="playing = !playing" 
+      @failed="getQueue()" 
+      :title="queue[0].title" 
+      :artist="queue[0].artist" 
+      :album="this.queue[0].album" 
+      :cover="queue[0].largeCover" 
+      :changed="queue[0].changed" 
+      :playTime="playTime"
+      :soundData="normalizedBassData"
+    />
     <div class="w-full overflow-auto xl:h-full">
-      <Card v-for="(val,index) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :index="index" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" />
+      <Card v-for="(val,index) in queueSongs" 
+        :key="val.id" class="z-10 w-full" 
+        @failed="getQueue()" 
+        :index="index" 
+        :title="val.title" 
+        :artist="val.artist" 
+        :cover="val.cover" 
+        :minutes="val.minutes" 
+        :changed="val.changed"
+        :soundData="normalizedBassData"
+      />
     </div>
-    <SongBg class="z-0 -left-10 overflow-hidden" :changed="queue[0].changed" :percent="currentSongTimer.percent" />
+    <SongBg 
+      :style="{filter: 'saturate('+ normalizedBassData * 200 +'%)'}" 
+      class="z-0 -left-10 overflow-hidden transition-all duration-75" 
+      :changed="queue[0].changed" 
+      :percent="currentSongTimer.percent" 
+    />
     <Loading class="z-20" :show="audioLoading || metaLoading" />
   </div>
 </template>
@@ -38,6 +64,7 @@
           },
         ],
         art: [],
+        aurTmpLogo:'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png',
         nextArt: null,
         pongOpen: true,
         queueOpen: true,
@@ -87,6 +114,24 @@
         lodashGet: null,
         io: null,
         uuid: require('uuid'),
+        audio:null,
+        volume:0,
+        expVol: 1,
+        playing:false,
+        context:null,
+        analyser:null,
+        nodeSource:null,
+        slowCon:false,
+        pausedMs:0,
+        playTimer:null,
+        playSeconds:0,
+        playTime:0,
+        loadingTime:0,
+        canPlay:false,
+        analyserInterval: null,
+        analyserTickLen:25,
+        analyserData:null,
+        normalizedBassData:0
       };
     },
     computed: {
@@ -95,7 +140,114 @@
       },
     },
     methods: {
+      initAudio() {
+        let proxy = this;
+        if (this.audio) this.audio.unload();
+        else this.audio = new Audio();
+        this.audio.src = 'https://api.ampupradio.com:8443/TOP40.mp3?nocache=' + Date.now();
+        this.audio.volume = 0;
+        this.audio.crossOrigin = 'anonymous';
+        this.pausedMs = 0;
+        this.accumPause = 0;
+        this.loadingTime = 0;
+        this.canPlay = false;
+
+        if (!this.context) {
+          this.context = new (window.AudioContext || window.webkitAudioContext)();
+          this.analyser = this.context.createAnalyser();
+          this.analyser.fftSize = 2048;
+          this.analyser.smoothingTimeConstant = 0.69;
+          this.nodeSource = this.context.createMediaElementSource(this.audio);
+          this.nodeSource.connect(this.analyser);
+          this.analyser.connect(this.context.destination);
+        }
+
+        
+        if(!this.analyserData) this.analyserData = new Uint8Array(this.analyser.frequencyBinCount);
+
+        if(this.analyserInterval) clearInterval(this.analyserInterval);
+        this.analyserInterval = null;
+
+        this.analyserInterval = setInterval(() => {
+          this.analyser.getByteFrequencyData(this.analyserData);
+          this.normalizedBassData = (this.analyserData[0] + this.analyserData[1] + this.analyserData[2]) / (3 * 255);
+          this.normalizedBassData = 1 / (1 + Math.pow(this.normalizedBassData / (1 - this.normalizedBassData), -1.5));
+        },this.analyserTickLen);
+
+        this.slowCon = this.slowCon ? this.slowCon : false;
+        let slowLoad = setTimeout(() => {
+          if (!this.canplay) this.slowCon = true;
+        }, 8000);
+
+        this.loadingTime = performance.now();
+        this.audioLoading = true;
+
+        this.audio.oncanplaythrough = function() {
+          proxy.audioLoading = false
+          proxy.loadingTime = performance.now() - proxy.loadingTime;
+          proxy.loadLatency = proxy.loadingTime;
+          proxy.audio.currentTime = proxy.loadingTime / 1000;
+          proxy.audio.play();
+          if (proxy.playing) {
+            proxy.audio.fade(0, proxy.expVol, 500);
+          }
+          proxy.canPlay = true;
+
+          clearTimeout(slowLoad);
+          proxy.slowCon = false;
+          proxy.audio.oncanplaythrough = null;
+        };
+
+        this.audio.onplay = function() {
+          proxy.updateTime();
+        };
+
+        this.audio.onerror = function() {
+          setTimeout(proxy.initAudio, 1000);
+        };
+
+        if (navigator)
+          if (navigator.mediaSession) {
+            navigator.mediaSession.setActionHandler('play', () => (proxy.playing = !proxy.playing));
+            navigator.mediaSession.setActionHandler('pause', () => (proxy.playing = !proxy.playing));
+          }
+      },
+      async play() {
+        this.pausedMs = this.pauseDate > 0 ? Date.now() - this.pauseDate : 0;
+        console.log('paused for ', this.pausedMs / 1000, 's');
+        console.log((this.audio ? this.audio.readyState : null));
+        if (!this.audio || this.audio.readyState < 3 || this.pausedMs > 60000) {
+          await this.audioReqStack();
+          this.initAudio();
+        } else {
+          this.audio.fade(0, this.expVol, 500);
+        }
+      },
+      pause() {
+        console.log(this.loadingTime);
+        this.pauseDate = Date.now();
+        this.audio.fade(this.expVol, 0, 100);
+      },
+      updateTime() {
+        if (!this.playTimer) {
+          let proxy = this;
+          proxy.playTimer = new AdjustingInterval(() => {
+            proxy.playSeconds = Math.floor(proxy.audio.currentTime - proxy.accumPause / 1000);
+            proxy.playTime = proxy.playSeconds.toString().toHHMMSS();
+          }, 1000);
+          proxy.playTimer.start();
+        } else {
+          if (!this.playTimer.running) {
+            this.playTimer.start();
+          }
+        }
+      },
+      resetTime() {
+        this.playTimer.stop();
+      },
+      async audioReqStack() {},
       async queueReqStack() {
+        this.queueReqOK = false;
         if (!this.Promise) {
           this.Promise = await import(/* webpackChunkName: "bluebird" */ 'bluebird');
           this.Promise = this.Promise.default;
@@ -262,8 +414,20 @@
               this.queue[i].date = this.res.response.history[i].date_played;
               this.queue[i].minutes = Math.floor((new Date().getTime() - new Date(this.res.response.history[i].date_played).getTime()) / 60000);
 
-              this.queue[i].cover = (this.lodashGet(this.art[i][0], 'images[0].thumbnails.small') || this.lodashGet(this.art[i][0], 'images[0].thumbnails["250"]') || this.lodashGet(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png').replace('http://', 'https://');
-              this.queue[i].largeCover = (this.lodashGet(this.art[i][0], 'images[0].thumbnails.large') || this.lodashGet(this.art[i][0], 'images[0].thumbnails["500"]') || this.lodashGet(this.art[i][0], 'images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png').replace('http://', 'https://');
+              this.queue[i].cover = (
+                this.lodashGet(this.art[i][0], 'images[0].thumbnails.small') 
+                || this.lodashGet(this.art[i][0], 'images[0].thumbnails["250"]') 
+                || this.lodashGet(this.art[i][0], 'images[0].image') 
+                || this.aurTmpLogo
+                ).replace('http://', 'https://');
+
+              this.queue[i].largeCover = (
+                this.lodashGet(this.art[i][0], 'images[0].thumbnails.large') 
+                || this.lodashGet(this.art[i][0], 'images[0].thumbnails["500"]') 
+                || this.lodashGet(this.art[i][0], 'images[0].image') 
+                || this.aurTmpLogo
+                ).replace('http://', 'https://');
+
               this.preloadSuccess = false;
               this.preloadRunning = false;
             }
@@ -277,7 +441,14 @@
       },
       async preloadNext() {
         let src = await this.getNextArt();
-        let preloadSrc = (this.lodashGet(src, 'response[0].images[0].thumbnails.small') || this.lodashGet(src, 'response[0].images[0].thumbnails["250"]') || this.lodashGet(src, 'response[0].images[0].image') || 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png').replace('http://', 'https://');
+
+        let preloadSrc = (
+          this.lodashGet(src, 'response[0].images[0].thumbnails.small') 
+          || this.lodashGet(src, 'response[0].images[0].thumbnails["250"]') 
+          || this.lodashGet(src, 'response[0].images[0].image') 
+          || this.aurTmpLogo
+          ).replace('http://', 'https://');
+
         let preloadImg = new Image();
         if (src) {
           if (preloadSrc == this.queue[0].cover) {
@@ -385,6 +556,44 @@
       },
     },
     watch: {
+      pausedMs: function(val) {
+        this.accumPause += val;
+      },
+      playSeconds: function() {
+        if (this.playing) {
+          this.audioLoading = false;
+          clearTimeout(this.stopped);
+          this.stopped = null;
+          this.stopped = setTimeout(() => this.audioLoading = true, 1000);
+          clearTimeout(this.hasDied);
+          this.hasDied = null;
+          this.hasDied = setTimeout(this.initAudio, 8000);
+        }
+      },
+      volume: function(newVal) {
+        console.log(newVal);
+        localStorage.setItem('volume', newVal);
+        this.expVol = 0.4 / (0.4 + Math.pow(newVal / (1 - newVal), -1.6));
+        if (this.audio && this.playing) {
+          this.audio.fade(this.audio.volume, this.expVol, 250);
+        }
+      },
+      playing: async function() {
+        if (!this.playing) {
+          this.pause();
+          this.resetTime();
+          this.audioLoading = false
+          clearTimeout(this.stopped);
+          this.stopped = null;
+          clearTimeout(this.hasDied);
+          this.hasDied = null;
+        } else {
+          await this.play();
+          if (!this.audio.paused) {
+            this.updateTime();
+          }
+        }
+      },
       loadLatency: function() {
         this.$nextTick(() => {
           console.log({
@@ -400,6 +609,64 @@
     },
     async beforeCreate() {},
     created() {
+
+      String.prototype.toHHMMSS = function() {
+        var sec_num = parseInt(this, 10); // don't forget the second param
+        var hours = Math.floor(sec_num / 3600);
+        var minutes = Math.floor((sec_num - hours * 3600) / 60);
+        var seconds = sec_num - hours * 3600 - minutes * 60;
+
+        if (hours < 10) {
+          hours = '0' + hours;
+        }
+        if (minutes < 10) {
+          minutes = '0' + minutes;
+        }
+        if (seconds < 10) {
+          seconds = '0' + seconds;
+        }
+        return hours + ':' + minutes + ':' + seconds;
+      };
+
+      Audio.prototype.fade = function(from, to, len) {
+        if (this._fadeInterval) clearInterval(this._fadeInterval);
+        this._fadeInterval = null;
+        let proxy = this;
+        let vol = from;
+        let diff = to - from;
+        let steps = Math.abs(diff / 0.01);
+        let stepLen = Math.max(4, steps > 0 ? len / steps : len);
+        var lastTick = Date.now();
+
+        this._fadeTo = to;
+        var tick;
+
+        this._fadeInterval = setInterval(() => {
+          tick = (Date.now() - lastTick) / len;
+          lastTick = Date.now();
+          vol += diff * tick;
+
+          vol = Math.round(vol * 100) / 100;
+
+          vol = diff < 0 ? Math.max(to, vol) : Math.min(to, vol);
+          
+          proxy.volume = vol;
+          
+
+          if ((to < from && vol <= to) || (to > from && vol >= to)) {
+            clearInterval(proxy._fadeInterval);
+            proxy._fadeInterval = null;
+            proxy._fadeTo = null;
+            proxy.volume = to;
+          }
+        }, stepLen);
+      };
+
+      Audio.prototype.unload = function() {
+        this.pause();
+        this.src = '';
+      };
+
       let proxy = this;
       let conApi;
       if (navigator.connection){

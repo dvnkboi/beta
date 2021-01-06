@@ -1,9 +1,9 @@
 <template>
   <div class="mainCard bg-black-dark bg-opacity-90 flex w-full xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300 overflow-auto">
     <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
-      <div class="transform-gpu hover:-translate-y-2 h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 ">
+      <div class="transform-gpu hover:-translate-y-2 h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
         <transition name="fade-up" mode="out-in" appear>
-          <img :key="'cover' + Date.now()" ref="coverArt" v-show="hasLoaded" @load="loaded" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
+          <img :key="'cover' + Date.now()" ref="coverArt" v-show="hasLoaded" @load="loaded" @error='updatedCover = aurLogo' v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
         </transition>
         <transition name="fade-up" mode="out-in" appear>
           <div :key="'coverSkelly' + Date.now()" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute"></div>
@@ -41,7 +41,7 @@
         </transition>
         <transition name="fade" appear>
           <div v-show="sliderShown" class="h-64 w-16 bg-black-light mb-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-start pt-4 transition duration-150">
-            <input ref="volumeSlider" type="range" min="0" max="1" step="0.01" name="volume" v-model="value" orient="vertical" data-orientation="vertical" id="volumeSlider" class="w-2 h-40" />
+            <input ref="volumeSlider" type="range" min="0" max="1" step="0.01" name="volume" v-model.lazy="value" orient="vertical" data-orientation="vertical" id="volumeSlider" class="w-2 h-40" />
           </div>
         </transition>
       </div>
@@ -62,182 +62,27 @@
         updatedArtist: '____',
         updatedAlbum: '____',
         updatedCover: null,
-        playTime: null,
-        playSeconds: 0,
-        audio: null,
         playing: false,
-        pauseDate: null,
-        pausedMs: 0,
-        accumPause: 0,
-        loadingTime: 0,
-        canPlay: false,
-        slowCon: false,
-        sliderShown: false,
         value: 1,
-        expVol: 1,
-        hasInitialised: false,
-        playTimer: null,
-        AdjustingInterval: null,
-        audioPos: 0,
-        hasStopped: null,
-        hasDied: null,
-        analyser: null,
-        analyzerFrame: null,
-        context: null,
-        nodeSource: null,
+        aurLogo:'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png',
+        scale: 0
       };
     },
     methods: {
       loaded(evt) {
         if (evt) if (evt.path[0].naturalWidth != 0) this.hasLoaded = true;
-      },
-      initAudio() {
-        let proxy = this;
-        if (this.audio) this.audio.unload();
-        if (!this.audio) this.audio = new Audio();
-        this.audio.src = 'https://api.ampupradio.com:8443/TOP40.mp3?nocache=' + Date.now();
-        this.audio.volume = 0;
-        this.audio.crossOrigin = 'anonymous';
-        this.pausedMs = 0;
-        this.accumPause = 0;
-        this.loadingTime = 0;
-        this.canPlay = false;
-
-        if (!this.context) {
-          this.context = new (window.AudioContext || window.webkitAudioContext)();
-          this.analyser = this.context.createAnalyser();
-          this.analyser.fftSize = 2048;
-          this.analyser.smoothingTimeConstant = 0;
-          this.nodeSource = this.context.createMediaElementSource(this.audio);
-          this.nodeSource.connect(this.analyser);
-          this.analyser.connect(this.context.destination);
-        }
-
-        var bufferLength = this.analyser.frequencyBinCount;
-        var dataArray = new Uint8Array(bufferLength);
-
-        setInterval(() => {
-          if (this.playing) {
-            this.analyser.getByteFrequencyData(dataArray);
-            var expData = (0.001 / (0.001 + Math.pow((dataArray[0] / 255) / (1 - (dataArray[0] / 255)), -6))) * 25; 
-            if(expData < 10) expData = 0;
-            navigator.vibrate(expData);
-          }
-        }, 25);
-
-        this.slowCon = this.slowCon ? this.slowCon : false;
-        let slowLoad = setTimeout(() => {
-          if (!this.canplay) this.slowCon = true;
-        }, 8000);
-
-        this.loadingTime = performance.now();
-        this.$emit('loading');
-
-        this.audio.oncanplaythrough = function() {
-          proxy.$emit('loaded');
-          proxy.loadingTime = performance.now() - proxy.loadingTime;
-          proxy.audio.currentTime = proxy.loadingTime / 1000;
-          proxy.audio.play();
-          if (proxy.playing) {
-            proxy.audio.fade(0, proxy.expVol, 500);
-          }
-          proxy.canPlay = true;
-
-          clearTimeout(slowLoad);
-          proxy.slowCon = false;
-          proxy.audio.oncanplaythrough = null;
-        };
-
-        this.audio.onplay = function() {
-          proxy.updateTime();
-        };
-
-        this.audio.onerror = function() {
-          setTimeout(proxy.initAudio, 1000);
-        };
-
-        if (navigator)
-          if (navigator.mediaSession) {
-            navigator.mediaSession.setActionHandler('play', () => (proxy.playing = !proxy.playing));
-            navigator.mediaSession.setActionHandler('pause', () => (proxy.playing = !proxy.playing));
-          }
-      },
-      async play() {
-        this.pausedMs = this.pauseDate > 0 ? Date.now() - this.pauseDate : 0;
-        console.log('paused for ', this.pausedMs / 1000, 's');
-        if (!this.audio || !this.audio.readyState < 3 || this.pausedMs > 60000) {
-          await this.requireStack();
-          this.initAudio();
-        } else {
-          this.audio.fade(0, this.expVol, 500);
-        }
-      },
-      pause() {
-        console.log(this.loadingTime);
-        this.pauseDate = Date.now();
-        this.audio.fade(this.expVol, 0, 100);
-      },
-      updateTime() {
-        if (!this.playTimer) {
-          let proxy = this;
-          proxy.playTimer = new this.AdjustingInterval(() => {
-            proxy.playSeconds = Math.floor(proxy.audio.currentTime - proxy.accumPause / 1000);
-            proxy.playTime = proxy.playSeconds.toString().toHHMMSS();
-          }, 1000);
-          proxy.playTimer.start();
-        } else {
-          if (!this.playTimer.running) {
-            this.playTimer.start();
-          }
-        }
-      },
-      resetTime() {
-        this.playTimer.stop();
-      },
-      async requireStack() {
-        if (!this.AdjustingInterval) {
-          this.AdjustingInterval = await import(/* webpackChunkName: "utils" */ '../utils.js');
-          this.AdjustingInterval = this.AdjustingInterval.AdjustingInterval;
-        }
-      },
+      }
     },
     watch: {
-      pausedMs: function(val) {
-        this.accumPause += val;
-      },
-      playSeconds: function() {
-        if (this.playing) {
-          this.$emit('loaded');
-          clearTimeout(this.stopped);
-          this.stopped = null;
-          this.stopped = setTimeout(() => this.$emit('loading'), 1000);
-          clearTimeout(this.hasDied);
-          this.hasDied = null;
-          this.hasDied = setTimeout(this.initAudio, 8000);
-        }
+      soundData: function(newVal){
+        this.scale = newVal;
       },
       value: function(newVal) {
-        localStorage.setItem('volume', newVal);
-        this.expVol = 0.4 / (0.4 + Math.pow(newVal / (1 - newVal), -1.6));
-        if (this.audio && this.playing) {
-          this.audio.fade(this.audio.volume, this.expVol, 250);
-        }
+        console.log(newVal);
+        this.$emit('volume',newVal);
       },
       playing: async function() {
-        if (!this.playing) {
-          this.pause();
-          this.resetTime();
-          this.$emit('loaded');
-          clearTimeout(this.stopped);
-          this.stopped = null;
-          clearTimeout(this.hasDied);
-          this.hasDied = null;
-        } else {
-          await this.play();
-          if (!this.audio.paused) {
-            this.updateTime();
-          }
-        }
+        this.$emit('playPause');
       },
       updatedCover: function() {
         this.hasLoaded = false;
@@ -281,60 +126,6 @@
       },
     },
     created() {
-      String.prototype.toHHMMSS = function() {
-        var sec_num = parseInt(this, 10); // don't forget the second param
-        var hours = Math.floor(sec_num / 3600);
-        var minutes = Math.floor((sec_num - hours * 3600) / 60);
-        var seconds = sec_num - hours * 3600 - minutes * 60;
-
-        if (hours < 10) {
-          hours = '0' + hours;
-        }
-        if (minutes < 10) {
-          minutes = '0' + minutes;
-        }
-        if (seconds < 10) {
-          seconds = '0' + seconds;
-        }
-        return hours + ':' + minutes + ':' + seconds;
-      };
-
-      Audio.prototype.fade = function(from, to, len) {
-        if (this._fadeInterval) clearInterval(this._fadeInterval);
-        this._fadeInterval = null;
-        let proxy = this;
-        let vol = from;
-        let diff = to - from;
-        let steps = Math.abs(diff / 0.01);
-        let stepLen = Math.max(4, steps > 0 ? len / steps : len);
-        var lastTick = Date.now();
-
-        this._fadeTo = to;
-        var tick;
-
-        this._fadeInterval = setInterval(() => {
-          tick = (Date.now() - lastTick) / len;
-          lastTick = Date.now();
-          vol += diff * tick;
-
-          vol = Math.round(vol * 100) / 100;
-
-          vol = diff < 0 ? Math.max(to, vol) : Math.min(to, vol);
-
-          proxy.volume = vol;
-
-          if ((to < from && vol <= to) || (to > from && vol >= to)) {
-            clearInterval(proxy._fadeInterval);
-            proxy._fadeInterval = null;
-            proxy._fadeTo = null;
-            proxy.volume = to;
-          }
-        }, stepLen);
-      };
-      Audio.prototype.unload = function() {
-        this.pause();
-        this.src = '';
-      };
     },
     beforeMount() {},
     mounted() {
@@ -357,6 +148,8 @@
       artist: String,
       changed: Boolean,
       album: String,
+      soundData: Number,
+      playTime: String
     },
   };
 </script>

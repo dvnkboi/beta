@@ -107,7 +107,7 @@
         if (!this.audio) {
           import(/* webpackChunkName: "SilenceJS" */ '../silence').then((Silence) => {
             Silence = Silence.default;
-            
+
             this.audio = new Silence('https://api.ampupradio.com:8443/TOP40.mp3?nocache=' + Date.now(),{
               volume: parseFloat(localStorage.getItem('volume')) || 1
             });
@@ -238,8 +238,7 @@
       async getQueue() {
         if (this.queueOpen && this.connected) {
           this.queueOpen = false;
-          console.log('get queue');
-          let loadTime = performance.now();
+          this.metaLoadTime = performance.now();
           let loadingTimer = setTimeout(() => (this.metaLoading = true), 5000);
           this.res = await this.Promise.retry(3, this.getHistory, 1000).catch((e) => console.log(e.message));
           this.art = this.lodashGet(await this.Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message)), 'response');
@@ -265,8 +264,7 @@
 
           clearTimeout(loadingTimer);
           this.metaLoading = false;
-          loadTime = performance.now() - loadTime;
-          console.log('finished getting meta in', loadTime);
+          this.metaLoadTime = performance.now() - this.metaLoadTime;
 
           this.setComponentInfo();
 
@@ -279,7 +277,6 @@
         try {
           startIndex = startIndex > 0 ? startIndex : 0;
           if (this.previousID.value == this.lodashGet(this.art[this.previousID.index][0], '_id') && !noCheckDup) {
-            console.log('break lol');
             setTimeout(() => {
               this.queueOpen = true;
             }, 1000);

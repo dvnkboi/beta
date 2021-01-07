@@ -38,7 +38,7 @@
           },
         ],
         art: [],
-        aurTmpLogo: 'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png',
+        aurTmpLogo: '/assets/aur400.png',
         nextArt: null,
         pongOpen: true,
         queueOpen: true,

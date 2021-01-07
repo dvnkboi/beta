@@ -3,6 +3,7 @@
 const TerserPlugin = require("terser-webpack-plugin");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
 
 // vue.config.js
 module.exports = {
@@ -13,6 +14,12 @@ module.exports = {
       test: /\.css(\?.*)?$/i,
       use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
     },
+    plugins:[
+      new CopyPlugin([{
+        from: './src/assets',
+        to: 'assets'
+      }]),
+    ],
     optimization: {
       removeAvailableModules: true,
       removeEmptyChunks: true,

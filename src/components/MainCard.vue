@@ -65,7 +65,7 @@
         playing: false,
         sliderShown:false,
         value: 1,
-        aurLogo:'https://cdn.discordapp.com/attachments/331151226756530176/791481882319257600/AURDefaultCleanDEC2020.png',
+        aurLogo:'/assets/aur400.png',
         scale: 0
       };
     },

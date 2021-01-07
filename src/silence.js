@@ -37,7 +37,6 @@ class Silence {
       slowTimeout: 8000
     }
 
-
     this._audioSource = new Audio();
     this._preload = this.config.preload || Silence.defaultConfig.preload;
     this._audioSource.crossOrigin = this.config.crossOrigin || Silence.defaultConfig.crossOrigin;

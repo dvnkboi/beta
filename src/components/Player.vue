@@ -107,9 +107,9 @@
         if (!this.audio) {
           import(/* webpackChunkName: "SilenceJS" */ '../silence').then((Silence) => {
             Silence = Silence.default;
-
+            
             this.audio = new Silence('https://api.ampupradio.com:8443/TOP40.mp3?nocache=' + Date.now(),{
-              volume: this.volume = parseFloat(localStorage.getItem('_Silence_volume')) || 1
+              volume: parseFloat(localStorage.getItem('volume')) || 1
             });
 
             this.audio.normalDataFn = (data) => {
@@ -431,7 +431,7 @@
     },
     watch: {
       volume: function(newVal) {
-        localStorage.setItem('_Silence_volume', newVal);
+        localStorage.setItem('volume', newVal);
         if(this.audio) this.audio.volume(newVal);
       },
       playing: async function() {

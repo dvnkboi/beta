@@ -79,7 +79,6 @@
         this.scale = newVal;
       },
       value: function(newVal) {
-        console.log(newVal);
         this.$emit('volume',newVal);
       },
       playing: async function() {

@@ -1,11 +1,11 @@
 <template>
-  <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full overflow-x-visible">
+  <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full relative">
     <connectivity class="z-20" :show="!connected || slowCon" />
     <MainCard class="z-10" ref="mainCard" @volume="volume = $event" @playPause="playing = !playing" @failed="getQueue()" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :soundData="normalizedBassData" />
     <div class="w-full overflow-auto xl:h-full">
       <Card v-for="(val, index) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :index="index" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" :soundData="normalizedBassData" />
     </div>
-    <SongBg :style="{ filter: 'saturate(' + normalizedBassData * 200 + '%)' }" class="z-0 -left-10 transition-all duration-100" :changed="queue[0].changed" :percent="currentSongTimer.percent" />
+    <SongBg :style="{ filter: 'saturate(' + normalizedBassData * 200 + '%)' }" class="z-0 transition-all duration-100" :changed="queue[0].changed" :percent="currentSongTimer.percent" />
     <Loading class="z-20" :show="audioLoading || metaLoading" />
   </div>
 </template>
@@ -87,7 +87,7 @@
         axios: null,
         lodashGet: null,
         io: null,
-        Silence:null,
+        Silence: null,
         uuid: require('uuid'),
         playing: false,
         normalizedBassData: 0,
@@ -108,8 +108,8 @@
           import(/* webpackChunkName: "SilenceJS" */ '../silence').then((Silence) => {
             Silence = Silence.default;
 
-            this.audio = new Silence('https://api.ampupradio.com:8443/TOP40.mp3?nocache=' + Date.now(),{
-              volume: parseFloat(localStorage.getItem('volume')) || 1
+            this.audio = new Silence('https://api.ampupradio.com:8443/TOP40.mp3?nocache=' + Date.now(), {
+              volume: parseFloat(localStorage.getItem('volume')) || 1,
             });
 
             this.audio.normalDataFn = (data) => {
@@ -135,8 +135,7 @@
 
             proxy.audio.play();
           });
-        } 
-        else {
+        } else {
           this.audio.play();
         }
       },
@@ -429,7 +428,7 @@
     watch: {
       volume: function(newVal) {
         localStorage.setItem('volume', newVal);
-        if(this.audio) this.audio.volume(newVal);
+        if (this.audio) this.audio.volume(newVal);
       },
       playing: async function() {
         if (!this.playing) {

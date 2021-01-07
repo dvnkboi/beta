@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed top-0 left-0 w-full h-full overflow-hidden">
+  <div class="fixed top-0 left-0 w-full h-full overflow-y-hidden overflow-visible">
     <transition name="fade" appear>
       <div :key="key" v-show="show" :style="{ transform: cssPercent, 'background-color': cssBackground }" class="background h-full transition-all duration-300 ease-linear bg-yellow-400"></div>
     </transition>

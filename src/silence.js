@@ -10,13 +10,13 @@ class Silence {
       value: function (prop, handler) {
         var setter = function (newVal) {
           let oldVal = this[prop];
-          this['_'+prop] = newVal;
+          this['_internal_' + prop] = newVal;
           return newVal = handler.call(this, newVal, oldVal);
         };
         Object.defineProperty(this, prop, {
           set: setter,
-          get(){
-            return this['_'+prop]
+          get() {
+            return this['_internal_' + prop]
           }
         });
       }
@@ -30,18 +30,19 @@ class Silence {
       crossOrigin: 'anonymous',
       analyser: true,
       analyserFps: 25,
-      fade:true,
-      freqDataFn:null,
-      timeDataFn:null,
+      fade: true,
+      freqDataFn: null,
+      timeDataFn: null,
       timeUpdateTick: 1000,
-      slowTimeout:8000
+      slowTimeout: 8000
     }
 
 
     this._audioSource = new Audio();
     this._preload = this.config.preload || Silence.defaultConfig.preload;
-    this._audioSource.volume = this.config.volume || Silence.defaultConfig.volume;
     this._audioSource.crossOrigin = this.config.crossOrigin || Silence.defaultConfig.crossOrigin;
+    this._audioSource.preload = false;
+    this._audioSource.volume = 0;
     this.url = url;
 
     this.slowCon = false;
@@ -54,29 +55,16 @@ class Silence {
     this.canPlay = false;
     this.firstInit = true;
     this.hhmmss = {};
+    this.currentTime = this._audioSource.currentTime;
+    this.unloaded = true;
 
+    // this.watch('vol', (newVal,oldVal) => {
+    //   console.log('changed vol from ', oldVal, ' to ', newVal);
+    // });
 
-    let date = Date.now();
-    this._tick = setInterval(() => {
-      date = Date.now() - date;
-      if(this.playing && this.canPlay) this.relativeTime += date;
-      this.absoluteTime+= date;
-      date = Date.now();
-      if(this.absoluteTime - this.relativeTime > 60000) this.context.suspend();
-      if(document.visibilityState === 'visible'){
-        this.hhmmss = this.toHHMMSS(this.relativeTime / 1000);
-      }
-    },this.config.timeUpdateTick || Silence.defaultConfig.timeUpdateTick);
-
-    this.watch('volume', (newVal) => {
-      newVal = 0.4 / (0.4 + Math.pow(newVal / (1 - newVal), -1.6));
-      this.fade(this._audioSource.volume, newVal, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 250 : 0);
-    });
-
-    this.watch('slowCon', (newVal) => {
-      this.events.emit('slowCon',newVal);
-    });
-    
+    // this.watch('currentTime', (newTime,oldTime) => {
+    //   console.log({oldTime,newTime});
+    // });
 
     if (this.config.analyser ? this.config.analyser : Silence.defaultConfig.analyser) {
       this.context = new (window.AudioContext || window.webkitAudioContext)();
@@ -93,48 +81,76 @@ class Silence {
     }
 
 
-    if(this._preload) {
+    if (this._preload) {
       let proxy = this;
       this.events.emit('loading');
       this.load();
-      this._audioSource.oncanplaythrough = function(){
-        proxy.events.emit('canplay',this.loadingTime);
+      this._audioSource.oncanplaythrough = function () {
+        proxy._audioSource.play();
+        proxy.events.emit('canplay', this.loadingTime);
+        proxy._audioSource.oncanplaythrough = null;
       }
     }
 
   }
 
-  on(evt,fn){
-    this.events.on(evt,fn);
+  on(evt, fn) {
+    this.events.on(evt, fn);
   }
 
-  once(evt,fn){
-    this.events.once(evt,fn);
+  once(evt, fn) {
+    this.events.once(evt, fn);
   }
 
-  off(evt){
+  off(evt) {
     this.events.removeListener(evt);
   }
 
   play() {
-    this.pausedMs = this.pauseDate > 0 ? Date.now() - this.pauseDate : 0;
-    if (!this._audioSource || this._audioSource.readyState < 3 || this.pausedMs > 60000) {
-      this.context.resume();
+    let proxy = this;
+    if (!this._audioSource || this.unloaded || this.firstInit) {
       this._init();
     } else {
-      console.log(this.volume);
-      this.fade(0, this.volume, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 500 : 0);
+      proxy.volume('unmute');
     }
     this.events.emit('play');
     this.playing = true;
   }
 
   pause() {
-    this.pauseDate = Date.now();
-    console.log(this.volume);
-    this.fade(this.volume, 0,  (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 100 : 0);
+    this.volume('mute');
     this.events.emit('pause');
     this.playing = false;
+  }
+
+  volume(val) {
+    if (val <= 1 && val >= 0) {
+      if(this.playing){
+        val = 0.4 / (0.4 + (Math.pow(val / (1 - val), -1.6)));
+        this.vol = val;
+        this._prevVol = this._audioSource.volume;
+        this.fade(this._audioSource.volume, val, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
+      }
+      else{
+        val = 0.4 / (0.4 + (Math.pow(val / (1 - val), -1.6)));
+        this._prevVol = this.vol = val;
+      }
+    }
+    else if (typeof val == 'string') {
+      if (val == 'mute') {
+        this.vol = 0;
+        this._prevVol = this._audioSource.volume;
+        this.fade(this._audioSource.volume, 0, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 100 : 0);
+      }
+      else if (val == 'unmute') {
+        this.vol = this._prevVol || this.config.volume || Silence.defaultConfig.volume;
+        this.fade(this._audioSource.volume, this._prevVol || this.config.volume || Silence.defaultConfig.volume, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
+      }
+    }
+    else if (!val) return this.vol;
+    else {
+      throw new Error('enter an acceptable value: val can be a float between 0 and 1, "mute", "unmute" or null');
+    }
   }
 
   fade(from, to, len) {
@@ -161,7 +177,7 @@ class Silence {
 
       vol = diff < 0 ? Math.max(to, vol) : Math.min(to, vol);
 
-      proxy._audioSource.volume = Math.min(1,Math.max(vol,0));
+      proxy._audioSource.volume = vol;
 
       if ((to < from && vol <= to) || (to > from && vol >= to)) {
         clearInterval(proxy._fadeInterval);
@@ -188,60 +204,76 @@ class Silence {
     if (seconds < 10) {
       seconds = '0' + seconds;
     }
-    if(this.timeUpdateFn) this.timeUpdateFn({hours, minutes, seconds});
-    return {hours, minutes, seconds};
+    if (this.timeUpdateFn) this.timeUpdateFn({ hours, minutes, seconds });
+    return { hours, minutes, seconds };
   }
 
   unload() {
-    this._audioSource.pause();
     this._audioSource.src = '';
+    this.context.suspend();
+    this.unloaded = true;
   }
 
-  load(){
+  load() {
     this._audioSource.src = this.url;
     this._audioSource.load();
   }
 
-  reload(){
+  reload() {
     this.unload();
     this.load();
   }
 
   _init() {
+
     let proxy = this;
-    if(!this.preload && this.firstInit) {
-      this.load();
-      proxy.events.emit('loading');
-      this.canPlay = false;
+
+    if(this.firstInit) console.log('%c ✨✨ SilenceJS is initialising 🔊🔊 ', 'background: rgb(219, 39, 119); color: rgb(27, 27, 27);font-size: 1rem;padding: 1rem;font-weight:700;');
+    else {
+      console.warn('reloading');
     }
-    else{
-      this.events.emit('loading');
-      this.reload();
-      this.canPlay = false;
-    }
-    this.firstInit = false;
     this._audioReqStack().then(() => {
+
+      if (!this.preload && this.firstInit) {
+        this.load();
+        proxy.events.emit('loading');
+        this.canPlay = false;
+      }
+
+      if(this.unloaded){
+        this.events.emit('loading');
+        this.load();
+        this.canPlay = false;
+      }
+  
+      this.firstInit = false;
+      this.context.resume();
+
       this.slowCon = this.slowCon ? this.slowCon : false;
+
       let slowLoad = setTimeout(() => {
         if (!this.canplay) this.slowCon = true;
       }, this.config.slowTimeout || Silence.defaultConfig.slowTimeout);
-      
+
       this.loadingTime = performance.now();
       this.audioLoading = true;
       this.relativeTime = 0;
       this.absoluteTime = 0;
 
       this._audioSource.oncanplaythrough = function () {
-        proxy.events.emit('canplay',this.loadingTime);
+        proxy.events.emit('canplay', this.loadingTime);
+        proxy.unloaded = false;
         proxy.audioLoading = false;
         proxy.loadingTime = performance.now() - proxy.loadingTime;
         proxy._audioSource.currentTime = proxy.loadingTime / 1000;
         proxy._audioSource.play();
-        proxy.fade(0, proxy.volume, (proxy.config.fade == null ? Silence.defaultConfig.fade : proxy.config.fade) ? 500 : 0);
         proxy.canPlay = true;
-
+        proxy.volume('unmute');
         clearTimeout(slowLoad);
         proxy.slowCon = false;
+
+        if(proxy.playing) proxy.play();
+        
         proxy._audioSource.oncanplaythrough = null;
       };
 
@@ -256,8 +288,7 @@ class Silence {
       };
 
       this._audioSource.onerror = function () {
-        proxy.events.emit('error');
-        setTimeout(proxy._init, 1000);
+        proxy.events.emit('audioError');
       };
 
       if (navigator)
@@ -265,6 +296,21 @@ class Silence {
           navigator.mediaSession.setActionHandler('play', () => (proxy.playing = !proxy.playing));
           navigator.mediaSession.setActionHandler('pause', () => (proxy.playing = !proxy.playing));
         }
+
+      if (this._tick) clearInterval(this._tick);
+      let date = Date.now();
+      this._tick = null;
+      this._tick = setInterval(() => {
+        date = Date.now() - date;
+        if (this.playing && this.canPlay) this.relativeTime += date;
+        this.absoluteTime += date;
+        date = Date.now();
+        if (this.absoluteTime - this.relativeTime > 60000) this.unload();
+        if (document.visibilityState === 'visible') {
+          this.hhmmss = this.toHHMMSS(this.relativeTime / 1000);
+        }
+        this.currentTime = this._audioSource.currentTime;
+      }, this.config.timeUpdateTick || Silence.defaultConfig.timeUpdateTick);
 
     });
   }
@@ -275,26 +321,26 @@ class Silence {
 
   _updateCycle() {
     let proxy = this;
-    if(this.freqDataFn) this.analyser.getByteFrequencyData(this.freqData);
-    if(this.timeDataFn) this.analyser.getByteTimeDomainData(this.timeData);
-    
+    if (this.freqDataFn) this.analyser.getByteFrequencyData(this.freqData);
+    if (this.timeDataFn) this.analyser.getByteTimeDomainData(this.timeData);
+
     function update() {
       setTimeout(function () {
         requestAnimationFrame(update);
-        if(document.visibilityState === 'visible'){
-          if(proxy.freqDataFn) {
+        if (document.visibilityState === 'visible') {
+          if (proxy.freqDataFn) {
             proxy.analyser.getByteFrequencyData(proxy.freqData);
             proxy.freqDataFn(proxy.freqData);
-            if(proxy.normalDataFn){
+            if (proxy.normalDataFn) {
               proxy.normalizedBassData = (proxy.freqData[0] + proxy.freqData[1] + proxy.freqData[2]) / (3 * 255);
             }
           }
-          if(proxy.timeDataFn) {
+          if (proxy.timeDataFn) {
             proxy.analyser.getByteTimeDomainData(proxy.timeData);
             proxy.timeDataFn(proxy.timeData);
           }
-          
-          if(proxy.normalDataFn && !proxy.freqDataFn){
+
+          if (proxy.normalDataFn && !proxy.freqDataFn) {
             proxy.analyser.getByteFrequencyData(proxy.freqData);
             proxy.normalizedBassData = (proxy.freqData[0] + proxy.freqData[1] + proxy.freqData[2]) / (3 * 255);
             proxy.normalizedBassData = proxy.normalizedBassData = 0.01 / (0.01 + Math.pow(proxy.normalizedBassData / (1 - proxy.normalizedBassData), -6));
@@ -306,8 +352,6 @@ class Silence {
 
     requestAnimationFrame(update);
   }
-
-
 
 }
 

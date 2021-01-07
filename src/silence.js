@@ -124,13 +124,13 @@ class Silence {
 
   volume(val) {
     if (val <= 1 && val >= 0) {
-      if(this.playing){
+      if (this.playing) {
         val = 0.4 / (0.4 + (Math.pow(val / (1 - val), -1.6)));
         this.vol = val;
         this._prevVol = this._audioSource.volume;
         this.fade(this._audioSource.volume, val, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
       }
-      else{
+      else {
         val = 0.4 / (0.4 + (Math.pow(val / (1 - val), -1.6)));
         this._prevVol = this.vol = val;
       }
@@ -142,8 +142,8 @@ class Silence {
         this.fade(this._audioSource.volume, 0, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 100 : 0);
       }
       else if (val == 'unmute') {
-        this.vol = this._prevVol || this.config.volume || Silence.defaultConfig.volume;
-        this.vol = 0.4 / (0.4 + (Math.pow(this.vol / (1 - this.vol), -1.6)));
+        this.vol = (this._prevVol || this.config.volume || Silence.defaultConfig.volume);
+        if (this.firstInit) this.vol = 0.4 / (0.4 + (Math.pow(this.vol / (1 - this.vol), -1.6)));
         this.fade(this._audioSource.volume, this.vol, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
       }
     }
@@ -224,7 +224,7 @@ class Silence {
 
     this.slowCon = this.slowCon ? this.slowCon : false;
 
-    if(this._slowLoad) clearTimeout(this._slowLoad);
+    if (this._slowLoad) clearTimeout(this._slowLoad);
     this._slowLoad = null;
     this._slowLoad = setTimeout(() => {
       if (!this.canplay) this.slowCon = true;
@@ -247,8 +247,8 @@ class Silence {
       clearTimeout(proxy._slowLoad);
       proxy.slowCon = false;
 
-      if(proxy.playing) proxy.play();
-      
+      if (proxy.playing) proxy.play();
+
       proxy._audioSource.oncanplaythrough = null;
     };
   }
@@ -257,7 +257,7 @@ class Silence {
 
     let proxy = this;
 
-    if(this.firstInit) console.log('%c ✨✨ SilenceJS is initialising 🔊🔊 ', 'background: rgb(219, 39, 119); color: rgb(27, 27, 27);font-size: 1rem;padding: 1rem;font-weight:700;');
+    if (this.firstInit) console.log('%c ✨✨ SilenceJS is initialising 🔊🔊 ', 'background: rgb(219, 39, 119); color: rgb(27, 27, 27);font-size: 1rem;padding: 1rem;font-weight:700;');
     else {
       console.warn('reloading');
     }
@@ -319,7 +319,7 @@ class Silence {
     function update() {
       setTimeout(function () {
         requestAnimationFrame(update);
-        if (document.visibilityState === 'visible') {
+        if (document.visibilityState === 'visible' && proxy.vol > 0) {
           if (proxy.freqDataFn) {
             proxy.analyser.getByteFrequencyData(proxy.freqData);
             proxy.freqDataFn(proxy.freqData);
@@ -334,7 +334,7 @@ class Silence {
 
           if (proxy.normalDataFn && !proxy.freqDataFn) {
             proxy.analyser.getByteFrequencyData(proxy.freqData);
-            proxy.normalizedBassData = (proxy.freqData[0] + proxy.freqData[1] + proxy.freqData[2]) / (3 * 255);
+            proxy.normalizedBassData = ((proxy.freqData[0] + proxy.freqData[1] + proxy.freqData[2]) / (3 * 255));
             proxy.normalizedBassData = proxy.normalizedBassData = 0.01 / (0.01 + Math.pow(proxy.normalizedBassData / (1 - proxy.normalizedBassData), -6));
             proxy.normalDataFn(proxy.normalizedBassData);
           }

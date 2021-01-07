@@ -144,7 +144,8 @@ class Silence {
       }
       else if (val == 'unmute') {
         this.vol = this._prevVol || this.config.volume || Silence.defaultConfig.volume;
-        this.fade(this._audioSource.volume, this._prevVol || this.config.volume || Silence.defaultConfig.volume, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
+        this.vol = 0.4 / (0.4 + (Math.pow(this.vol / (1 - this.vol), -1.6)));
+        this.fade(this._audioSource.volume, this.vol, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
       }
     }
     else if (!val) return this.vol;
@@ -215,13 +216,42 @@ class Silence {
   }
 
   load() {
+    let proxy = this;
+    this.events.emit('loading');
+    this.canPlay = false;
     this._audioSource.src = this.url;
     this._audioSource.load();
-  }
+    this.context.resume();
 
-  reload() {
-    this.unload();
-    this.load();
+    this.slowCon = this.slowCon ? this.slowCon : false;
+
+    if(this._slowLoad) clearTimeout(this._slowLoad);
+    this._slowLoad = null;
+    this._slowLoad = setTimeout(() => {
+      if (!this.canplay) this.slowCon = true;
+    }, this.config.slowTimeout || Silence.defaultConfig.slowTimeout);
+
+    this.loadingTime = performance.now();
+    this.audioLoading = true;
+    this.relativeTime = 0;
+    this.absoluteTime = 0;
+
+    this._audioSource.oncanplaythrough = function () {
+      proxy.events.emit('canplay', this.loadingTime);
+      proxy.unloaded = false;
+      proxy.audioLoading = false;
+      proxy.loadingTime = performance.now() - proxy.loadingTime;
+      proxy._audioSource.currentTime = proxy.loadingTime / 1000;
+      proxy._audioSource.play();
+      proxy.canPlay = true;
+      proxy.volume('unmute');
+      clearTimeout(proxy._slowLoad);
+      proxy.slowCon = false;
+
+      if(proxy.playing) proxy.play();
+      
+      proxy._audioSource.oncanplaythrough = null;
+    };
   }
 
   _init() {
@@ -234,48 +264,11 @@ class Silence {
     }
     this._audioReqStack().then(() => {
 
-      if (!this.preload && this.firstInit) {
+      if ((!this.preload && this.firstInit) || this.unloaded) {
         this.load();
-        proxy.events.emit('loading');
-        this.canPlay = false;
       }
 
-      if(this.unloaded){
-        this.events.emit('loading');
-        this.load();
-        this.canPlay = false;
-      }
-  
       this.firstInit = false;
-      this.context.resume();
-
-      this.slowCon = this.slowCon ? this.slowCon : false;
-
-      let slowLoad = setTimeout(() => {
-        if (!this.canplay) this.slowCon = true;
-      }, this.config.slowTimeout || Silence.defaultConfig.slowTimeout);
-
-      this.loadingTime = performance.now();
-      this.audioLoading = true;
-      this.relativeTime = 0;
-      this.absoluteTime = 0;
-
-      this._audioSource.oncanplaythrough = function () {
-        proxy.events.emit('canplay', this.loadingTime);
-        proxy.unloaded = false;
-        proxy.audioLoading = false;
-        proxy.loadingTime = performance.now() - proxy.loadingTime;
-        proxy._audioSource.currentTime = proxy.loadingTime / 1000;
-        proxy._audioSource.play();
-        proxy.canPlay = true;
-        proxy.volume('unmute');
-        clearTimeout(slowLoad);
-        proxy.slowCon = false;
-
-        if(proxy.playing) proxy.play();
-        
-        proxy._audioSource.oncanplaythrough = null;
-      };
 
       this._audioSource.onplay = function () {
         proxy.events.emit('play');

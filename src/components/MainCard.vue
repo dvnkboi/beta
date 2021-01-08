@@ -152,8 +152,8 @@
       artist: String,
       changed: Boolean,
       album: String,
-      soundData: Number,
-      normalizedBassData: String
+      normalizedBassData: Number,
+      playTime: String
     },
   };
 </script>

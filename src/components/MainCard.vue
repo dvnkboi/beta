@@ -3,18 +3,18 @@
     <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
       <div class="transform-gpu hover:-translate-y-2 h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
         <transition name="fade-up" mode="out-in" appear>
-          <img :key="'cover' + Date.now()" ref="coverArt" v-show="hasLoaded" @load="loaded" @error='updatedCover = aurLogo' v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
+          <img :key="'mainCover'" ref="coverArt" v-show="hasLoaded" @load="loaded" @error='updatedCover = aurLogo' v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
         </transition>
         <transition name="fade-up" mode="out-in" appear>
-          <div :key="'coverSkelly' + Date.now()" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute"></div>
+          <div :key="'mainCoverSkelly'" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute"></div>
         </transition>
       </div>
       <div class="px-7 w-full flex-auto overflow-hidden">
         <transition name="fade-up" mode="out-in" appear>
-          <h1 :key="'maintitle' + Date.now()" v-show="showTitle" class="mainTitle font-sans overflow-ellipsis overflow-hidden break-words text-gray-300 text-4xl md:text-6xl xl:text-8xl pt-1 font-bold w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedTitle }}</h1>
+          <h1 :key="'mainTitle'" v-show="showTitle" class="mainTitle font-sans overflow-ellipsis overflow-hidden break-words text-gray-300 text-4xl md:text-6xl xl:text-8xl pt-1 font-bold w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedTitle }}</h1>
         </transition>
         <transition name="fade-up" mode="out-in" appear>
-          <h2 :key="'mainArtist' + Date.now()" v-show="showArtist" class="mainArtist font-sans break-words truncate overflow-ellipsis max-w-full md:-mt-3 text-gray-400 text-2xl md:text-4xl xl:text-6xl w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedArtist }}</h2>
+          <h2 :key="'mainArtist'" v-show="showArtist" class="mainArtist font-sans break-words truncate overflow-ellipsis max-w-full md:-mt-3 text-gray-400 text-2xl md:text-4xl xl:text-6xl w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedArtist }}</h2>
         </transition>
       </div>
       <h2 class="font-sans text-gray-400 text-lg md:text-2xl w-full text-center">{{ playTime || '00:00:00' }}</h2>
@@ -40,7 +40,7 @@
           </span>
         </transition>
         <transition name="fade" appear>
-          <div v-show="sliderShown" class="h-64 w-16 bg-black-light mb-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-start pt-4 transition duration-150">
+          <div v-show="sliderShown" class="h-64 w-16 bg-black-light -mt-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-start pt-4 transition duration-150">
             <input ref="volumeSlider" type="range" min="0" max="1" step="0.01" name="volume" v-model.lazy="value" orient="vertical" data-orientation="vertical" id="volumeSlider" class="w-2 h-40" />
           </div>
         </transition>
@@ -153,7 +153,7 @@
       changed: Boolean,
       album: String,
       soundData: Number,
-      playTime: String
+      normalizedBassData: String
     },
   };
 </script>

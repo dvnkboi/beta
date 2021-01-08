@@ -125,13 +125,13 @@ class Silence {
   volume(val) {
     if (val <= 1 && val >= 0) {
       if (this.playing) {
-        val = 0.4 / (0.4 + (Math.pow(val / (1 - val), -1.6)));
+        val = this._sCurve(val,0.4,1.6);
         this.vol = val;
         this._prevVol = this._audioSource.volume;
         this.fade(this._audioSource.volume, val, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
       }
       else {
-        val = 0.4 / (0.4 + (Math.pow(val / (1 - val), -1.6)));
+        val = this._sCurve(val,0.4,1.6);
         this._prevVol = this.vol = val;
       }
     }
@@ -143,7 +143,7 @@ class Silence {
       }
       else if (val == 'unmute') {
         this.vol = (this._prevVol || this.config.volume || Silence.defaultConfig.volume);
-        if (this.firstInit) this.vol = 0.4 / (0.4 + (Math.pow(this.vol / (1 - this.vol), -1.6)));
+        if (this.firstInit) this.vol = this._sCurve(this.vol,0.4,1.6);
         this.fade(this._audioSource.volume, this.vol, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
       }
     }
@@ -343,6 +343,10 @@ class Silence {
     }
 
     requestAnimationFrame(update);
+  }
+
+  _sCurve(val,skew,curvature){
+    return (skew / (skew + (Math.pow(val / (1 - val), -curvature))));
   }
 
 }

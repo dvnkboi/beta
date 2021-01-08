@@ -105,7 +105,7 @@
       minutes: Number,
       changed: Boolean,
       index: Number,
-      soundData: Number,
+      normalizedBassData: Number,
     },
   };
 </script>

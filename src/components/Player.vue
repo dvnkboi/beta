@@ -1,9 +1,9 @@
 <template>
   <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full relative">
     <connectivity class="z-20" :show="!connected || slowCon" />
-    <MainCard class="z-10" ref="mainCard" @volume="volume = $event" @playPause="playing = !playing" @failed="getQueue()" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :soundData="normalizedBassData" />
+    <MainCard class="z-10" ref="mainCard" @volume="volume = $event" @playPause="playing = !playing" @failed="getQueue()" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :normalizedBassData="normalizedBassData" />
     <div class="w-full overflow-auto xl:h-full">
-      <Card v-for="(val, index) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :index="index" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" :soundData="normalizedBassData" />
+      <Card v-for="(val, index) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :index="index" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" :normalizedBassData="normalizedBassData" />
     </div>
     <SongBg :style="{ filter: 'saturate(' + normalizedBassData * 200 + '%)' }" class="z-0 transition-all duration-100" :changed="queue[0].changed" :percent="currentSongTimer.percent" />
     <Loading class="z-20" :show="audioLoading || metaLoading" />

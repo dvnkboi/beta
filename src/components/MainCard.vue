@@ -1,7 +1,7 @@
 <template>
   <div class="mainCard bg-black-dark bg-opacity-90 flex w-full xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300">
     <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
-      <div :class="{'cursor-pointer':wikiAvailable,'pointer-events-none':showWiki && wikiAvailable}" @click="showWiki = true" class="transform-gpu hover:-translate-y-2 h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
+      <div :class="{'cursor-pointer':wikiAvailable,'pointer-events-none':showWiki && wikiAvailable && wikiExtract != ''}" @click="showWiki = true" class="transform-gpu hover:-translate-y-2 h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
         <transition name="fade-up" mode="out-in" appear>
           <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
         </transition>
@@ -10,7 +10,7 @@
         </transition>
       </div>
       <transition name="fade" mode="out-in" appear>
-        <div v-if="wikiAvailable && showWiki" class="fixed w-screen h-screen overflow-auto top-0 bottom-0 left-0 right-0 backdrop-blur bg-black-dark bg-opacity-80 z-50 pt-8 transition duration-300">
+        <div v-if="wikiAvailable && showWiki && wikiExtract != ''" class="fixed w-screen h-screen overflow-auto top-0 bottom-0 left-0 right-0 backdrop-blur bg-black-dark bg-opacity-80 z-50 pt-8 transition duration-300">
           <div @click="showWiki = false" class="cursor-pointer transform-gpu hover:-translate-y-2 h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
             <transition name="fade-up" mode="out-in">
               <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
@@ -20,7 +20,7 @@
             </transition>
           </div>
           <transition name="fade-up" mode="out-in" appear>
-            <h2 :key="'artistInfo' + Date.now()" class="font-sans break-words px-7 mt-3 absolute z-20 text-gray-400 text-xl md:text-2xl xl:text-4xl w-full text-center md:text-left capitalize transition-all duration-300">{{ artistWiki.extract }}</h2>
+            <h2 :key="'artistInfo' + Date.now()" class="font-sans break-words px-7 mt-3 absolute z-20 text-gray-400 text-xl md:text-2xl xl:text-4xl w-full text-center md:text-left capitalize transition-all duration-300">{{ wikiExtract }}</h2>
           </transition>
         </div>
       </transition>
@@ -84,7 +84,8 @@
         value: 1,
         aurLogo: '/assets/aur400.png',
         scale: 0,
-        wikiAvailable:false
+        wikiAvailable:false,
+        wikiExtract:''
       };
     },
     methods: {
@@ -144,12 +145,18 @@
       },
       artistWiki: function(){
         if(this.artistWiki)
-          if(this.artistWiki.extract != null && this.artistWiki.extract != '')
-            this.wikiAvailable = true;
-          else
+          if(this.artistWiki.extract != null && this.artistWiki.extract != ''){
+            this.wikiAvailable = true;  
+            this.wikiExtract = this.artistWiki.extract;
+          }
+          else{
+            this.wikiExtract = '';
             this.wikiAvailable = this.showWiki = false;
-        else
+          }
+        else{
+          this.wikiExtract = '';
           this.wikiAvailable = this.showWiki = false;
+        }
       }
     },
     created() {

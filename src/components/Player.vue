@@ -196,17 +196,18 @@
             responseType: 'json',
           });
 
-          if(Object.values(res.data.query.pages)[0].extract.includes('Born')
-          || Object.values(res.data.query.pages)[0].extract.includes('born')
-          || Object.values(res.data.query.pages)[0].extract.includes('debuted')
-          || Object.values(res.data.query.pages)[0].extract.includes('also known as')
-          || Object.values(res.data.query.pages)[0].extract.includes('studio')
-          || Object.values(res.data.query.pages)[0].extract.includes('album')
-          || Object.values(res.data.query.pages)[0].extract.includes('song')
-          || Object.values(res.data.query.pages)[0].extract.includes('music')
-          || Object.values(res.data.query.pages)[0].extract.includes('release')
-          || Object.values(res.data.query.pages)[0].extract.includes('singer')
-          || Object.values(res.data.query.pages)[0].extract.includes('band')
+          if(Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('born')
+          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('debuted')
+          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('known')
+          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('studio')
+          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('album')
+          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('song')
+          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('music')
+          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('release')
+          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('singer')
+          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('band')
+          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('dj')
+          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('producer')
           )
             return Object.values(res.data.query.pages)[0];
           else

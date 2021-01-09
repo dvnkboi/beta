@@ -243,7 +243,7 @@ class Silence {
       proxy._audioSource.currentTime = proxy.loadingTime / 1000;
       proxy._audioSource.play();
       proxy.canPlay = true;
-      proxy.volume('unmute');
+      if(proxy.playing) proxy.volume('unmute');
       clearTimeout(proxy._slowLoad);
       proxy.slowCon = false;
 
@@ -285,8 +285,8 @@ class Silence {
 
       if (navigator)
         if (navigator.mediaSession) {
-          navigator.mediaSession.setActionHandler('play', () => (proxy.playing = !proxy.playing));
-          navigator.mediaSession.setActionHandler('pause', () => (proxy.playing = !proxy.playing));
+          navigator.mediaSession.setActionHandler('play', () => proxy.play());
+          navigator.mediaSession.setActionHandler('pause', () => proxy.pause());
         }
 
       if (this._tick) clearInterval(this._tick);

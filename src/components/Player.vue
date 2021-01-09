@@ -196,18 +196,20 @@
             responseType: 'json',
           });
 
-          if(Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('born')
-          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('debuted')
-          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('known')
-          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('studio')
-          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('album')
-          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('song')
-          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('music')
-          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('release')
-          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('singer')
-          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('band')
-          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('dj')
-          || Object.values(res.data.query.pages)[0].extract.toLowerCase().includes('producer')
+          let relevancyCheck = Object.values(res.data.query.pages)[0].extract.toLowerCase();
+
+          if(relevancyCheck.includes('born')
+          || relevancyCheck.includes('debuted')
+          || relevancyCheck.includes('known')
+          || relevancyCheck.includes('studio')
+          || relevancyCheck.includes('album')
+          || relevancyCheck.includes('song')
+          || relevancyCheck.includes('music')
+          || relevancyCheck.includes('release')
+          || relevancyCheck.includes('singer')
+          || relevancyCheck.includes('band')
+          || relevancyCheck.includes('dj')
+          || relevancyCheck.includes('producer')
           )
             return Object.values(res.data.query.pages)[0];
           else

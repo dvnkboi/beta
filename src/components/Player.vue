@@ -144,20 +144,17 @@
       },
       async queueReqStack() {
         this.queueReqOK = false;
-        if (!this.Promise) {
-          this.Promise = await import(/* webpackChunkName: "bluebird" */ 'bluebird');
-          this.Promise = this.Promise.default;
-          this.Promise.config({
-            cancellation: true,
-          });
-          this.Promise.wait = (time) => new this.Promise((resolve) => setTimeout(resolve, time || 0));
-          this.Promise.retry = (cont, fn, delay) => fn().catch(() => (cont > 0 ? this.Promise.wait(delay).then(() => this.Promise.retry(cont - 1, fn, delay)) : this.Promise.reject('failed')));
+        if (!Promise.wait || !Promise.retry) {
+          Promise.wait = (time) => new Promise((resolve) => setTimeout(resolve, time || 0));
+          Promise.retry = (cont, fn, delay) => fn().catch(() => (cont > 0 ? Promise.wait(delay).then(() => Promise.retry(cont - 1, fn, delay)) : Promise.reject('failed')));
         }
 
         if (!this.axios) {
           this.axios = await import(/* webpackChunkName: "axios" */ 'axios');
           this.axios = this.axios.default;
-          this.axios = this.Promise.promisifyAll(this.axios);
+          this.axios = this.axios.create({
+            timeout: 3000,
+          });
         }
         require('dotenv').config();
 
@@ -170,77 +167,44 @@
       },
       async getHistory() {
         const proxy = this;
-        return new this.Promise((resolve, reject) => {
-          this.axios
-            .get(proxy.queueUrl, {
-              responseType: 'json',
-            })
-            .then((res) => {
-              resolve(res.data);
-              return res.data;
-            })
-            .catch((e) => {
-              reject(null);
-              console.log(e);
-            });
-        })
-          .delay(500)
-          .timeout(3000, 'api call was poopi')
-          .catch(proxy.Promise.TimeoutError, function() {
-            proxy.Promise.reject(null);
+        try {
+          let res = await this.axios.get(proxy.queueUrl, {
+            responseType: 'json',
           });
+          return res.data;
+        } catch (e) {
+          return Promise.reject(new Error('timed out at preload'));
+        }
       },
       async getArt() {
         const proxy = this;
-        return new this.Promise((resolve, reject) => {
-          this.axios
-            .get(proxy.artUrl, {
-              responseType: 'json',
-            })
-            .then((res) => {
-              resolve(res.data);
-              return res.data;
-            })
-            .catch((e) => {
-              reject(null);
-              console.log(e);
-            });
-        })
-          .delay(500)
-          .timeout(3000, 'api call was poopi')
-          .catch(proxy.Promise.TimeoutError, function() {
-            proxy.Promise.reject(null);
+        try {
+          let res = await this.axios.get(proxy.artUrl, {
+            responseType: 'json',
           });
+          return res.data;
+        } catch (e) {
+          return Promise.reject(new Error('timed out at preload'));
+        }
       },
       async getNextArt() {
         const proxy = this;
-        return new this.Promise((resolve, reject) => {
-          this.axios
-            .get(proxy.nextArtUrl, {
-              responseType: 'json',
-            })
-            .then((res) => {
-              resolve(res.data);
-              return res.data;
-            })
-            .catch((e) => {
-              reject(null);
-              console.log(e);
-            });
-        })
-          .delay(500)
-          .timeout(3000, 'api call was poopi')
-          .catch(proxy.Promise.TimeoutError, function() {
-            proxy.Promise.reject(null);
+        try {
+          let res = await this.axios.get(proxy.nextArtUrl, {
+            responseType: 'json',
           });
+          return res.data;
+        } catch (e) {
+          return Promise.reject(new Error('timed out at preload'));
+        }
       },
       async getQueue() {
         if (this.queueOpen && this.connected) {
           this.queueOpen = false;
           this.metaLoadTime = performance.now();
           let loadingTimer = setTimeout(() => (this.metaLoading = true), 5000);
-          this.res = await this.Promise.retry(3, this.getHistory, 1000).catch((e) => console.log(e.message));
-          this.art = this.lodashGet(await this.Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message)), 'response');
+          this.res = await Promise.retry(3, this.getHistory, 1000).catch((e) => console.log(e.message));
+          this.art = this.lodashGet(await Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message)), 'response');
           this.currentSongTimer.init();
 
           if (!this.art || !this.res || this.art.length < 1 || this.res.length < 1) {

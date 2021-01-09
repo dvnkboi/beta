@@ -20,6 +20,7 @@
     "smoothscroll-for-websites": "^1.4.10",
     "socket.io-client": "^3.0.4",
     "tailwindcss-aspect-ratio": "^3.0.0",
+    "tailwindcss-filters": "^3.0.0",
     "vue": "^3.0.0"
   },
   "devDependencies": {

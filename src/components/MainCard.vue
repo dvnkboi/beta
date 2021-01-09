@@ -1,15 +1,30 @@
 <template>
-  <div class="mainCard bg-black-dark bg-opacity-90 flex w-full xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300 overflow-auto">
+  <div class="mainCard bg-black-dark bg-opacity-90 flex w-full xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300">
     <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
-      <div class="transform-gpu hover:-translate-y-2 h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
+      <div :class="{'cursor-pointer':wikiAvailable,'pointer-events-none':showWiki && wikiAvailable}" @click="showWiki = true" class="transform-gpu hover:-translate-y-2 h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
         <transition name="fade-up" mode="out-in" appear>
-          <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error='updatedCover = aurLogo' v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
+          <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
         </transition>
         <transition name="fade-up" mode="out-in" appear>
           <div :key="'mainCoverSkelly' + updatedCover" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute"></div>
         </transition>
       </div>
-      <div class="px-7 w-full flex-auto overflow-hidden">
+      <transition name="fade" mode="out-in" appear>
+        <div v-if="wikiAvailable && showWiki" class="fixed w-screen h-screen overflow-auto top-0 bottom-0 left-0 right-0 backdrop-blur bg-black-dark bg-opacity-80 z-50 pt-8 transition duration-300">
+          <div @click="showWiki = false" class="cursor-pointer transform-gpu hover:-translate-y-2 h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
+            <transition name="fade-up" mode="out-in">
+              <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
+            </transition>
+            <transition name="fade-up" mode="out-in">
+              <div :key="'mainCoverSkelly' + updatedCover" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute"></div>
+            </transition>
+          </div>
+          <transition name="fade-up" mode="out-in" appear>
+            <h2 :key="'artistInfo' + Date.now()" class="font-sans break-words px-7 mt-3 absolute z-20 text-gray-400 text-xl md:text-2xl xl:text-4xl w-full text-center md:text-left capitalize transition-all duration-300">{{ artistWiki.extract }}</h2>
+          </transition>
+        </div>
+      </transition>
+      <div class="px-7 w-full flex-auto overflow-hidden relative">
         <transition name="fade-up" mode="out-in" appear>
           <h1 :key="'mainTitle'" v-show="showTitle" class="mainTitle font-sans overflow-ellipsis overflow-hidden break-words text-gray-300 text-4xl md:text-6xl xl:text-8xl pt-1 font-bold w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedTitle }}</h1>
         </transition>
@@ -58,28 +73,31 @@
         showTitle: true,
         showArtist: true,
         showAlbum: true,
+        showWiki: false,
         updatedTitle: '____',
         updatedArtist: '____',
         updatedAlbum: '____',
+        artistInfo: '____',
         updatedCover: null,
         playing: false,
-        sliderShown:false,
+        sliderShown: false,
         value: 1,
-        aurLogo:'/assets/aur400.png',
-        scale: 0
+        aurLogo: '/assets/aur400.png',
+        scale: 0,
+        wikiAvailable:false
       };
     },
     methods: {
       loaded(evt) {
         if (evt) if (evt.path[0].naturalWidth != 0) this.hasLoaded = true;
-      }
+      },
     },
     watch: {
-      soundData: function(newVal){
+      soundData: function(newVal) {
         this.scale = newVal;
       },
       value: function(newVal) {
-        this.$emit('volume',newVal);
+        this.$emit('volume', newVal);
       },
       playing: async function() {
         this.$emit('playPause');
@@ -124,10 +142,19 @@
           this.showMin = true;
         }
       },
+      artistWiki: function(){
+        if(this.artistWiki)
+          if(this.artistWiki.extract != null && this.artistWiki.extract != '')
+            this.wikiAvailable = true;
+          else
+            this.wikiAvailable = this.showWiki = false;
+        else
+          this.wikiAvailable = this.showWiki = false;
+      }
     },
     created() {
       let proxy = this;
-      document.addEventListener('click',() => {
+      document.addEventListener('click', () => {
         proxy.sliderShown = false;
       });
     },
@@ -153,7 +180,8 @@
       changed: Boolean,
       album: String,
       normalizedBassData: Number,
-      playTime: String
+      playTime: String,
+      artistWiki: Object
     },
   };
 </script>

@@ -1,12 +1,12 @@
 <template>
   <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full relative">
-    <connectivity class="z-20" :show="!connected || slowCon" />
-    <MainCard class="z-10" ref="mainCard" @volume="volume = $event" @playPause="playing = !playing" @failed="getQueue()" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :normalizedBassData="normalizedBassData" />
-    <div class="w-full overflow-auto xl:h-full">
+    <connectivity class="z-50" :show="!connected || slowCon" />
+    <MainCard class="z-20" ref="mainCard" @volume="volume = $event" @playPause="playing = !playing" @failed="getQueue()" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :normalizedBassData="normalizedBassData" :artistWiki="artistWiki" />
+    <div class="w-full z-10 overflow-auto xl:h-full">
       <Card v-for="(val, index) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :index="index" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" :normalizedBassData="normalizedBassData" />
     </div>
     <SongBg :style="{ filter: 'saturate(' + normalizedBassData * 200 + '%)' }" class="z-0 transition-all duration-100" :changed="queue[0].changed" :percent="currentSongTimer.percent" />
-    <Loading class="z-20" :show="audioLoading || metaLoading" />
+    <Loading class="z-50" :show="audioLoading || metaLoading" />
   </div>
 </template>
 
@@ -25,22 +25,13 @@
         queueUrl: `https://api.ampupradio.com:3000/v2?action=get_queue`,
         artUrl: `https://api.ampupradio.com:3000/v2?action=get_art`,
         nextArtUrl: `https://api.ampupradio.com:3000/v2?action=get_next_art`,
+        wikiPageUrl:`https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=`,
+        artistWiki:{},
         covers: 11,
-        queue: [
-          {
-            changed: true,
-            id: 0,
-            title: 'none',
-            artist: 'none',
-            album: 'none',
-            date: null,
-            cover: null,
-          },
-        ],
+        queue: [],
         art: [],
         aurTmpLogo: '/assets/aur400.png',
         nextArt: null,
-        pongOpen: true,
         queueOpen: true,
         connected: true,
         audioLatency: ((943718 * 8) / 256000) * 1000,
@@ -48,8 +39,6 @@
         totalLatency: 0,
         audioLoading: false,
         metaLoading: false,
-        previousTitle: null,
-        songChangeTimer: null,
         currentSongTimer: {
           timer: new AdjustingInterval(
             () => {
@@ -83,11 +72,9 @@
         },
         artTries: 0,
         queueReqOK: false,
-        Promise: null,
         axios: null,
         lodashGet: null,
         io: null,
-        Silence: null,
         uuid: require('uuid'),
         playing: false,
         normalizedBassData: 0,
@@ -173,7 +160,7 @@
           });
           return res.data;
         } catch (e) {
-          return Promise.reject(new Error('timed out at preload'));
+          return Promise.reject(new Error('timed out at queue'));
         }
       },
       async getArt() {
@@ -184,7 +171,7 @@
           });
           return res.data;
         } catch (e) {
-          return Promise.reject(new Error('timed out at preload'));
+          return Promise.reject(new Error('timed out at art'));
         }
       },
       async getNextArt() {
@@ -198,13 +185,48 @@
           return Promise.reject(new Error('timed out at preload'));
         }
       },
+      async getWikiPage() {
+        const proxy = this;
+        let processedArtist = this.res.response.history[0].artist.split('_').join(' ').split(',')[0];
+        processedArtist = processedArtist.split(' ').map((e) => {
+          return e.charAt(0).toUpperCase() + e.substring(1,e.length);
+        }).join('%20');
+        try {
+          let res = await this.axios.get(proxy.wikiPageUrl + processedArtist, {
+            responseType: 'json',
+          });
+
+          if(Object.values(res.data.query.pages)[0].extract.includes('Born')
+          || Object.values(res.data.query.pages)[0].extract.includes('born')
+          || Object.values(res.data.query.pages)[0].extract.includes('debuted')
+          || Object.values(res.data.query.pages)[0].extract.includes('also known as')
+          || Object.values(res.data.query.pages)[0].extract.includes('studio')
+          || Object.values(res.data.query.pages)[0].extract.includes('album')
+          || Object.values(res.data.query.pages)[0].extract.includes('song')
+          || Object.values(res.data.query.pages)[0].extract.includes('music')
+          || Object.values(res.data.query.pages)[0].extract.includes('release')
+          || Object.values(res.data.query.pages)[0].extract.includes('singer')
+          || Object.values(res.data.query.pages)[0].extract.includes('band')
+          )
+            return Object.values(res.data.query.pages)[0];
+          else
+            return null
+        } catch (e) {
+          return null
+        }
+      },
       async getQueue() {
         if (this.queueOpen && this.connected) {
+          let proxy =this;
           this.queueOpen = false;
           this.metaLoadTime = performance.now();
           let loadingTimer = setTimeout(() => (this.metaLoading = true), 5000);
           this.res = await Promise.retry(3, this.getHistory, 1000).catch((e) => console.log(e.message));
           this.art = this.lodashGet(await Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message)), 'response');
+
+          Promise.retry(3, this.getWikiPage, 1000).then((res) => proxy.artistWiki = res).catch((e) => console.log(e));
+        
+
           this.currentSongTimer.init();
 
           if (!this.art || !this.res || this.art.length < 1 || this.res.length < 1) {

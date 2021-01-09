@@ -319,7 +319,7 @@ class Silence {
     function update() {
       setTimeout(function () {
         requestAnimationFrame(update);
-        if (document.visibilityState === 'visible' && proxy.vol > 0) {
+        if (document.visibilityState === 'visible') {
           if (proxy.freqDataFn) {
             proxy.analyser.getByteFrequencyData(proxy.freqData);
             proxy.freqDataFn(proxy.freqData);

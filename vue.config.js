@@ -7,7 +7,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 
 // vue.config.js
 module.exports = {
-  lintOnSave: process.env.NODE_ENV !== 'production',
+  lintOnSave: process.env.NODE_ENV != 'production',
   configureWebpack: {
     mode: process.env.NODE_ENV == 'production' ? 'production' : 'development',
     loader: {
@@ -26,9 +26,9 @@ module.exports = {
       nodeEnv: 'production',
       splitChunks: {
         chunks: "async",
-        minSize: 10000,
-        maxSize: 30000,
-        minChunks: 2,
+        minSize: 1000,
+        maxSize: 1000,
+        minChunks: 1,
         maxAsyncRequests: 5,
         maxInitialRequests: 3,
         automaticNameMaxLength: 5,

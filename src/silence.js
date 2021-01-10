@@ -80,16 +80,7 @@ class Silence {
     }
 
 
-    if (this._preload) {
-      let proxy = this;
-      this.events.emit('loading');
-      this.load();
-      this._audioSource.oncanplaythrough = function () {
-        proxy._audioSource.play();
-        proxy.events.emit('canplay', this.loadingTime);
-        proxy._audioSource.oncanplaythrough = null;
-      }
-    }
+    if (this._preload) this.load();
 
   }
 
@@ -221,9 +212,8 @@ class Silence {
     this._audioSource.src = this.url;
     this._audioSource.load();
     this.context.resume();
-
+    
     this.slowCon = this.slowCon ? this.slowCon : false;
-
     if (this._slowLoad) clearTimeout(this._slowLoad);
     this._slowLoad = null;
     this._slowLoad = setTimeout(() => {
@@ -248,8 +238,19 @@ class Silence {
       proxy.slowCon = false;
 
       if (proxy.playing) proxy.play();
-
-      proxy._audioSource.oncanplaythrough = null;
+      
+      proxy._audioSource.onplay = function(){
+        proxy._audioSource.onwaiting = function(){
+          proxy.events.emit('loading');
+          proxy.loadingTime = performance.now();
+          proxy._audioSource.oncanplaythrough = function(){
+            proxy.events.emit('loaded');
+            proxy.loadingTime = performance.now() - proxy.loadingTime;
+            console.log('hanged for ',proxy.loadingTime,'ms');
+          }
+        }
+        proxy._audioSource.onplaying = null;
+      }
     };
   }
 

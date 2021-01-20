@@ -104,12 +104,14 @@ class Silence {
       proxy.volume('unmute');
     }
     this.events.emit('play');
+    this.events.emit('playPause');
     this.playing = true;
   }
 
   pause() {
     this.volume('mute');
     this.events.emit('pause');
+    this.events.emit('playPause');
     this.playing = false;
   }
 
@@ -286,8 +288,16 @@ class Silence {
 
       if (navigator)
         if (navigator.mediaSession) {
-          navigator.mediaSession.setActionHandler('play', () => proxy.play());
-          navigator.mediaSession.setActionHandler('pause', () => proxy.pause());
+          navigator.mediaSession.setActionHandler('play', () => {
+            if(!proxy.playing) proxy.play();
+            else proxy.pause();
+            navigator.mediaSession.playbackState = 'playing';
+          });
+          navigator.mediaSession.setActionHandler('pause', () => {
+            if(!proxy.playing) proxy.play();
+            else proxy.pause();
+            navigator.mediaSession.playbackState = 'paused';
+          });
         }
 
       if (this._tick) clearInterval(this._tick);

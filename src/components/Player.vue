@@ -1,12 +1,46 @@
 <template>
   <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full relative">
     <connectivity class="z-50" :show="!connected || slowCon" />
-    <MainCard class="z-20" ref="mainCard" @volume="volume = $event" @playPause="playing = !playing" @failed="getQueue()" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :normalizedBassData="normalizedBassData" :artistWiki="artistWiki" />
-    <div class="w-full z-10 overflow-auto xl:h-full">
-      <Card v-for="(val, index) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :index="index" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" :normalizedBassData="normalizedBassData" />
+    <MainCard 
+      class="z-20" 
+      ref="mainCard" 
+      @volume="volume = $event" 
+      @playPause="playPause()"
+      @failed="getQueue()"
+      :title="queue[0].title" 
+      :artist="queue[0].artist" 
+      :album="this.queue[0].album"
+      :cover="queue[0].largeCover"
+      :changed="queue[0].changed"
+      :playTime="playTime" 
+      :normalizedBassData="normalizedBassData" 
+      :artistWiki="artistWiki"
+      :playing='playing'
+    />
+    <div 
+      class="w-full z-10 overflow-auto xl:h-full">
+      <Card v-for="(val, index) in queueSongs" 
+      :key="val.id" 
+      class="z-10 w-full" 
+      @failed="getQueue()" 
+      :index="index" 
+      :title="val.title" 
+      :artist="val.artist" 
+      :cover="val.cover" 
+      :minutes="val.minutes" 
+      :changed="val.changed" 
+      :normalizedBassData="normalizedBassData"/>
     </div>
-    <SongBg :style="{ filter: 'saturate(' + normalizedBassData * 200 + '%)' }" class="z-0 transition-all duration-100" :changed="queue[0].changed" :percent="currentSongTimer.percent" />
-    <Loading class="z-50" :show="audioLoading || metaLoading" />
+    <SongBg 
+    :style="{ filter: 'saturate(' + normalizedBassData * 200 + '%)' }" 
+      class="z-0 transition-all duration-100" 
+      :changed="queue[0].changed" 
+      :percent="currentSongTimer.percent"
+    />
+    <Loading 
+      class="z-50" 
+      :show="audioLoading || metaLoading"
+    />
   </div>
 </template>
 
@@ -76,11 +110,11 @@
         lodashGet: null,
         io: null,
         uuid: require('uuid'),
-        playing: false,
         normalizedBassData: 0,
         slowCon: false,
         playTime: null,
         volume: 0,
+        playing:false
       };
     },
     computed: {
@@ -89,6 +123,10 @@
       },
     },
     methods: {
+      playPause(){
+        if(this.audio) this.playing = !this.audio.playing;
+        else this.playing = true;
+      },
       async play() {
         let proxy = this;
         if (!this.audio) {
@@ -118,6 +156,10 @@
 
             this.audio.watch('slowCon', (val) => {
               proxy.slowCon = val;
+            });
+
+            this.audio.watch('playing',(val) => {
+              proxy.playing = val;
             });
 
             proxy.audio.play();
@@ -438,6 +480,9 @@
       downlink: function(oldVal, newVal) {
         console.log('connection changed', { oldVal, newVal });
       },
+      keyEvent: function(){
+        this.playing = !this.playing;
+      },
     },
     async beforeCreate() {},
     created() {
@@ -493,6 +538,9 @@
       Connectivity,
       Loading,
       SongBg,
+    },
+    props: {
+      keyEvent: Number
     },
   };
 </script>

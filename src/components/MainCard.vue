@@ -35,7 +35,7 @@
       <h2 class="font-sans text-gray-400 text-lg md:text-2xl w-full text-center">{{ playTime || '00:00:00' }}</h2>
     </div>
     <div class="h-24 w-full px-3 flex justify-between items-center">
-      <div @click="playing = !playing" class="click cursor-pointer flex justify-center items-center h-full w-16 flex-none">
+      <div @click="$emit('playPause')" class="click cursor-pointer flex justify-center items-center h-full w-16 flex-none">
         <transition name="fade-left" mode="out-in">
           <span key="playBtn" v-if="!playing" class="transition duration-150">
             <box-icon name="play" size="cssSize" class="w-16 h-16 fill-current stroke-current text-gray-300" v-pre></box-icon>
@@ -79,7 +79,6 @@
         updatedAlbum: '____',
         artistInfo: '____',
         updatedCover: null,
-        playing: false,
         sliderShown: false,
         value: 1,
         aurLogo: '/assets/aur400.png',
@@ -99,9 +98,6 @@
       },
       value: function(newVal) {
         this.$emit('volume', newVal);
-      },
-      playing: async function() {
-        this.$emit('playPause');
       },
       updatedCover: function() {
         this.hasLoaded = false;
@@ -188,7 +184,8 @@
       album: String,
       normalizedBassData: Number,
       playTime: String,
-      artistWiki: Object
+      artistWiki: Object,
+      playing: Boolean
     },
   };
 </script>

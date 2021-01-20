@@ -1,6 +1,6 @@
 <template>
   <transition name="fade-up" appear>
-    <player ref="player" class="transition duration-750" />
+    <player ref="player" class="transition duration-750" :keyEvent="keyPlayPause"/>
   </transition>
 </template>
 
@@ -11,19 +11,19 @@
     data() {
       return {
         captureKeypress: true,
+        keyPlayPause: 0 
       };
     },
     methods: {
-      playPause() {
-        if (this.captureKeypress) this.$refs.player.$refs.mainCard.playing = !this.$refs.player.$refs.mainCard.playing;
-      },
     },
     props: {},
     created() {
       let proxy = this;
       document.addEventListener('keyup', function(e) {
-        if (e.keyCode == 32) {
-          proxy.playPause();
+        if (proxy.captureKeypress){
+          if (e.keyCode == 32) {
+            proxy.keyPlayPause = Date.now();
+          }
         }
       });
     },

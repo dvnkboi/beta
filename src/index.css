@@ -48,7 +48,6 @@ html,
   -ms-user-select: none;
   user-select: none;
   @apply bg-black-dark;
-  scroll-behavior: smooth;
 }
 
 body {
@@ -61,6 +60,12 @@ body {
 
 .background {
   filter: blur(50px);
+}
+
+.bgMask{
+  background: linear-gradient(180deg,rgba(0,0,0,0),#000000);
+  background-size: 100% 175%;
+  background-position: bottom;
 }
 
 .mainTitle{
@@ -76,6 +81,50 @@ body {
   line-clamp: 2;
   overflow: hidden;
 }
+
+.artistInfo{
+  word-break: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  -ms-box-orient: vertical;
+  box-orient: vertical;
+  -webkit-line-clamp: 7;
+  -moz-line-clamp: 7;
+  -ms-line-clamp: 7;
+  line-clamp: 7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.artistInfoName{
+  word-break: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  -ms-box-orient: vertical;
+  box-orient: vertical;
+  -webkit-line-clamp: 2;
+  -moz-line-clamp: 2;
+  -ms-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 85%;
+}
+
+.bgImg {
+  filter:blur(7px) saturate(100%);
+}
+
+.artistImgCont:hover,
+.artistImgCont:hover .wikiImgcont,
+.wikiImgCont:hover,
+.wikiImgCont:hover .artistImgcont
+{
+  @apply -translate-y-2;
+}
+
 
 .fade-up-enter-from,
 .fade-up-leave-to {

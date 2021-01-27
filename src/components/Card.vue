@@ -1,5 +1,5 @@
 <template>
-  <div :key="'recent' + index" class="card flex-auto w-full bg-black bg-opacity-90 relative grid grid-cols-4 grid-rows-1 overflow-hidden transition duration-300 border-b border-gray-600">
+  <div :key="'recent' + index" class="card flex-auto w-full bg-black bg-opacity-80 relative grid grid-cols-4 grid-rows-1 overflow-hidden transition duration-300 border-b border-gray-600">
     <div class="col-span-1 aspect-ratio-square overflow-hidden relative">
       <transition name="fade-up" mode="out-in" appear>
         <img :key="'cover' + index + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error='updatedCover = aurLogo' v-loadedifcomplete :src="updatedCover" class="h-full w-full object-cover bg-cover ring-2 ring-purple-200 ring-opacity-25 transition-transform duration-300 absolute" alt="" />

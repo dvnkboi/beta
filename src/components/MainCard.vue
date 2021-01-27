@@ -1,7 +1,7 @@
 <template>
-  <div class="mainCard bg-black-dark bg-opacity-90 flex w-full xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300">
+  <div class="mainCard bg-black-dark bg-opacity-80 flex w-full xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300 overflow-hidden">
     <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
-      <div :class="{'cursor-pointer':wikiAvailable,'pointer-events-none':showWiki && wikiAvailable && wikiExtract != ''}" @click="showWiki = true" class="transform-gpu hover:-translate-y-2 h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
+      <div :class="{ 'cursor-pointer': wikiAvailable, 'pointer-events-none': showWiki && wikiAvailable && artistWiki.extract != '' }" @click="showWiki = true" class="artistImgCont transform-gpu h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
         <transition name="fade-up" mode="out-in" appear>
           <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
         </transition>
@@ -10,17 +10,28 @@
         </transition>
       </div>
       <transition name="fade" mode="out-in" appear>
-        <div v-if="wikiAvailable && showWiki && wikiExtract != ''" class="fixed w-screen h-screen overflow-auto top-0 bottom-0 left-0 right-0 backdrop-blur bg-black-dark bg-opacity-80 z-50 pt-8 transition duration-300">
-          <div @click="showWiki = false" class="cursor-pointer transform-gpu hover:-translate-y-2 h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
-            <transition name="fade-up" mode="out-in">
-              <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
-            </transition>
-            <transition name="fade-up" mode="out-in">
-              <div :key="'mainCoverSkelly' + updatedCover" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute"></div>
-            </transition>
+        <div v-if="wikiAvailable && showWiki && artistWiki.extract != ''" class="fixed w-screen h-screen overflow-auto top-0 bottom-0 left-0 right-0 backdrop-blur bg-black-dark bg-opacity-80 z-50 pt-8 transition duration-300">
+          <div class="float-left flex justify-center items-center md:justify-start md:items-start flex-auto w-full h-64 sm:h-96">
+            <div @click="showWiki = false" class="wikiImgCont cursor-pointer transform-gpu hover:-translate-y-2 h-64 w-64 flex-shrink-0 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
+              <transition name="fade-up" mode="out-in">
+                <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
+              </transition>
+              <transition name="fade-up" mode="out-in">
+                <div :key="'mainCoverSkelly' + updatedCover" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute"></div>
+              </transition>
+            </div>
+            <div class="artistInfoName invisible max-w-0 pointer-events-none md:visible md:max-w-none max-h-full uppercase font-bold text-7xl md:text-6xl lg:text-8xl xl:text-10xl text-gray-300 mt-auto mb-auto">
+              {{updatedArtist.split(',')[0].split('feat.')[0].split('ft.')[0]}}
+            </div>
           </div>
           <transition name="fade-up" mode="out-in" appear>
-            <h2 :key="'artistInfo' + Date.now()" class="font-sans break-words px-7 mt-3 absolute z-20 text-gray-400 text-xl md:text-2xl xl:text-4xl w-full text-center md:text-left capitalize transition-all duration-300">{{ wikiExtract }}</h2>
+            <h2 :key="'artistInfo' + Date.now()" class="artistInfo font-sans break-words px-7 pt-2 z-20 text-gray-400 text-2xl md:text-3xl xl:text-4xl w-full text-center md:text-left transition-all duration-300">{{ artistWiki.extract }}</h2>
+          </transition>
+          <transition name="fade" mode="out-in" appear>
+            <div class="mt-1 z-20 w-full text-center md:text-left transition-all duration-300 flex justify-center items-center md:justify-end">
+              <h2 :key="'wikiText' + Date.now()" class="font-sans break-words pr-1 text-gray-400 text-lg xl:text-lg">from</h2>
+              <a :href="artistWiki.fullurl" target="_blank"  :key="'wikiLink' + Date.now()" class="font-sans break-words pr-7 text-gray-400 hover:text-gray-300 transition duration-300 text-xl xl:text-2xl font-bold outline-none">Wikipedia</a>
+            </div>
           </transition>
         </div>
       </transition>
@@ -45,7 +56,10 @@
           </span>
         </transition>
       </div>
-      <div @click.stop.self="sliderShown = !sliderShown" class="click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative">
+      <div class="h-10 w-32 bg-gray-300 flex justify-center items-center text-lg text-black rounded-full transform-gpu hover:-translate-y-2 transition duration-300">
+        beta 0.2.8
+      </div>
+      <div @click.stop.self="sliderShown = !sliderShown" class="slooder click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative transition duration-100">
         <transition name="fade-left" mode="out-in">
           <span key="volLarge" @click.stop="sliderShown = !sliderShown" v-if="value >= 0.7" class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150">
             <box-icon name="volume-full" type="solid" size="cssSize" class="w-12 h-12 fill-current -ml-2 stroke-current text-gray-300 stroke-0" v-pre></box-icon>
@@ -77,14 +91,12 @@
         updatedTitle: '____',
         updatedArtist: '____',
         updatedAlbum: '____',
-        artistInfo: '____',
         updatedCover: null,
         sliderShown: false,
         value: 1,
         aurLogo: '/assets/aur400.png',
         scale: 0,
-        wikiAvailable:false,
-        wikiExtract:''
+        wikiAvailable: false,
       };
     },
     methods: {
@@ -139,21 +151,17 @@
           this.showMin = true;
         }
       },
-      artistWiki: function(){
-        if(this.artistWiki)
-          if(this.artistWiki.extract != null && this.artistWiki.extract != ''){
-            this.wikiAvailable = true;  
-            this.wikiExtract = this.artistWiki.extract;
-          }
-          else{
-            this.wikiExtract = '';
+      artistWiki: function() {
+        if (this.artistWiki)
+          if (this.artistWiki.extract != null && this.artistWiki.extract != '') {
+            this.wikiAvailable = true;
+          } else {
             this.wikiAvailable = this.showWiki = false;
           }
-        else{
-          this.wikiExtract = '';
+        else {
           this.wikiAvailable = this.showWiki = false;
         }
-      }
+      },
     },
     created() {
       let proxy = this;
@@ -164,6 +172,15 @@
     beforeMount() {},
     mounted() {
       this.value = parseFloat(localStorage.getItem('volume') || 1);
+      // let slider = document.querySelector('.slooder');
+
+      // console.log(slider);
+      // function animateVol(){
+      //   let vol = slider.querySelector('input').value;
+      //   slider.style.transform = `translateX(${(Math.random() - Math.random()) * 4 * vol}px) translateY(${(Math.random() - Math.random()) * 4 * vol}px) rotate(${(Math.random() - Math.random()) * 4 * vol}deg)`;
+      //   requestAnimationFrame(animateVol);
+      // } 
+      // requestAnimationFrame(animateVol);
     },
     beforeUnmount() {
       this.audio.unload();
@@ -185,7 +202,7 @@
       normalizedBassData: Number,
       playTime: String,
       artistWiki: Object,
-      playing: Boolean
+      playing: Boolean,
     },
   };
 </script>

@@ -14,8 +14,7 @@
         keyPlayPause: 0 
       };
     },
-    methods: {
-    },
+    methods: {},
     props: {},
     created() {
       let proxy = this;

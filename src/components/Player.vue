@@ -1,46 +1,12 @@
 <template>
   <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full relative">
     <connectivity class="z-50" :show="!connected || slowCon" />
-    <MainCard 
-      class="z-20" 
-      ref="mainCard" 
-      @volume="volume = $event" 
-      @playPause="playPause()"
-      @failed="getQueue()"
-      :title="queue[0].title" 
-      :artist="queue[0].artist" 
-      :album="this.queue[0].album"
-      :cover="queue[0].largeCover"
-      :changed="queue[0].changed"
-      :playTime="playTime" 
-      :normalizedBassData="normalizedBassData" 
-      :artistWiki="artistWiki"
-      :playing='playing'
-    />
-    <div 
-      class="w-full z-10 overflow-auto xl:h-full">
-      <Card v-for="(val, index) in queueSongs" 
-      :key="val.id" 
-      class="z-10 w-full" 
-      @failed="getQueue()" 
-      :index="index" 
-      :title="val.title" 
-      :artist="val.artist" 
-      :cover="val.cover" 
-      :minutes="val.minutes" 
-      :changed="val.changed" 
-      :normalizedBassData="normalizedBassData"/>
+    <MainCard class="z-20" ref="mainCard" @volume="volume = $event" @playPause="playPause()" @failed="getQueue()" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :normalizedBassData="normalizedBassData" :artistWiki="artistWiki" :playing="playing" />
+    <div class="w-full z-10 overflow-auto xl:h-full">
+      <Card v-for="(val, index) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :index="index" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" :normalizedBassData="normalizedBassData" />
     </div>
-    <SongBg 
-    :style="{ filter: 'saturate(' + normalizedBassData * 200 + '%)' }" 
-      class="z-0 transition-all duration-100" 
-      :changed="queue[0].changed" 
-      :percent="currentSongTimer.percent"
-    />
-    <Loading 
-      class="z-50" 
-      :show="audioLoading || metaLoading"
-    />
+    <SongBg class="z-0 transition-all duration-100" :changed="queue[0].changed" :percent="currentSongTimer.percent" :albumImg="queue[0].largeCover" :normalizedBassData="normalizedBassData"/>
+    <Loading class="z-50" :show="audioLoading || metaLoading" />
   </div>
 </template>
 
@@ -59,8 +25,8 @@
         queueUrl: `https://api.ampupradio.com:3000/v2?action=get_queue`,
         artUrl: `https://api.ampupradio.com:3000/v2?action=get_art`,
         nextArtUrl: `https://api.ampupradio.com:3000/v2?action=get_next_art`,
-        wikiPageUrl:`https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=`,
-        artistWiki:{},
+        wikiPageUrl: `https://en.wikipedia.org/w/api.php?format=json&action=query&prop=info|extracts&inprop=url&exintro&explaintext&redirects=1&titles=`,
+        artistWiki: {},
         covers: 11,
         queue: [],
         art: [],
@@ -114,7 +80,7 @@
         slowCon: false,
         playTime: null,
         volume: 0,
-        playing:false
+        playing: false,
       };
     },
     computed: {
@@ -123,8 +89,8 @@
       },
     },
     methods: {
-      playPause(){
-        if(this.audio) this.playing = !this.audio.playing;
+      playPause() {
+        if (this.audio) this.playing = !this.audio.playing;
         else this.playing = true;
       },
       async play() {
@@ -138,7 +104,7 @@
             });
 
             this.audio.normalDataFn = (data) => {
-              proxy.normalizedBassData = data;
+              proxy.normalizedBassData = data > 0.1 ? data : 0;
             };
 
             this.audio.timeUpdateFn = (data) => {
@@ -158,7 +124,7 @@
               proxy.slowCon = val;
             });
 
-            this.audio.watch('playing',(val) => {
+            this.audio.watch('playing', (val) => {
               proxy.playing = val;
             });
 
@@ -229,10 +195,16 @@
       },
       async getWikiPage() {
         const proxy = this;
-        let processedArtist = this.res.response.history[0].artist.split('_').join(' ').split(',')[0];
-        processedArtist = processedArtist.split(' ').map((e) => {
-          return e.charAt(0).toUpperCase() + e.substring(1,e.length);
-        }).join('%20');
+        let processedArtist = this.res.response.history[0].artist
+          .split('_')
+          .join(' ')
+          .split(',')[0];
+        processedArtist = processedArtist
+          .split(' ')
+          .map((e) => {
+            return e.charAt(0).toUpperCase() + e.substring(1, e.length);
+          })
+          .join('%20');
         try {
           let res = await this.axios.get(proxy.wikiPageUrl + processedArtist, {
             responseType: 'json',
@@ -240,37 +212,28 @@
 
           let relevancyCheck = Object.values(res.data.query.pages)[0].extract.toLowerCase();
 
-          if(relevancyCheck.includes('born')
-          || relevancyCheck.includes('debuted')
-          || relevancyCheck.includes('known')
-          || relevancyCheck.includes('studio')
-          || relevancyCheck.includes('album')
-          || relevancyCheck.includes('song')
-          || relevancyCheck.includes('music')
-          || relevancyCheck.includes('release')
-          || relevancyCheck.includes('singer')
-          || relevancyCheck.includes('band')
-          || relevancyCheck.includes('dj')
-          || relevancyCheck.includes('producer')
-          )
-            return Object.values(res.data.query.pages)[0];
-          else
-            return null
+          if (relevancyCheck.includes('born') || relevancyCheck.includes('debuted') || relevancyCheck.includes('known') || relevancyCheck.includes('studio') || relevancyCheck.includes('album') || relevancyCheck.includes('song') || relevancyCheck.includes('music') || relevancyCheck.includes('release') || relevancyCheck.includes('singer') || relevancyCheck.includes('band') || relevancyCheck.includes('dj') || relevancyCheck.includes('producer')) return Object.values(res.data.query.pages)[0];
+          else return null;
         } catch (e) {
-          return null
+          return null;
         }
       },
       async getQueue() {
         if (this.queueOpen && this.connected) {
-          let proxy =this;
+          let proxy = this;
           this.queueOpen = false;
           this.metaLoadTime = performance.now();
           let loadingTimer = setTimeout(() => (this.metaLoading = true), 5000);
-          this.res = await Promise.retry(3, this.getHistory, 1000).catch((e) => console.log(e.message));
-          this.art = this.lodashGet(await Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message)), 'response');
+          this.res = await Promise
+            .retry(3, this.getHistory, 1000)
+            .catch((e) => console.log(e.message));
+          this.art = this.lodashGet(await Promise
+            .retry(3, this.getArt, 1000)
+            .catch((e) => console.log(e.message)), 'response');
 
-          Promise.retry(3, this.getWikiPage, 1000).then((res) => proxy.artistWiki = res).catch((e) => console.log(e));
-        
+          Promise.retry(3, this.getWikiPage, 1000)
+            .then((res) => (proxy.artistWiki = res))
+            .catch((e) => console.log(e));
 
           this.currentSongTimer.init();
 
@@ -480,7 +443,7 @@
       downlink: function(oldVal, newVal) {
         console.log('connection changed', { oldVal, newVal });
       },
-      keyEvent: function(){
+      keyEvent: function() {
         this.playing = !this.playing;
       },
     },
@@ -530,6 +493,14 @@
       await this.preloadNext();
       this.preloadSuccess = false;
       this.preloadRunning = false;
+
+      var myWorker = new Worker("wakeupWorker.js");
+      myWorker.onmessage = function (ev) {
+        if (ev && ev.data === 'wakeup') {
+          this.getQueue();
+          this.setComponentInfo(true);
+        }
+      }
     },
     beforeUnmount() {},
     components: {
@@ -540,7 +511,7 @@
       SongBg,
     },
     props: {
-      keyEvent: Number
+      keyEvent: Number,
     },
   };
 </script>

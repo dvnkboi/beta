@@ -57,7 +57,7 @@
         </transition>
       </div>
       <div class="h-10 w-32 bg-gray-300 flex justify-center items-center text-lg text-black rounded-full transform-gpu hover:-translate-y-2 transition duration-300">
-        beta 0.2.8
+        beta 0.2.9
       </div>
       <div @click.stop.self="sliderShown = !sliderShown" class="slooder click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative transition duration-100">
         <transition name="fade-left" mode="out-in">

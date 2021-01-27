@@ -5,7 +5,7 @@
     <div class="w-full z-10 overflow-auto xl:h-full">
       <Card v-for="(val, index) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :index="index" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" :normalizedBassData="normalizedBassData" />
     </div>
-    <SongBg class="z-0 transition-all duration-100" :changed="queue[0].changed" :percent="currentSongTimer.percent" :albumImg="queue[0].largeCover" :normalizedBassData="normalizedBassData"/>
+    <SongBg class="z-0 transition-all duration-100" :changed="queue[0].changed" :percent="currentSongTimer.percent" :albumImg="queue[0].largeCover" :normalizedBassData="normalizedBassData" />
     <Loading class="z-50" :show="audioLoading || metaLoading" />
   </div>
 </template>
@@ -105,6 +105,7 @@
 
             this.audio.normalDataFn = (data) => {
               proxy.normalizedBassData = data > 0.1 ? data : 0;
+              proxy.normalizedBassData = proxy.normalizedBassData < 0.97 ? proxy.normalizedBassData : 1;
             };
 
             this.audio.timeUpdateFn = (data) => {
@@ -224,12 +225,8 @@
           this.queueOpen = false;
           this.metaLoadTime = performance.now();
           let loadingTimer = setTimeout(() => (this.metaLoading = true), 5000);
-          this.res = await Promise
-            .retry(3, this.getHistory, 1000)
-            .catch((e) => console.log(e.message));
-          this.art = this.lodashGet(await Promise
-            .retry(3, this.getArt, 1000)
-            .catch((e) => console.log(e.message)), 'response');
+          this.res = await Promise.retry(3, this.getHistory, 1000).catch((e) => console.log(e.message));
+          this.art = this.lodashGet(await Promise.retry(3, this.getArt, 1000).catch((e) => console.log(e.message)), 'response');
 
           Promise.retry(3, this.getWikiPage, 1000)
             .then((res) => (proxy.artistWiki = res))
@@ -494,13 +491,13 @@
       this.preloadSuccess = false;
       this.preloadRunning = false;
 
-      var myWorker = new Worker("wakeupWorker.js");
-      myWorker.onmessage = function (ev) {
+      var myWorker = new Worker('wakeupWorker.js');
+      myWorker.onmessage = function(ev) {
         if (ev && ev.data === 'wakeup') {
           this.getQueue();
           this.setComponentInfo(true);
         }
-      }
+      };
     },
     beforeUnmount() {},
     components: {

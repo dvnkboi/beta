@@ -20,8 +20,22 @@
                 <div :key="'mainCoverSkelly' + updatedCover" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute"></div>
               </transition>
             </div>
-            <div class="artistInfoName invisible max-w-0 pointer-events-none md:visible md:max-w-none max-h-full uppercase font-bold text-7xl md:text-6xl lg:text-8xl xl:text-10xl text-gray-300 mt-auto mb-auto">
-              {{updatedArtist.split(',')[0].split('feat.')[0].split('ft.')[0]}}
+            <div :key="'artistInfoTitle' + Date.now()" class="flex flex-col justify-center items-start h-full w-full invisible max-w-0 pointer-events-none md:visible md:max-w-none max-h-full">
+              <transition name="fade-up" mode="out-in" appear>
+                <h2 :key="'artistInfoBigTitle' + Date.now()" class="artistInfoName invisible max-w-0 pointer-events-none md:visible md:max-w-none max-h-full uppercase font-bold text-7xl md:text-6xl lg:text-8xl xl:text-10xl text-gray-300">
+                  {{
+                    updatedArtist
+                      .split(',')[0]
+                      .split('feat.')[0]
+                      .split('ft.')[0]
+                  }}
+                </h2>
+              </transition>
+              <transition name="fade-up" mode="out-in" appear>
+                <h2 :key="'artistInfoSmolTitle' + Date.now()" class="invisible max-w-0 pointer-events-none md:visible md:max-w-none max-h-full uppercase text-7xl md:text-3xl lg:text-5xl xl:text-7xl text-gray-400">
+                  {{ updatedAlbum }}
+                </h2>
+              </transition>
             </div>
           </div>
           <transition name="fade-up" mode="out-in" appear>
@@ -30,7 +44,7 @@
           <transition name="fade" mode="out-in" appear>
             <div class="mt-1 z-20 w-full text-center md:text-left transition-all duration-300 flex justify-center items-center md:justify-end">
               <h2 :key="'wikiText' + Date.now()" class="font-sans break-words pr-1 text-gray-400 text-lg xl:text-lg">from</h2>
-              <a :href="artistWiki.fullurl" target="_blank"  :key="'wikiLink' + Date.now()" class="font-sans break-words pr-7 text-gray-400 hover:text-gray-300 transition duration-300 text-xl xl:text-2xl font-bold outline-none">Wikipedia</a>
+              <a :href="artistWiki.fullurl" target="_blank" :key="'wikiLink' + Date.now()" class="font-sans break-words pr-7 text-gray-400 hover:text-gray-300 transition duration-300 text-xl xl:text-2xl font-bold outline-none">Wikipedia</a>
             </div>
           </transition>
         </div>
@@ -179,7 +193,7 @@
       //   let vol = slider.querySelector('input').value;
       //   slider.style.transform = `translateX(${(Math.random() - Math.random()) * 4 * vol}px) translateY(${(Math.random() - Math.random()) * 4 * vol}px) rotate(${(Math.random() - Math.random()) * 4 * vol}deg)`;
       //   requestAnimationFrame(animateVol);
-      // } 
+      // }
       // requestAnimationFrame(animateVol);
     },
     beforeUnmount() {

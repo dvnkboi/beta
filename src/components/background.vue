@@ -9,7 +9,7 @@
       </div>
     </div>
     <transition name="fade" appear class="z-50">
-      <div :style="{filter: saturation}" class="h-full transition-all duration-100 z-50 opacity-60">
+      <div :style="{filter: `${saturation} ${brightness}`}" class="h-full transition-all duration-100 z-50 opacity-60">
         <div :key="key" v-show="show" :style="{ transform: cssPercent, 'background-color': cssBackground }" class="background absolute w-full h-full transition-all duration-300 ease-linear bg-yellow-400"></div>
       </div>
     </transition>
@@ -36,6 +36,9 @@
       },
       saturation(){
         return `saturate(${this.normalizedBassData * 200}%)`;
+      },
+      brightness(){
+        return `saturate(${this.normalizedBassData * 100}%)`;
       }
     },
     watch: {

@@ -1,5 +1,5 @@
 <template>
-  <div class="mainCard bg-black-dark bg-opacity-80 flex w-full xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300 overflow-hidden">
+  <div class="mainCard bg-black-dark bg-opacity-70 flex w-full xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300 overflow-hidden">
     <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
       <div :class="{ 'cursor-pointer': wikiAvailable, 'pointer-events-none': showWiki && wikiAvailable && artistWiki.extract != '' }" @click="showWiki = true" class="artistImgCont transform-gpu h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
         <transition name="fade-up" mode="out-in" appear>

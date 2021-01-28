@@ -5,7 +5,7 @@
     <div class="w-full z-10 overflow-auto xl:h-full">
       <Card v-for="(val, index) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :index="index" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" :normalizedBassData="normalizedBassData" />
     </div>
-    <SongBg class="z-0 transition-all duration-100 bg-black-light" :changed="queue[0].changed" :percent="currentSongTimer.percent" :albumImg="queue[0].largeCover" :normalizedBassData="normalizedBassData" />
+    <SongBg class="z-0 transition-all duration-100" :changed="queue[0].changed" :percent="currentSongTimer.percent" :albumImg="queue[0].largeCover" :normalizedBassData="normalizedBassData" />
     <Loading class="z-50" :show="audioLoading || metaLoading" />
   </div>
 </template>

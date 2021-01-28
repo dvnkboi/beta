@@ -1,16 +1,17 @@
 /* eslint-disable no-undef */
 
+import { registerRoute } from 'workbox-routing';
+import { ExpirationPlugin } from 'workbox-expiration';
+import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
+import { cacheNames } from 'workbox-core';
+
+precacheAndRoute(self.__WB_MANIFEST);
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
 self.addEventListener("message", (e) => {
     if (e.data.action == 'skipWaiting') self.skipWaiting()
 });
-
-import { registerRoute } from 'workbox-routing';
-import { ExpirationPlugin } from 'workbox-expiration';
-import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
-import { cacheNames } from 'workbox-core';
 
 registerRoute(
     ({ request }) => request.destination === 'image',

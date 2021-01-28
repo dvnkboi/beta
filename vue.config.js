@@ -30,32 +30,40 @@ module.exports = {
           to: 'assets'
         },
       ]),
-      new WorkboxPlugin.GenerateSW({
+      new WorkboxPlugin.InjectManifest({
         // these options encourage the ServiceWorkers to get in there fast
         // and not allow any straggling "old" SWs to hang around
-        clientsClaim: true,
-        skipWaiting: true,
+        // clientsClaim: true,
+        // skipWaiting: true,
         swDest:'sw.js',
-        runtimeCaching: [{
-          // Match any request that ends with .png, .jpg, .jpeg or .svg.
-          urlPattern: /\.(?:png|jpg|jpeg|svg|js|css)$/,
+        swSrc:'./src/sw.js',
+        exclude: [
+          /\.map$/,
+          /manifest$/,
+          /\.htaccess$/,
+          /service-worker\.js$/,
+          /sw\.js$/,
+        ],
+        // runtimeCaching: [{
+        //   // Match any request that ends with .png, .jpg, .jpeg or .svg.
+        //   urlPattern: /\.(?:png|jpg|jpeg|svg|js|css)$/,
 
-          // Apply a cache-first strategy.
-          handler: 'CacheFirst',
+        //   // Apply a cache-first strategy.
+        //   handler: 'CacheFirst',
   
-          options: {
-            // Use a custom cache name.
-            cacheName: 'static',
+        //   options: {
+        //     // Use a custom cache name.
+        //     cacheName: 'static',
             
-            cacheableResponse:{
-              statuses: [0, 200]
-            },
-            // Only cache 10 images.
-            expiration: {
-              maxEntries: 150,
-            },
-          },
-        }],
+        //     cacheableResponse:{
+        //       statuses: [0, 200]
+        //     },
+        //     // Only cache 10 images.
+        //     expiration: {
+        //       maxEntries: 150,
+        //     },
+        //   },
+        // }],
       }),
     ],
     optimization: {

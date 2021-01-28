@@ -40,20 +40,20 @@ module.exports = {
         to: 'assets'
       },
       {
-        from: 'node_modules/workbox-routing', 
-        to: 'WorkBox'
+        from: './node_modules/workbox-routing', 
+        to: 'WorkBox/workbox-routing'
       },
       {
-        from: 'node_modules/workbox-expiration', 
-        to: 'WorkBox'
+        from: './node_modules/workbox-expiration', 
+        to: 'WorkBox/workbox-expiration'
       },
       {
-        from: 'node_modules/workbox-strategies', 
-        to: 'WorkBox'
+        from: './node_modules/workbox-strategies', 
+        to: 'WorkBox/workbox-strategies'
       },
       {
-        from: 'node_modules/workbox-core', 
-        to: 'WorkBox'
+        from: './node_modules/workbox-core', 
+        to: 'WorkBox/workbox-core'
       },
     ]),
     ],

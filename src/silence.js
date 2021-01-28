@@ -208,52 +208,57 @@ class Silence {
   }
 
   load() {
-    let proxy = this;
-    this.events.emit('loading');
-    this.canPlay = false;
-    this._audioSource.src = this.url;
-    this._audioSource.load();
-    this.context.resume();
-    
-    this.slowCon = this.slowCon ? this.slowCon : false;
-    if (this._slowLoad) clearTimeout(this._slowLoad);
-    this._slowLoad = null;
-    this._slowLoad = setTimeout(() => {
-      if (!this.canplay) this.slowCon = true;
-    }, this.config.slowTimeout || Silence.defaultConfig.slowTimeout);
-
-    this.loadingTime = performance.now();
-    this.audioLoading = true;
-    this.relativeTime = 0;
-    this.absoluteTime = 0;
-
-    this._audioSource.oncanplaythrough = function () {
-      proxy.events.emit('canplay', this.loadingTime);
-      proxy.unloaded = false;
-      proxy.audioLoading = false;
-      proxy.loadingTime = performance.now() - proxy.loadingTime;
-      proxy._audioSource.currentTime = proxy.loadingTime / 1000;
-      proxy._audioSource.play();
-      proxy.canPlay = true;
-      if(proxy.playing) proxy.volume('unmute');
-      clearTimeout(proxy._slowLoad);
-      proxy.slowCon = false;
-
-      if (proxy.playing) proxy.play();
+    try{
+      let proxy = this;
+      this.events.emit('loading');
+      this.canPlay = false;
+      this._audioSource.src = this.url;
+      this._audioSource.load();
+      this.context.resume();
       
-      proxy._audioSource.onplay = function(){
+      this.slowCon = this.slowCon ? this.slowCon : false;
+      if (this._slowLoad) clearTimeout(this._slowLoad);
+      this._slowLoad = null;
+      this._slowLoad = setTimeout(() => {
+        if (!this.canplay) this.slowCon = true;
+      }, this.config.slowTimeout || Silence.defaultConfig.slowTimeout);
+  
+      this.loadingTime = performance.now();
+      this.audioLoading = true;
+      this.relativeTime = 0;
+      this.absoluteTime = 0;
+  
+      this._audioSource.oncanplaythrough = function () {
+        proxy.events.emit('loaded', this.loadingTime);
+        proxy.unloaded = false;
+        proxy.audioLoading = false;
+        proxy.loadingTime = performance.now() - proxy.loadingTime;
+        proxy._audioSource.currentTime = proxy.loadingTime / 1000;
+        proxy._audioSource.play();
+        proxy.canPlay = true;
+        if(proxy.playing) proxy.volume('unmute');
+        clearTimeout(proxy._slowLoad);
+        proxy.slowCon = false;
+  
+        if (proxy.playing) proxy.play();
+        
         proxy._audioSource.onwaiting = function(){
           proxy.events.emit('loading');
+          console.log('emitted loading');
           proxy.loadingTime = performance.now();
           proxy._audioSource.oncanplaythrough = function(){
-            proxy.events.emit('loaded');
+            proxy.events.emit('loaded', this.loadingTime);
             proxy.loadingTime = performance.now() - proxy.loadingTime;
             console.log('hanged for ',proxy.loadingTime,'ms');
           }
         }
-        proxy._audioSource.onplaying = null;
-      }
-    };
+        
+        proxy._audioSource.oncanplaythrough = null;
+      };
+    }
+    catch(e){
+      setTimeout(this.load,1000);
+    }
   }
 
   _init() {

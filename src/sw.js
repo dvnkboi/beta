@@ -1,6 +1,12 @@
+/* eslint-disable no-undef */
 import { registerRoute } from 'workbox-routing';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
+
+
+self.__precacheManifest = [].concat(self.__precacheManifest || []);
+workbox.precaching.suppressWarnings();
+workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
 registerRoute(
     ({ request }) => request.destination === 'image',
@@ -11,6 +17,7 @@ registerRoute(
                 maxEntries: 60,
                 maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
             }),
+            new CacheableResponsePlugin({statuses: [0,200]}),
         ],
     })
 );
@@ -22,3 +29,7 @@ registerRoute(
         cacheName: 'static-resources',
     })
 );
+
+self.addEventListener("message", (e) => {
+    if (e.data.action == 'skipWaiting') self.skipWaiting()
+});

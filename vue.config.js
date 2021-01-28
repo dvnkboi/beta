@@ -17,30 +17,7 @@ module.exports = {
 
     workboxPluginMode: 'InjectManifest',
     workboxOptions: {
-      // Do not precache images
-      exclude: [/\.(?:png|jpg|jpeg|svg)$/],
-      
-      // Define runtime caching rules.
-      runtimeCaching: [{
-        // Match any request that ends with .png, .jpg, .jpeg or .svg.
-        urlPattern: /\.(?:png|jpg|jpeg|svg)$/,
-
-        swSrc: 'src/sw.js',
-        // Apply a cache-first strategy.
-        handler: 'CacheFirst',
-
-        options: {
-          // Use a custom cache name.
-          cacheName: 'images',
-          cacheableResponse:{
-            statuses: [0, 200]
-          },
-          // Only cache 10 images.
-          expiration: {
-            maxEntries: 50,
-          },
-        },
-      }],
+      swSrc: 'src/sw.js',
     },
 
     manifestOptions: {

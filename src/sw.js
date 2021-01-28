@@ -7,7 +7,6 @@
 // importScripts('/WorkBox/workbox-routing/index.d.ts','/WorkBox/workbox-expiration/index.d.ts','/WorkBox/workbox-strategies/index.d.ts','/WorkBox/workbox-core/index.d.ts')
 
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
-workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
 // workbox.routing.registerRoute(

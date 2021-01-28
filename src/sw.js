@@ -1,6 +1,10 @@
 /* eslint-disable no-undef */
+// import { registerRoute } from 'workbox-routing';
+// import { ExpirationPlugin } from 'workbox-expiration';
+// import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
+// import { cacheNames } from 'workbox-core';
 
-importScripts('/WorkBox/workbox-routing','/WorkBox/workbox-expiration','/WorkBox/workbox-strategies','/WorkBox/workbox-core')
+importScripts('/WorkBox/workbox-routing/index.d.ts','/WorkBox/workbox-expiration/index.d.ts','/WorkBox/workbox-strategies/index.d.ts','/WorkBox/workbox-core/index.d.ts')
 
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();

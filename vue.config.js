@@ -18,6 +18,7 @@ module.exports = {
     workboxPluginMode: 'InjectManifest',
     workboxOptions: {
       swSrc: 'src/sw.js',
+      swDest: 'sw.js',
     },
 
     manifestOptions: {

@@ -1,8 +1,5 @@
 /* eslint-disable no-undef */
-import { registerRoute } from 'workbox-routing';
-import { ExpirationPlugin } from 'workbox-expiration';
-import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
-
+importScripts('workbox-routing','workbox-expiration','workbox-strategies','workbox-core')
 
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
@@ -32,4 +29,10 @@ registerRoute(
 
 self.addEventListener("message", (e) => {
     if (e.data.action == 'skipWaiting') self.skipWaiting()
+});
+
+self.addEventListener('install', (event) => {
+  const urls = ['/'];
+  const cacheName = cacheNames.runtime;
+  event.waitUntil(caches.open(cacheName).then((cache) => cache.addAll(urls)));
 });

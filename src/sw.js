@@ -1,10 +1,6 @@
 /* eslint-disable no-undef */
-// import { registerRoute } from 'workbox-routing';
-// import { ExpirationPlugin } from 'workbox-expiration';
-// import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
-// import { cacheNames } from 'workbox-core';
 
-importScripts('workbox-routing','workbox-expiration','workbox-strategies','workbox-core')
+importScripts('/WorkBox/workbox-routing','/WorkBox/workbox-expiration','/WorkBox/workbox-strategies','/WorkBox/workbox-core')
 
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();

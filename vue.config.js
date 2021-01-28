@@ -34,10 +34,28 @@ module.exports = {
       use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
     },
     plugins:[
-      new CopyPlugin([{
+      new CopyPlugin([
+      {
         from: './src/assets',
         to: 'assets'
-      }]),
+      },
+      {
+        from: 'node_modules/workbox-routing', 
+        to: 'WorkBox'
+      },
+      {
+        from: 'node_modules/workbox-expiration', 
+        to: 'WorkBox'
+      },
+      {
+        from: 'node_modules/workbox-strategies', 
+        to: 'WorkBox'
+      },
+      {
+        from: 'node_modules/workbox-core', 
+        to: 'WorkBox'
+      },
+    ]),
     ],
     optimization: {
       removeAvailableModules: true,

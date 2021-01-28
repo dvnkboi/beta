@@ -10,13 +10,13 @@ class Silence {
       value: function (prop, handler) {
         var setter = function (newVal) {
           let oldVal = this[prop];
-          this['_internal_' + prop] = newVal;
+          this['_watched_' + prop] = newVal;
           return newVal = handler.call(this, newVal, oldVal);
         };
         Object.defineProperty(this, prop, {
           set: setter,
           get() {
-            return this['_internal_' + prop]
+            return this['_watched_' + prop]
           }
         });
       }

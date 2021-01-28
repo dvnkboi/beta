@@ -130,6 +130,8 @@
               proxy.playing = val;
             });
 
+            console.log(this.audio);
+
             proxy.audio.play();
           });
         } else {

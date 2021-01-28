@@ -2,6 +2,7 @@
 
 import { register } from 'register-service-worker'
 
+
 register(`sw.js`, {
   ready() {
     console.log(
@@ -30,3 +31,5 @@ register(`sw.js`, {
     console.error('Error during service worker registration:', error)
   }
 })
+
+

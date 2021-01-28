@@ -31,12 +31,8 @@ module.exports = {
         },
       ]),
       new WorkboxPlugin.InjectManifest({
-        // these options encourage the ServiceWorkers to get in there fast
-        // and not allow any straggling "old" SWs to hang around
-        // clientsClaim: true,
-        // skipWaiting: true,
-        swDest:'sw.js',
-        swSrc:'./src/sw.js',
+        swDest: 'sw.js',
+        swSrc: './src/sw.js',
         exclude: [
           /\.map$/,
           /manifest$/,
@@ -44,27 +40,7 @@ module.exports = {
           /service-worker\.js$/,
           /sw\.js$/,
         ],
-        // runtimeCaching: [{
-        //   // Match any request that ends with .png, .jpg, .jpeg or .svg.
-        //   urlPattern: /\.(?:png|jpg|jpeg|svg|js|css)$/,
-
-        //   // Apply a cache-first strategy.
-        //   handler: 'CacheFirst',
-  
-        //   options: {
-        //     // Use a custom cache name.
-        //     cacheName: 'static',
-            
-        //     cacheableResponse:{
-        //       statuses: [0, 200]
-        //     },
-        //     // Only cache 10 images.
-        //     expiration: {
-        //       maxEntries: 150,
-        //     },
-        //   },
-        // }],
-      }),
+      })
     ],
     optimization: {
       removeAvailableModules: true,
@@ -140,3 +116,18 @@ module.exports = {
 }
 
 
+// if (process.env.NODE_ENV === 'production') {
+//   module.exports.configureWebpack.plugins.push(
+//     new WorkboxPlugin.InjectManifest({
+//       swDest: 'sw.js',
+//       swSrc: './src/sw.js',
+//       exclude: [
+//         /\.map$/,
+//         /manifest$/,
+//         /\.htaccess$/,
+//         /service-worker\.js$/,
+//         /sw\.js$/,
+//       ],
+//     })
+//   );
+// }

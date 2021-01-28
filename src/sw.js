@@ -25,7 +25,7 @@ registerRoute(
 registerRoute(
     ({ request }) => request.destination === 'script' ||
         request.destination === 'style',
-    new CacheFirst({
+    new StaleWhileRevalidate({
         cacheName: 'static-resources',
     })
 );

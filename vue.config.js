@@ -22,7 +22,7 @@ module.exports = {
     },
 
     manifestOptions: {
-      short_name:'AUR',
+      short_name: 'AUR',
       background_color: "#1b1b1b"
     }
   },
@@ -33,13 +33,21 @@ module.exports = {
       test: /\.css(\?.*)?$/i,
       use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
     },
-    plugins:[
+    module: {
+      rules: [
+        {
+          test: /\.ts(\?.*)?$/i,
+          use: ['ts-loader']
+        }
+      ]
+    },
+    plugins: [
       new CopyPlugin([
-      {
-        from: './src/assets',
-        to: 'assets'
-      },
-    ]),
+        {
+          from: './src/assets',
+          to: 'assets'
+        },
+      ]),
     ],
     optimization: {
       removeAvailableModules: true,

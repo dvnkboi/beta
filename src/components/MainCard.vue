@@ -10,7 +10,7 @@
         </transition>
       </div>
       <transition name="fade" mode="out-in" appear>
-        <div v-if="wikiAvailable && showWiki && artistWiki.extract != ''" class="fixed w-screen h-screen overflow-auto top-0 bottom-0 left-0 right-0 backdrop-blur bg-black-dark bg-opacity-80 z-50 pt-8 transition duration-300">
+        <div v-if="wikiAvailable && showWiki && artistWiki.extract != ''" class="fixed overflow-x-hidden overflow-y-auto w-screen h-screen top-0 bottom-0 left-0 right-0 backdrop-blur bg-black-dark bg-opacity-80 z-50 pt-8 transition duration-300">
           <div class="float-left flex justify-center items-center md:justify-start md:items-start flex-auto w-full h-64 sm:h-96">
             <div @click="showWiki = false" class="wikiImgCont cursor-pointer transform-gpu hover:-translate-y-2 h-64 w-64 flex-shrink-0 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
               <transition name="fade-up" mode="out-in">

@@ -4,9 +4,10 @@ import { registerRoute } from 'workbox-routing';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
 import { cacheNames } from 'workbox-core';
+import { precacheAndRoute } from 'workbox-precaching'
 
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
-workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);
+precacheAndRoute(self.__WB_MANIFEST);
 
 self.addEventListener("message", (e) => {
     if (e.data.action == 'skipWaiting') self.skipWaiting()

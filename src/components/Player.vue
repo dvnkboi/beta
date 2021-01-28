@@ -114,7 +114,6 @@
 
             this.audio.on('loading', () => {
               proxy.audioLoading = true;
-              console.log('recieved loading');
             });
 
             this.audio.on('loaded', (loadingTime) => {
@@ -129,8 +128,6 @@
             this.audio.watch('playing', (val) => {
               proxy.playing = val;
             });
-
-            console.log(this.audio);
 
             proxy.audio.play();
           });

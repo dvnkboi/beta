@@ -3,7 +3,7 @@
     <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
       <div :class="{ 'cursor-pointer': wikiAvailable, 'pointer-events-none': showWiki && wikiAvailable && artistWiki.extract != '' }" @click="showWiki = true" class="artistImgCont transform-gpu h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
         <transition name="fade-up" mode="out-in" appear>
-          <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete crossorigin="anonymous" :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
+          <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
         </transition>
         <transition name="fade-up" mode="out-in" appear>
           <div :key="'mainCoverSkelly' + updatedCover" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute"></div>
@@ -14,7 +14,7 @@
           <div class="float-left flex justify-center items-center md:justify-start md:items-start flex-auto w-full h-64 sm:h-96">
             <div @click="showWiki = false" class="wikiImgCont cursor-pointer transform-gpu hover:-translate-y-2 h-64 w-64 flex-shrink-0 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
               <transition name="fade-up" mode="out-in">
-                <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete crossorigin="anonymous" :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
+                <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
               </transition>
               <transition name="fade-up" mode="out-in">
                 <div :key="'mainCoverSkelly' + updatedCover" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute"></div>
@@ -71,7 +71,7 @@
         </transition>
       </div>
       <div class="h-10 w-32 bg-gray-300 flex justify-center items-center text-lg text-black rounded-full transform-gpu hover:-translate-y-2 transition duration-300">
-        beta 0.2.9
+        beta 0.3.0
       </div>
       <div @click.stop.self="sliderShown = !sliderShown" class="slooder click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative transition duration-100">
         <transition name="fade-left" mode="out-in">

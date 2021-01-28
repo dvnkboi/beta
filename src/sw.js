@@ -16,7 +16,7 @@ registerRoute(
         plugins: [
             new ExpirationPlugin({
                 maxEntries: 700,
-                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
+                maxAgeSeconds: 30 * 24 * 60 * 60 * 12,
             })
         ],
     })
@@ -25,7 +25,7 @@ registerRoute(
 registerRoute(
     ({ request }) => request.destination === 'script' ||
         request.destination === 'style',
-    new StaleWhileRevalidate({
+    new CacheFirst({
         cacheName: 'static-resources',
     })
 );

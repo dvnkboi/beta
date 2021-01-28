@@ -244,7 +244,6 @@ class Silence {
         
         proxy._audioSource.onwaiting = function(){
           proxy.events.emit('loading');
-          console.log('emitted loading');
           proxy.loadingTime = performance.now();
           proxy._audioSource.oncanplaythrough = function(){
             proxy.events.emit('loaded', this.loadingTime);

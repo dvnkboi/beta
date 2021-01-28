@@ -8,6 +8,14 @@ const WorkboxPlugin = require('workbox-webpack-plugin');
 
 // vue.config.js
 module.exports = {
+  pwa:{
+    name:'AmpUpRadio',
+    themeColor:'#d1d5db',
+    msTileColor:'#1b1b1b',
+    appleMobileWebAppCapable:'yes',
+    appleMobileWebAppStatusBarStyle:'black',
+    
+  },
   lintOnSave: process.env.NODE_ENV != 'production',
   configureWebpack: {
     mode: process.env.NODE_ENV == 'production' ? 'production' : 'development',

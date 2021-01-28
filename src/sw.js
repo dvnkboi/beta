@@ -5,6 +5,7 @@ import { ExpirationPlugin } from 'workbox-expiration';
 import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
 import { cacheNames } from 'workbox-core';
 import { precacheAndRoute } from 'workbox-precaching'
+import {CacheableResponsePlugin} from 'workbox-cacheable-response';
 
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
 precacheAndRoute(self.__WB_MANIFEST);

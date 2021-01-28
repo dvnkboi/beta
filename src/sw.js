@@ -1,8 +1,16 @@
 /* eslint-disable no-undef */
-importScripts('workbox-routing')
-importScripts('workbox-expiration')
-importScripts('workbox-strategies')
-importScripts('workbox-core')
+// import { registerRoute } from 'workbox-routing';
+// import { ExpirationPlugin } from 'workbox-expiration';
+// import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
+// import { cacheNames } from 'workbox-core';
+
+const registerRoute = require('workbox-routing').registerRoute;
+const ExpirationPlugin = require('workbox-expiration').ExpirationPlugin;
+const CacheFirst = require('workbox-strategies').CacheFirst;
+const StaleWhileRevalidate = require('workbox-strategies').StaleWhileRevalidate;
+const cacheNames = require('workbox-core').cacheNames;
+
+// importScripts('workbox-routing','workbox-expiration','workbox-strategies','workbox-core')
 
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();

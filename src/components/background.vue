@@ -9,7 +9,7 @@
       </div>
       <div :style="{ filter: `${imgSaturation}` }" class="absolute h-full w-full overflow-hidden z-0 flex justify-center items-start transition-all duration-100">
         <transition name="fade-up" appear>
-          <img :key="albumImg" :src="albumImg" alt="" class="bgImg w-full h-auto object-cover opacity-100" />
+          <img :key="albumImg" crossorigin="anonymous" :src="albumImg" alt="" class="bgImg w-full h-auto object-cover opacity-100" />
         </transition>
       </div>
     </div>

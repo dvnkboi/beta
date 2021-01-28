@@ -25,7 +25,7 @@
         queueUrl: `https://api.ampupradio.com:3000/v2?action=get_queue`,
         artUrl: `https://api.ampupradio.com:3000/v2?action=get_art`,
         nextArtUrl: `https://api.ampupradio.com:3000/v2?action=get_next_art`,
-        wikiPageUrl: `https://en.wikipedia.org/w/api.php?format=json&action=query&prop=info|extracts&inprop=url&exintro&explaintext&redirects=1&titles=`,
+        wikiPageUrl: `https://en.wikipedia.org/w/api.php?origin=*&format=json&action=query&prop=info|extracts&inprop=url&exintro&explaintext&redirects=1&titles=`,
         artistWiki: {},
         covers: 11,
         queue: [],

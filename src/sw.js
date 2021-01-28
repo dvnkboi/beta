@@ -5,6 +5,7 @@ import { registerRoute } from 'workbox-routing';
 import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
 import { cacheNames } from 'workbox-core';
 import { precacheAndRoute } from 'workbox-precaching';
+import {CacheableResponsePlugin} from 'workbox-cacheable-response';
 
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
 precacheAndRoute(self.__WB_MANIFEST);
@@ -17,6 +18,9 @@ registerRoute(
             new ExpirationPlugin({
                 maxEntries: 700,
                 maxAgeSeconds: 30 * 24 * 60 * 60 * 12,
+            }),
+            new CacheableResponsePlugin({
+                statuses:[0,200]
             })
         ],
     })

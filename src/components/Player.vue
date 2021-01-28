@@ -209,6 +209,8 @@
         try {
           let res = await this.axios.get(`https://api.allorigins.win/raw?url=${encodeURIComponent(proxy.wikiPageUrl + processedArtist)}`, {
             responseType: 'json',
+            Origin:"https://ampupradio.com",
+            "Content-Type": "application/json; charset=UTF-8"
           });
 
           let relevancyCheck = Object.values(res.data.query.pages)[0].extract.toLowerCase();

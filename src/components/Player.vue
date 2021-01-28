@@ -207,7 +207,7 @@
           })
           .join('%20');
         try {
-          let res = await this.axios.get(`https://api.allorigins.win/raw?url=${encodeURIComponent(proxy.wikiPageUrl + processedArtist)}`, {
+          let res = await this.axios.get(proxy.wikiPageUrl + processedArtist, {
             responseType: 'json',
             Origin:"https://ampupradio.com",
             "Content-Type": "application/json; charset=UTF-8"

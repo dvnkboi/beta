@@ -207,7 +207,7 @@
           })
           .join('%20');
         try {
-          let res = await this.axios.get(proxy.wikiPageUrl + processedArtist, {
+          let res = await this.axios.get(`https://api.allorigins.win/raw?url=${encodeURIComponent(proxy.wikiPageUrl + processedArtist)}`, {
             responseType: 'json',
           });
 
@@ -290,9 +290,15 @@
               this.queue[i].date = this.res.response.history[i].date_played;
               this.queue[i].minutes = Math.floor((new Date().getTime() - new Date(this.res.response.history[i].date_played).getTime()) / 60000);
 
-              this.queue[i].cover = (this.lodashGet(this.art[i][0], 'images[0].thumbnails.small') || this.lodashGet(this.art[i][0], 'images[0].thumbnails["250"]') || this.lodashGet(this.art[i][0], 'images[0].image') || this.aurTmpLogo).replace('http://', 'https://');
+              this.queue[i].cover = (`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails.small'))}` 
+              ||`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails["250"]'))}`  
+              || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].image'))}` 
+              || this.aurTmpLogo).replace('http://', 'https://');
 
-              this.queue[i].largeCover = (this.lodashGet(this.art[i][0], 'images[0].thumbnails.large') || this.lodashGet(this.art[i][0], 'images[0].thumbnails["500"]') || this.lodashGet(this.art[i][0], 'images[0].image') || this.aurTmpLogo).replace('http://', 'https://');
+              this.queue[i].largeCover = (`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails.large'))}` 
+              ||`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails["500"]'))}`  
+              || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].image'))}` 
+              || this.aurTmpLogo).replace('http://', 'https://');
 
               this.preloadSuccess = false;
               this.preloadRunning = false;
@@ -308,7 +314,10 @@
       async preloadNext() {
         let src = await this.getNextArt();
 
-        let preloadSrc = (this.lodashGet(src, 'response[0].images[0].thumbnails.small') || this.lodashGet(src, 'response[0].images[0].thumbnails["250"]') || this.lodashGet(src, 'response[0].images[0].image') || this.aurTmpLogo).replace('http://', 'https://');
+        let preloadSrc = (`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(src, 'response[0].images[0].thumbnails.small'))}` 
+        ||`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(src, 'response[0].images[0].thumbnails["250"]'))}`  
+        || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(src, 'response[0].images[0].image'))}`
+        || this.aurTmpLogo).replace('http://', 'https://');
 
         let preloadImg = new Image();
         if (src) {

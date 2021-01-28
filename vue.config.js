@@ -4,28 +4,10 @@ const TerserPlugin = require("terser-webpack-plugin");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
+const WorkboxPlugin = require('workbox-webpack-plugin');
 
 // vue.config.js
 module.exports = {
-  pwa: {
-    name: 'AmpUpRadio',
-    themeColor: '#8f00df',
-    msTileColor: '#8f00df',
-    appleMobileWebAppCapable: 'yes',
-    appleMobileWebAppCache: "yes",
-    appleMobileWebAppStatusBarStyle: 'black',
-
-    workboxPluginMode: 'InjectManifest',
-    workboxOptions: {
-      swSrc: 'src/sw.js',
-      swDest: 'sw.js',
-    },
-
-    manifestOptions: {
-      short_name: 'AUR',
-      background_color: "#1b1b1b"
-    }
-  },
   lintOnSave: process.env.NODE_ENV != 'production',
   configureWebpack: {
     mode: process.env.NODE_ENV == 'production' ? 'production' : 'development',
@@ -48,6 +30,33 @@ module.exports = {
           to: 'assets'
         },
       ]),
+      new WorkboxPlugin.GenerateSW({
+        // these options encourage the ServiceWorkers to get in there fast
+        // and not allow any straggling "old" SWs to hang around
+        clientsClaim: true,
+        skipWaiting: true,
+        swDest:'sw.js',
+        runtimeCaching: [{
+          // Match any request that ends with .png, .jpg, .jpeg or .svg.
+          urlPattern: /\.(?:png|jpg|jpeg|svg|js|css)$/,
+
+          // Apply a cache-first strategy.
+          handler: 'CacheFirst',
+  
+          options: {
+            // Use a custom cache name.
+            cacheName: 'static',
+            
+            cacheableResponse:{
+              statuses: [0, 200]
+            },
+            // Only cache 10 images.
+            expiration: {
+              maxEntries: 150,
+            },
+          },
+        }],
+      }),
     ],
     optimization: {
       removeAvailableModules: true,

@@ -1,7 +1,7 @@
 {
   "name": "AmpUpRadio",
   "short_name": "AUR",
-  "theme_color": "#8f00df",
+  "theme_color": "rgb(209, 213, 219)",
   "icons": [
     { "src": "./img/icons/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "./img/icons/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" },

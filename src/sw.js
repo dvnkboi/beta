@@ -4,11 +4,15 @@
 // import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
 // import { cacheNames } from 'workbox-core';
 
-const registerRoute = require('workbox-routing').registerRoute;
-const ExpirationPlugin = require('workbox-expiration').ExpirationPlugin;
-const CacheFirst = require('workbox-strategies').CacheFirst;
-const StaleWhileRevalidate = require('workbox-strategies').StaleWhileRevalidate;
-const cacheNames = require('workbox-core').cacheNames;
+// const registerRoute = require('workbox-routing').registerRoute;
+// const ExpirationPlugin = require('workbox-expiration').ExpirationPlugin;
+// const CacheFirst = require('workbox-strategies').CacheFirst;
+// const StaleWhileRevalidate = require('workbox-strategies').StaleWhileRevalidate;
+// const cacheNames = require('workbox-core').cacheNames;
+
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.0.2/workbox-sw.js');
+
+const {strategies} = workbox;
 
 // importScripts('workbox-routing','workbox-expiration','workbox-strategies','workbox-core')
 
@@ -16,9 +20,9 @@ self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
-registerRoute(
+workbox.routing.registerRoute(
     ({ request }) => request.destination === 'image',
-    new CacheFirst({
+    new strategies.CacheFirst({
         cacheName: 'images',
         plugins: [
             new ExpirationPlugin({
@@ -30,10 +34,10 @@ registerRoute(
     })
 );
 
-registerRoute(
+workbox.routing.registerRoute(
     ({ request }) => request.destination === 'script' ||
         request.destination === 'style',
-    new StaleWhileRevalidate({
+    new strategies.StaleWhileRevalidate({
         cacheName: 'static-resources',
     })
 );

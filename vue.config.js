@@ -4,7 +4,6 @@ const TerserPlugin = require("terser-webpack-plugin");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
-const WorkboxPlugin = require('workbox-webpack-plugin');
 
 // vue.config.js
 module.exports = {
@@ -15,6 +14,33 @@ module.exports = {
     appleMobileWebAppCapable: 'yes',
     appleMobileWebAppCache: "yes",
     appleMobileWebAppStatusBarStyle: 'black',
+
+    workboxPluginMode: 'GenerateSW',
+    workboxOptions: {
+      // Do not precache images
+      exclude: [/\.(?:png|jpg|jpeg|svg)$/],
+      
+      // Define runtime caching rules.
+      runtimeCaching: [{
+        // Match any request that ends with .png, .jpg, .jpeg or .svg.
+        urlPattern: /\.(?:png|jpg|jpeg|svg)$/,
+
+        // Apply a cache-first strategy.
+        handler: 'CacheFirst',
+
+        options: {
+          // Use a custom cache name.
+          cacheName: 'images',
+          cacheableResponse:{
+            statuses: [0, 200]
+          },
+          // Only cache 10 images.
+          expiration: {
+            maxEntries: 50,
+          },
+        },
+      }],
+    },
 
     manifestOptions: {
       short_name:'AUR',
@@ -29,31 +55,6 @@ module.exports = {
       use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
     },
     plugins:[
-      new WorkboxPlugin.GenerateSW({
-        // Do not precache images
-        exclude: [/\.(?:png|jpg|jpeg|svg)$/],
-  
-        // Define runtime caching rules.
-        runtimeCaching: [{
-          // Match any request that ends with .png, .jpg, .jpeg or .svg.
-          urlPattern: /\.(?:png|jpg|jpeg|svg)$/,
-  
-          // Apply a cache-first strategy.
-          handler: 'CacheFirst',
-  
-          options: {
-            // Use a custom cache name.
-            cacheName: 'images',
-            cacheableResponse:{
-              statuses: [0, 200]
-            },
-            // Only cache 10 images.
-            expiration: {
-              maxEntries: 50,
-            },
-          },
-        }],
-      }),
       new CopyPlugin([{
         from: './src/assets',
         to: 'assets'

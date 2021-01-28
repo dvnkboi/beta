@@ -4,17 +4,7 @@
 // import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
 // import { cacheNames } from 'workbox-core';
 
-// const registerRoute = require('workbox-routing').registerRoute;
-// const ExpirationPlugin = require('workbox-expiration').ExpirationPlugin;
-// const CacheFirst = require('workbox-strategies').CacheFirst;
-// const StaleWhileRevalidate = require('workbox-strategies').StaleWhileRevalidate;
-// const cacheNames = require('workbox-core').cacheNames;
-
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.0.2/workbox-sw.js');
-
-const {strategies} = workbox;
-
-// importScripts('workbox-routing','workbox-expiration','workbox-strategies','workbox-core')
+importScripts('workbox-routing','workbox-expiration','workbox-strategies','workbox-core')
 
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();

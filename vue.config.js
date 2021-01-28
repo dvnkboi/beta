@@ -15,7 +15,7 @@ module.exports = {
     appleMobileWebAppCache: "yes",
     appleMobileWebAppStatusBarStyle: 'black',
 
-    workboxPluginMode: 'GenerateSW',
+    workboxPluginMode: 'InjectManifest',
     workboxOptions: {
       // Do not precache images
       exclude: [/\.(?:png|jpg|jpeg|svg)$/],
@@ -25,6 +25,7 @@ module.exports = {
         // Match any request that ends with .png, .jpg, .jpeg or .svg.
         urlPattern: /\.(?:png|jpg|jpeg|svg)$/,
 
+        swSrc: 'src/sw.js',
         // Apply a cache-first strategy.
         handler: 'CacheFirst',
 

@@ -68,7 +68,7 @@ export default {
     },
     methods: {
       handleScroll() {
-        this.targetPosY = 1 - (Math.min(window.scrollY,580) / 580);
+        this.targetPosY = 1 - (Math.min(window.scrollY,window.innerHeight) / window.innerHeight);
 
         if(this.posInterval) clearInterval(this.posInterval);
         this.posInterval = null;

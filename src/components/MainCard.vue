@@ -1,7 +1,7 @@
 <template>
   <div class="mainCard bg-black-dark bg-opacity-70 max-h-full flex w-full xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300 overflow-auto">
-    <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
-      <div :class="{ 'cursor-pointer': wikiAvailable, 'pointer-events-none': showWiki && wikiAvailable && artistWiki.extract != '' }" @click="showWiki = true" class="artistImgCont transform-gpu h-64 w-64 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
+    <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full"> 
+      <div :class="{ 'cursor-pointer': wikiAvailable, 'pointer-events-none': showWiki && wikiAvailable && artistWiki.extract != '' }" @click="showWiki = true" class="artistImgCont transform-gpu h-80 w-80 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
         <transition name="fade-up" mode="out-in" appear>
           <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
         </transition>
@@ -12,7 +12,7 @@
       <transition name="fade" mode="out-in" appear>
         <div v-if="wikiAvailable && showWiki && artistWiki.extract != ''" class="fixed overflow-x-hidden overflow-y-auto w-screen h-screen top-0 bottom-0 left-0 right-0 backdrop-blur bg-black-dark bg-opacity-80 z-50 pt-8 transition duration-300">
           <div class="float-left flex justify-center items-center md:justify-start md:items-start flex-auto w-full h-64 sm:h-96">
-            <div @click="showWiki = false" class="wikiImgCont cursor-pointer transform-gpu hover:-translate-y-2 h-64 w-64 flex-shrink-0 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
+            <div @click="showWiki = false" class="wikiImgCont cursor-pointer transform-gpu hover:-translate-y-2 h-80 w-80 flex-shrink-0 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
               <transition name="fade-up" mode="out-in">
                 <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
               </transition>
@@ -51,15 +51,15 @@
       </transition>
       <div class="px-7 w-full flex-auto overflow-hidden relative">
         <transition name="fade-up" mode="out-in" appear>
-          <h1 :key="'mainTitle'" v-show="showTitle" class="mainTitle font-sans overflow-ellipsis overflow-hidden break-words text-gray-300 text-4xl md:text-6xl xl:text-7xl pt-1 font-bold w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedTitle }}</h1>
+          <h1 :key="'mainTitle'" v-show="showTitle" class="mainTitle font-sans overflow-ellipsis overflow-hidden break-words text-gray-300 text-5xl md:text-6xl xl:text-7xl pt-1 font-bold w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedTitle }}</h1>
         </transition>
         <transition name="fade-up" mode="out-in" appear>
-          <h2 :key="'mainArtist'" v-show="showArtist" class="mainArtist font-sans break-words truncate overflow-ellipsis max-w-full md:-mt-3 text-gray-400 text-2xl md:text-4xl xl:text-5xl w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedArtist }}</h2>
+          <h2 :key="'mainArtist'" v-show="showArtist" class="mainArtist font-sans break-words truncate overflow-ellipsis max-w-full md:-mt-3 text-gray-400 text-3xl md:text-4xl xl:text-5xl w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedArtist }}</h2>
         </transition>
       </div>
       <h2 class="font-sans text-gray-400 text-lg md:text-2xl w-full text-center">{{ playTime || '00:00:00' }}</h2>
     </div>
-    <div class="h-24 w-full px-3 flex justify-between items-center">
+    <div class="h-24 w-full px-3 flex justify-between items-center relative">
       <div @click="$emit('playPause')" class="click cursor-pointer flex justify-center items-center h-full w-16 flex-none">
         <transition name="fade-left" mode="out-in">
           <span key="playBtn" v-if="!playing" class="transition duration-150">
@@ -73,6 +73,7 @@
       <div class="h-10 w-32 bg-gray-300 flex justify-center items-center text-lg text-black rounded-full transform-gpu hover:-translate-y-2 transition duration-300">
         beta 0.3.1
       </div>
+      <box-icon name="chevron-up" type="solid" size="cssSize" class="absolute bottom-0 w-full h-5 visible xl:hidden -ml-3 fill-current stroke-current text-gray-300 stroke-0" v-pre></box-icon>
       <div @click.stop.self="sliderShown = !sliderShown" class="slooder click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative transition duration-100">
         <transition name="fade-left" mode="out-in">
           <span key="volLarge" @click.stop="sliderShown = !sliderShown" v-if="value >= 0.7" class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150">

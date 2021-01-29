@@ -46,8 +46,11 @@
             if (e.target.tagName !== "INPUT") {
               proxy.keyPlayPause = Date.now();
             }
-            if(e.target == document.body) e.preventDefault();
-          }
+            if(e.target == document.body) {
+              e.preventDefault();
+              e.stopImmediatePropagation();
+              }
+            }
         }
       });
 

@@ -1,6 +1,6 @@
 <template>
   <div class="fixed top-0 left-0 w-screen h-full overflow-y-hidden overflow-x-visible">
-    <div :key="albumImg" class="absolute top-0 left-0 w-full h-full flex justify-center items-center z-0 transition duration-300">
+    <div :key="updatedCover" class="absolute top-0 left-0 w-full h-full flex justify-center items-center z-0 transition duration-300">
       <div class="absolute bgMask w-full h-full z-20"></div>
       <div ref="scrollMask" style="opacity:1" class="absolute h-full w-full">
         <div :style="{ filter: `${saturation}` }" class="absolute h-full w-full transition-all duration-100 z-10 opacity-40">
@@ -10,7 +10,7 @@
         </div>
         <div :style="{ filter: `${imgSaturation}` }" class="absolute h-full w-full overflow-hidden z-0 flex justify-center items-start transition-all duration-100">
           <transition name="fade-up" appear>
-            <img :key="albumImg" :src="albumImg" alt="" class="bgImg w-full h-auto object-cover opacity-100" />
+            <img @error="updatedCover = aurLogo" :key="updatedCover" :src="updatedCover" alt="" class="bgImg w-full h-auto object-cover opacity-100" />
           </transition>
         </div>
       </div>
@@ -31,7 +31,9 @@ export default {
         show: false,
         posY:1,
         posInterval: null,
-        targetPosY:0
+        targetPosY:0,
+        aurLogo: '/assets/aur400.png',
+        updatedCover:null
       };
     },
     computed: {
@@ -84,6 +86,15 @@ export default {
         this.currentColor = nextColor == this.currentColor ? this.colors[(this.colors.indexOf(this.currentColor) + 1) % this.colors.length] : nextColor;
         this.key = Date.now();
       },
+      cover: function() {
+        if (this.cover != this.updatedCover && this.cover) {
+          this.updatedCover = null;
+          this.updatedCover = this.cover;
+        } else {
+          console.log('didnt change cover');
+          this.hasLoaded = true;
+        }
+      }
     },
     mounted() {
       this.show = true;
@@ -93,7 +104,7 @@ export default {
     props: {
       percent: Number,
       changed: Boolean,
-      albumImg: String,
+      cover: String,
       normalizedBassData: Number,
     },
   };

@@ -67,6 +67,10 @@ body {
   background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.46262254901960786) 17%, rgba(0,0,0,0.7539390756302521) 35%, rgba(0,0,0,0.9248074229691877) 55%, rgba(0,0,0,0.9724264705882353) 80%);
 }
 
+.bgMaskRad{
+  background: radial-gradient(circle farthest-corner, transparent, #000 50%);
+}
+
 .mainTitle{
   word-break: normal;
   display: -webkit-box;

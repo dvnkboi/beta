@@ -96,6 +96,8 @@ module.exports = {
     },
     extend: {
       transitionDuration: {
+        25:'25ms',
+        50:'50ms',
         2000: '2000ms'
       },
       height: {

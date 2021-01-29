@@ -1,31 +1,31 @@
 /* eslint-disable no-undef */
 
 import { registerRoute } from 'workbox-routing';
-import { ExpirationPlugin } from 'workbox-expiration';
-import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
+// import { ExpirationPlugin } from 'workbox-expiration';
+import { /*CacheFirst*/ StaleWhileRevalidate } from 'workbox-strategies';
 import { cacheNames } from 'workbox-core';
 import { precacheAndRoute } from 'workbox-precaching';
-import { CacheableResponsePlugin } from 'workbox-cacheable-response';
+// import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { BroadcastUpdatePlugin } from 'workbox-broadcast-update';
 
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
 precacheAndRoute(self.__WB_MANIFEST);
 
-registerRoute(
-    ({ request }) => request.destination === 'image',
-    new CacheFirst({
-        cacheName: 'images',
-        plugins: [
-            new ExpirationPlugin({
-                maxEntries: 700,
-                maxAgeSeconds: 30 * 24 * 60 * 60 * 12,
-            }),
-            new CacheableResponsePlugin({
-                statuses: [0, 200]
-            })
-        ],
-    })
-);
+// registerRoute(
+//     ({ request }) => request.destination === 'image',
+//     new CacheFirst({
+//         cacheName: 'images',
+//         plugins: [
+//             new ExpirationPlugin({
+//                 maxEntries: 700,
+//                 maxAgeSeconds: 30 * 24 * 60 * 60 * 12,
+//             }),
+//             new CacheableResponsePlugin({
+//                 statuses: [0, 200]
+//             })
+//         ],
+//     })
+// );
 
 registerRoute(
     ({ request }) => request.destination === 'script' ||

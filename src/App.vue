@@ -40,15 +40,15 @@
     props: {},
     created() {
       let proxy = this;
-      document.addEventListener('keyup', function(e) {
+      document.addEventListener('keydown', function(e) {
         if (proxy.captureKeypress){
-          if (e.keyCode == 32) {
+          if (e.key == " ") {
             if (e.target.tagName !== "INPUT") {
               proxy.keyPlayPause = Date.now();
             }
             if(e.target == document.body) {
+              e.stopPropagation();
               e.preventDefault();
-              e.stopImmediatePropagation();
               }
             }
         }

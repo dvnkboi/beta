@@ -67,19 +67,18 @@ export default {
     },
     methods: {
       handleScroll() {
-        this.targetPosY = window.scrollY;
-        this.targetPosY = Math.min(this.targetPosY,580) / 580;
-        this.targetPosY = 1 - this.targetPosY;
+        this.targetPosY = 1 - (Math.min(window.scrollY,580) / 580);
 
         if(this.posInterval) clearInterval(this.posInterval);
         this.posInterval = null;
+        
 
         this.posInterval = setInterval(() => {
-          if(Math.abs(this.posY - this.targetPosY) < 0.001) clearInterval(this.posInterval);
+          if(Math.abs(this.targetPosY - this.posY) < 0.001) clearInterval(this.posInterval);
           this.posY = lerp(this.posY,this.targetPosY,0.2);
           this.$refs.scrollMask.style.opacity = this.posY + 0.4 * this.posY;
           this.$refs.scrollRadGr.style.opacity = (1 - this.posY) * 0.6 + 0.4;
-        },15);
+        },1000/60);
       },
     },
     watch: {

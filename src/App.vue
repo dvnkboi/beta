@@ -43,7 +43,10 @@
       document.addEventListener('keyup', function(e) {
         if (proxy.captureKeypress){
           if (e.keyCode == 32) {
-            proxy.keyPlayPause = Date.now();
+            if (e.target.tagName !== "INPUT") {
+              proxy.keyPlayPause = Date.now();
+              e.preventDefault();
+            }
           }
         }
       });

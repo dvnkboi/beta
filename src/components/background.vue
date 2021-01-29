@@ -11,7 +11,7 @@
         </div>
         <div :style="{ filter: `${imgSaturation}` }" class="absolute h-full w-full overflow-hidden z-0 flex justify-center items-start transition-all duration-100">
           <transition name="fade-up" appear>
-            <img @error="updatedCover = aurLogo" :key="updatedCover" :src="updatedCover" alt="" class="bgImg w-full h-auto object-cover opacity-100" />
+            <img @load="grabColor()" @error="updatedCover = aurLogo" :key="updatedCover" :src="updatedCover" alt="" class="bgImg w-full h-auto object-cover opacity-100" />
           </transition>
         </div>
       </div>
@@ -20,7 +20,8 @@
 </template>
 
 <script>
-import {lerp} from '../utils'
+import {lerp} from '../utils';
+import * as Vibrant from 'node-vibrant';
 
 export default {
     name: 'SongBg',
@@ -80,6 +81,12 @@ export default {
           this.$refs.scrollRadGr.style.opacity = (1 - this.posY) * 0.6 + 0.4;
         },1000/60);
       },
+      grabColor(){
+        Vibrant.from(this.updatedCover).getPalette()
+        .then((palette) => {
+          this.cssBackground = palette.Vibrant.hex;
+        });
+      }
     },
     watch: {
       changed: function() {

@@ -72,7 +72,6 @@ export default {
 
         if(this.posInterval) clearInterval(this.posInterval);
         this.posInterval = null;
-        
 
         this.posInterval = setInterval(() => {
           if(Math.abs(this.targetPosY - this.posY) < 0.001) clearInterval(this.posInterval);
@@ -82,16 +81,21 @@ export default {
         },1000/60);
       },
       grabColor(){
+        let proxy = this;
         Vibrant.from(this.updatedCover).getPalette()
         .then((palette) => {
-          this.cssBackground = palette.Vibrant.hex;
+          proxy.currentColor = palette.Vibrant.hex;
+          console.log(proxy.currentColor);
+        })
+        .catch((e) => {
+          console.log(e);
+          let nextColor = proxy.colors[Math.floor(proxy.colors.length * Math.random())];
+          proxy.currentColor = nextColor == proxy.currentColor ? proxy.colors[(proxy.colors.indexOf(proxy.currentColor) + 1) % proxy.colors.length] : nextColor;
         });
       }
     },
     watch: {
       changed: function() {
-        let nextColor = this.colors[Math.floor(this.colors.length * Math.random())];
-        this.currentColor = nextColor == this.currentColor ? this.colors[(this.colors.indexOf(this.currentColor) + 1) % this.colors.length] : nextColor;
         this.key = Date.now();
       },
       cover: function() {

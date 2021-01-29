@@ -27,6 +27,9 @@ function AdjustingInterval(workFunc, interval, errorFunc) {
    }
 }
 
+const lerp = (x, y, a) => y*a + x*(1-a);
+
 module.exports = {
-   AdjustingInterval
+   AdjustingInterval,
+   lerp
 };

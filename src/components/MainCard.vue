@@ -85,7 +85,7 @@
         </transition>
         <transition name="fade" appear>
           <div v-show="sliderShown" class="h-64 w-16 bg-black-light -mt-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-start pt-4 transition duration-150">
-            <input ref="volumeSlider" type="range" min="0" max="1" step="0.01" name="volume" v-model.lazy="value" orient="vertical" data-orientation="vertical" id="volumeSlider" class="w-2 h-40" />
+            <input ref="volumeSlider" type="range" min="0" max="1" step="0.01" name="volume" v-model="value" orient="vertical" data-orientation="vertical" id="volumeSlider" class="w-2 h-40" />
           </div>
         </transition>
       </div>

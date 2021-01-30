@@ -48,7 +48,6 @@ html,
   -ms-user-select: none;
   user-select: none;
   @apply bg-black-dark;
-  scroll-behavior: smooth;
 }
 
 body {

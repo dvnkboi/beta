@@ -6,7 +6,7 @@
       <div ref="scrollMask" style="opacity:1" class="absolute h-full w-full">
         <div :style="{ filter: `${saturation}` }" class="absolute h-full w-full transition-all duration-100 z-10 opacity-40">
           <transition name="fade" appear class="z-50">
-            <div :key="key" v-show="show" :style="{ 'background-color': cssBackground  }" class="background absolute w-full h-full transition-all duration-300 ease-linear bg-yellow-400"></div>
+            <div :key="key" v-show="show" :style="{ 'background-color': cssBackground }" class="background absolute w-full h-full transition-all duration-300 ease-linear bg-yellow-400"></div>
           </transition>
         </div>
         <div :style="{ filter: `${imgSaturation}` }" class="absolute h-full w-full overflow-hidden z-0 flex justify-center items-start transition-all duration-100">
@@ -114,7 +114,10 @@ export default {
     },
     mounted() {
       this.show = true;
-      window.addEventListener('scroll', this.handleScroll);
+      window.addEventListener('scroll', this.handleScroll, {
+        capture: true,
+        passive: true
+      });
       this.handleScroll();
     },
     props: {

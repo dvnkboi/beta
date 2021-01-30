@@ -502,6 +502,11 @@
       this.preloadSuccess = false;
       this.preloadRunning = false;
 
+      setTimeout(async () => {
+        await this.getQueue();
+        await this.preloadNext();
+      },5000);
+
       var myWorker = new Worker('wakeupWorker.js');
       myWorker.onmessage = function(ev) {
         if (ev && ev.data === 'wakeup') {

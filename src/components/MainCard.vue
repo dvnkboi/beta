@@ -10,7 +10,7 @@
         </transition>
       </div>
       <transition name="fade" mode="out-in" appear>
-        <div v-if="wikiAvailable && showWiki" class="fixed overflow-x-hidden overflow-y-auto w-screen h-screen top-0 bottom-0 left-0 right-0 backdrop-blur bg-black-dark bg-opacity-80 z-50 pt-8 transition duration-300">
+        <div v-if="wikiAvailable && showWiki" class="fixed overflow-hidden w-screen h-screen top-0 bottom-0 left-0 right-0 backdrop-blur bg-black-dark bg-opacity-80 z-50 pt-8 transition duration-300">
           <div class="float-left flex justify-center items-center md:justify-start md:items-start flex-auto w-full h-64 xxs:h-80 sm:h-96">
             <div @click="showWiki = false" class="wikiImgCont cursor-pointer transform-gpu hover:-translate-y-2 h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 flex-shrink-0 relative mx-8 transition-transform duration-300 overflow-hidden">
               <transition name="fade-up" mode="out-in">
@@ -71,7 +71,7 @@
         </transition>
       </div>
       <div class="h-10 w-32 bg-gray-300 flex justify-center items-center text-lg text-black rounded-full transform-gpu hover:-translate-y-2 transition duration-300">
-        beta 0.3.1
+        beta 0.3.2
       </div>
       <box-icon name="chevron-up" type="solid" size="cssSize" class="absolute bottom-0 w-full h-5 visible xl:hidden -ml-3 fill-current stroke-current text-gray-300 stroke-0" v-pre></box-icon>
       <div @click.stop.self="sliderShown = !sliderShown" class="slooder click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative transition duration-100">

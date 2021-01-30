@@ -5,6 +5,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
 const WorkboxPlugin = require('workbox-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
+
 
 // vue.config.js
 module.exports = {
@@ -14,14 +16,14 @@ module.exports = {
     msTileColor:'#1b1b1b',
     appleMobileWebAppCapable:'yes',
     appleMobileWebAppStatusBarStyle:'black',
-    
+
   },
   lintOnSave: process.env.NODE_ENV != 'production',
   configureWebpack: {
     mode: process.env.NODE_ENV == 'production' ? 'production' : 'development',
     loader: {
       test: /\.css(\?.*)?$/i,
-      use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+      use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader','sass'],
     },
     module: {
       rules: [
@@ -32,6 +34,10 @@ module.exports = {
       ]
     },
     plugins: [
+      new CompressionPlugin({
+        test: /\.js(\?.*)?$/i,
+        algorithm: 'gzip'
+      }),
       new CopyPlugin([
         {
           from: './src/assets',

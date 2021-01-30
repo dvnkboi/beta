@@ -11,7 +11,7 @@
         </div>
         <div :style="{ filter: `${imgSaturation}` }" class="absolute h-full w-full overflow-hidden z-0 flex justify-center items-start transition-all duration-100">
           <transition name="fade-up" appear>
-            <img @load="grabColor()" @error="updatedCover = aurLogo" :key="updatedCover" :src="updatedCover" alt="" class="bgImg w-full h-auto object-cover opacity-100" />
+            <img @load="grabColor()" @error="updatedCover = aurLogo" :key="updatedCover" :src="updatedCover" alt="" class="bgImg h-screen w-auto lg:w-full lg:h-auto object-cover opacity-100 transform scale-105" />
           </transition>
         </div>
       </div>

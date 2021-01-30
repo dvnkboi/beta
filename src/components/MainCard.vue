@@ -1,6 +1,6 @@
 <template>
-  <div class="mainCard bg-black-dark bg-opacity-70 max-h-full flex w-full min-h-screen sm:min-h-0 xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300 overflow-auto">
-    <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full"> 
+  <div ref="mainCard" class="mainCard bg-black-dark bg-opacity-70 max-h-full flex w-full min-h-screen sm:min-h-0 xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300 overflow-auto">
+    <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
       <div :class="{ 'cursor-pointer': wikiAvailable, 'pointer-events-none': !wikiAvailable }" @click="showWiki = true" class="artistImgCont transform-gpu h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
         <transition name="fade-up" mode="out-in" appear>
           <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
@@ -74,20 +74,21 @@
         beta 0.3.2
       </div>
       <box-icon name="chevron-up" type="solid" size="cssSize" class="absolute bottom-0 w-full h-5 visible xl:hidden -ml-3 fill-current stroke-current text-gray-300 stroke-0" v-pre></box-icon>
-      <div @click.stop.self="sliderShown = !sliderShown" class="slooder click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative transition duration-100">
+      <div class="group slooder click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative transition duration-100">
         <transition name="fade-left" mode="out-in">
-          <span key="volLarge" @click.stop="sliderShown = !sliderShown" v-if="value >= 0.7" class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150">
+          <span key="volLarge" v-if="value >= 0.7" class="click w-12 h-12 pointer-events-none absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
             <box-icon name="volume-full" type="solid" size="cssSize" class="w-12 h-12 fill-current -ml-2 stroke-current text-gray-300 stroke-0" v-pre></box-icon>
           </span>
-          <span key="volSmol" @click.stop="sliderShown = !sliderShown" v-else class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150">
+          <span key="volSmol" v-else class="click w-12 h-12 pointer-events-none absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
             <box-icon name="volume-low" type="solid" size="cssSize" class="w-12 h-12 fill-current stroke-current text-gray-300 stroke-0" v-pre></box-icon>
           </span>
         </transition>
-        <transition name="fade" appear>
-          <div v-show="sliderShown" class="h-64 w-16 bg-black-light -mt-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-start pt-4 transition duration-150">
-            <input ref="volumeSlider" type="range" min="0" max="1" step="0.01" name="volume" v-model="value" orient="vertical" data-orientation="vertical" id="volumeSlider" class="w-2 h-40" />
+        <div @touchstart="sliderOpen = true" @touchmove="handleDrag" @mousemove="handleDrag" @mousedown="sliderOpen = true" @mouseup="sliderOpen = false" @mouseleave="sliderOpen = false"  class="h-64 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto w-16 bg-black-light -mt-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-end transition duration-150 overflow-hidden">
+          <div ref="volumeCont" style="height:calc(100% - 6rem)" class="w-4 rounded-4xl mb-16 overflow-hidden flex justify-end items-end bg-black-dark">
+            <div ref="slider" :style="{ height: value * 100 + '%' }" class="w-full bg-pink-500 rounded-4xl"></div>
           </div>
-        </transition>
+          <!-- <input ref="volumeSlider" type="range" min="0" max="1" step="0.01" name="volume" v-model="value" orient="vertical" data-orientation="vertical" id="volumeSlider" class="w-2 h-40" /> -->
+        </div>
       </div>
     </div>
   </div>
@@ -107,7 +108,7 @@
         updatedArtist: '____',
         updatedAlbum: '____',
         updatedCover: null,
-        sliderShown: false,
+        sliderOpen: false,
         value: 1,
         aurLogo: '/assets/aur400.png',
         scale: 0,
@@ -117,6 +118,24 @@
     methods: {
       loaded(evt) {
         if (evt) if (evt.path[0].naturalWidth != 0) this.hasLoaded = true;
+      },
+      handleDrag(e) {
+        if (this.sliderOpen) {
+          e.stopPropagation();
+          e.preventDefault();
+          let containerH = this.$refs.mainCard.getBoundingClientRect().height;
+          let containerY = this.$refs.mainCard.getBoundingClientRect().y;
+          let containerRel = containerH + containerY;
+          let bottom = this.$refs.volumeCont.getBoundingClientRect().bottom;
+          let top = this.$refs.volumeCont.getBoundingClientRect().top;
+          let y = window.event.clientY || e.targetTouches[0].clientY;
+          let height = (bottom - top);
+          y = ((y - top) * ((bottom + height) / containerRel)) / height;
+          y = Math.min(Math.max(y, 0), 1);
+          y = 1 - y;
+          this.value = y;
+          console.log(y);
+        }
       },
     },
     watch: {
@@ -187,15 +206,6 @@
     beforeMount() {},
     mounted() {
       this.value = parseFloat(localStorage.getItem('volume') || 1);
-      // let slider = document.querySelector('.slooder');
-
-      // console.log(slider);
-      // function animateVol(){
-      //   let vol = slider.querySelector('input').value;
-      //   slider.style.transform = `translateX(${(Math.random() - Math.random()) * 4 * vol}px) translateY(${(Math.random() - Math.random()) * 4 * vol}px) rotate(${(Math.random() - Math.random()) * 4 * vol}deg)`;
-      //   requestAnimationFrame(animateVol);
-      // }
-      // requestAnimationFrame(animateVol);
     },
     beforeUnmount() {
       this.audio.unload();

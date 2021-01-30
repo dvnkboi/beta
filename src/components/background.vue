@@ -1,8 +1,8 @@
 <template>
   <div class="fixed top-0 left-0 w-screen h-full overflow-y-hidden overflow-x-visible">
-    <div :key="updatedCover" class="absolute top-0 left-0 w-full h-full flex justify-center items-center z-0 transition duration-300">
+    <div class="absolute top-0 left-0 w-full h-full flex justify-center items-center z-0 transition duration-300">
       <div ref="scrollRadGr" style="opacity:0.4" class="absolute bgMaskRad w-full h-full z-20"></div>
-      <div ref="scrollLinGr" class="absolute bgMask w-full h-full z-40 transform origin-bottom scale-y-50"></div>
+      <div ref="scrollLinGr" class="absolute bgMask w-full h-full z-40 transform origin-bottom scale-y-35"></div>
       <div ref="scrollMask" style="opacity:1" class="absolute h-full w-full">
         <div :style="{ filter: `${saturation}` }" class="absolute h-full w-full transition-all duration-100 z-10 opacity-40">
           <transition name="fade" appear class="z-50">
@@ -57,7 +57,7 @@ export default {
         return this.currentColor;
       },
       saturation() {
-        return `saturate(${this.normalizedBassData * 150 + 50}%)`;
+        return `saturate(${this.normalizedBassData * 100}%)`;
       },
       imgSaturation() {
         return `saturate(${this.normalizedBassData * 50 + 50}%)`;
@@ -85,12 +85,16 @@ export default {
         Vibrant.from(this.updatedCover).getPalette()
         .then((palette) => {
           proxy.currentColor = palette.Vibrant.hex;
-          console.log(proxy.currentColor);
+          
+          document.documentElement.style.setProperty('--maskR', palette.Vibrant.rgb[0]);
+          document.documentElement.style.setProperty('--maskG', palette.Vibrant.rgb[1]);
+          document.documentElement.style.setProperty('--maskB', palette.Vibrant.rgb[2]);
         })
         .catch((e) => {
           console.log(e);
           let nextColor = proxy.colors[Math.floor(proxy.colors.length * Math.random())];
           proxy.currentColor = nextColor == proxy.currentColor ? proxy.colors[(proxy.colors.indexOf(proxy.currentColor) + 1) % proxy.colors.length] : nextColor;
+          
         });
       }
     },

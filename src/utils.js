@@ -29,7 +29,17 @@ function AdjustingInterval(workFunc, interval, errorFunc) {
 
 const lerp = (x, y, a) => y*a + x*(1-a);
 
+function hexToRgb(hex) {
+   var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+   return result ? {
+     r: parseInt(result[1], 16),
+     g: parseInt(result[2], 16),
+     b: parseInt(result[3], 16)
+   } : null;
+ }
+
 module.exports = {
    AdjustingInterval,
-   lerp
+   lerp,
+   hexToRgb
 };

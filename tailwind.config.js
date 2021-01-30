@@ -95,6 +95,10 @@ module.exports = {
       full: '9999px',
     },
     extend: {
+      scale:{
+        '25':'.25',
+        '35':'.35'
+      },
       transitionDuration: {
         15:'15ms',
         25:'25ms',

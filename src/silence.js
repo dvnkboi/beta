@@ -42,6 +42,7 @@ class Silence {
     this._audioSource.crossOrigin = this.config.crossOrigin || Silence.defaultConfig.crossOrigin;
     this._audioSource.preload = false;
     this._audioSource.volume = 0;
+    this.config.volume = this._sCurve(this.config.volume,0.4,1.6)
     this.url = url;
 
     this.slowCon = false;

@@ -1,11 +1,11 @@
 <template>
   <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full relative">
     <connectivity class="z-50" :show="!connected || slowCon" />
-    <MainCard class="z-20" ref="mainCard" @volume="volume = $event" @playPause="playPause()" @failed="getQueue()" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :normalizedBassData="normalizedBassData" :artistWiki="artistWiki" :playing="playing" />
+    <MainCard class="z-20" ref="mainCard" @volume="volume = $event" @playPause="playPause()" @failed="getQueue()" :palette="currentPalette" :percent="currentSongTimer.percent" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :normalizedBassData="normalizedBassData" :artistWiki="artistWiki" :playing="playing" />
     <div class="w-full z-10 overflow-auto xl:h-full">
       <Card v-for="(val, index) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :index="index" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" :normalizedBassData="normalizedBassData" />
     </div>
-    <SongBg class="z-0 transition-all duration-100" :changed="queue[0].changed" :percent="currentSongTimer.percent" :cover="queue[0].largeCover" :normalizedBassData="normalizedBassData" />
+    <SongBg class="z-0 transition-all duration-100" :changed="queue[0].changed" :currentColor="currentPalette.Vibrant.hex" :percent="currentSongTimer.percent" :cover="queue[0].largeCover" :normalizedBassData="normalizedBassData" />
     <Loading class="z-50" :show="audioLoading || metaLoading" />
   </div>
 </template>
@@ -17,6 +17,7 @@
   import Loading from './loading';
   import SongBg from './background';
   import { AdjustingInterval } from '../utils';
+  import * as Vibrant from 'node-vibrant';
 
   export default {
     name: 'Player',
@@ -30,6 +31,8 @@
         covers: 11,
         queue: [],
         art: [],
+        currentPalette:{Vibrant:{hex:'#fff'}},
+        colors: ['rgba(219, 39, 119)', 'rgba(124, 58, 237)', 'rgba(251, 191, 36)'],
         aurTmpLogo: '/assets/aur400.png',
         nextArt: null,
         queueOpen: true,
@@ -259,6 +262,7 @@
           this.metaLoadTime = performance.now() - this.metaLoadTime;
 
           this.setComponentInfo();
+          this.grabColor();
 
           return setTimeout(() => {
             this.queueOpen = true;
@@ -306,6 +310,22 @@
         } catch (e) {
           console.log(e.message);
         }
+      },
+      grabColor(){
+        let proxy = this;
+        Vibrant.from(this.queue[0].cover).getPalette()
+        .then((palette) => {
+          proxy.currentPalette = palette;
+
+          
+          document.documentElement.style.setProperty('--maskR', palette.Vibrant.rgb[0]);
+          document.documentElement.style.setProperty('--maskG', palette.Vibrant.rgb[1]);
+          document.documentElement.style.setProperty('--maskB', palette.Vibrant.rgb[2]);
+        })
+        .catch(() => {
+          let nextColor = proxy.colors[Math.floor(proxy.colors.length * Math.random())];
+          proxy.currentPalette.Vibrant.hex = nextColor == proxy.currentPalette.Vibrant.hex ? proxy.colors[(proxy.colors.indexOf(proxy.currentPalette.Vibrant.hex) + 1) % proxy.colors.length] : nextColor;
+        });
       },
       async preloadNext() {
         let src = await this.getNextArt();

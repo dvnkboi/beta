@@ -95,6 +95,9 @@ module.exports = {
       full: '9999px',
     },
     extend: {
+      borderWidth:{
+        '1':'2px',
+      },
       scale:{
         '25':'.25',
         '35':'.35'

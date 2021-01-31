@@ -1,18 +1,24 @@
 <template>
-  <div ref="mainCard" class="mainCard bg-black-dark bg-opacity-70 max-h-full flex w-full min-h-screen sm:min-h-0 xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300 overflow-auto">
+  <div ref="mainCard" class="mainCard bg-black-dark bg-opacity-60 max-h-full flex w-full min-h-screen sm:min-h-0 xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start pt-4 flex-none transition duration-300 overflow-auto">
     <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
-      <div :class="{ 'cursor-pointer': wikiAvailable, 'pointer-events-none': !wikiAvailable }" @click="showWiki = true" class="artistImgCont transform-gpu h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 relative mx-8 pt-2 transition-transform duration-300 overflow-hidden">
+      <div :style="{ filter: `saturate(${0.6 + normalizedBassData * 0.4}` }" :class="{ 'cursor-pointer': wikiAvailable, 'pointer-events-none': !wikiAvailable }" @click="showWiki = true" class="artistImgCont transform-gpu h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 relative mx-8 transition-all duration-150 overflow-hidden">
         <transition name="fade-up" mode="out-in" appear>
-          <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
+          <div v-show="wikiAvailable" style="mix-blend-mode: difference" class="absolute w-6 h-6 top-2 left-2 z-50">
+            <box-icon type="solid" name="info-circle" size="cssSize" class="w-full h-full stroke-current text-white fill-current stroke-0 z-50" v-pre></box-icon>
+          </div>
         </transition>
         <transition name="fade-up" mode="out-in" appear>
-          <div :key="'mainCoverSkelly' + updatedCover" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute"></div>
+          <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-20 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
         </transition>
+        <transition name="fade-up" mode="out-in" appear>
+          <div :key="'mainCoverSkelly' + updatedCover" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute z-10"></div>
+        </transition>
+        <div :style="{ width: percent * 100 + '%' }" style="mix-blend-mode: difference;filter:saturate(0)" class="absolute bottom-0 h-1 z-50 bg-white transition-all duration-300"></div>
       </div>
       <transition name="fade" mode="out-in" appear>
-        <div v-if="wikiAvailable && showWiki" class="fixed overflow-hidden w-screen h-screen top-0 bottom-0 left-0 right-0 backdrop-blur bg-black-dark bg-opacity-80 z-50 pt-10 transition duration-300">
+        <div v-if="wikiAvailable && showWiki" class="fixed overflow-hidden w-screen h-screen top-0 bottom-0 left-0 right-0 backdrop-blur bg-black-dark bg-opacity-80 z-50 pt-8 transition duration-300">
           <div class="float-left flex justify-center items-center md:justify-start md:items-start flex-auto w-full h-64 xxs:h-80 sm:h-96">
-            <div @click="showWiki = false" class="wikiImgCont cursor-pointer transform-gpu hover:-translate-y-2 h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 flex-shrink-0 relative mx-8 transition-transform duration-300 overflow-hidden">
+            <div :style="{ filter: `saturate(${0.7 + normalizedBassData * 0.3}` }" @click="showWiki = false" class="wikiImgCont cursor-pointer transform-gpu hover:-translate-y-2 h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 flex-shrink-0 relative mx-8 transition-all duration-150 overflow-hidden">
               <transition name="fade-up" mode="out-in">
                 <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
               </transition>
@@ -71,7 +77,7 @@
         </transition>
       </div>
       <div class="h-full flex-none flex justify-center items-center">
-        <img src="../assets/logoB.png" alt="AmpUpRadio" class="h-auto w-28 xxs:w-36 md:w-48 lg:w-64">
+        <img src="../assets/logoB.png" alt="AmpUpRadio" class="h-auto w-28 xxs:w-36 md:w-48 lg:w-64" />
       </div>
       <box-icon name="chevron-up" type="solid" size="cssSize" class="absolute bottom-0 w-full h-5 visible xl:hidden -ml-3 fill-current stroke-current text-gray-300 stroke-0" v-pre></box-icon>
       <div class="group slooder click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative transition duration-100">
@@ -83,7 +89,7 @@
             <box-icon name="volume-low" type="solid" size="cssSize" class="w-12 h-12 fill-current stroke-current text-gray-300 stroke-0 transform scale-75 xxs:scale-100" v-pre></box-icon>
           </span>
         </transition>
-        <div @touchstart="sliderOpen = true" @touchmove="handleDrag" @mousemove="handleDrag" @mousedown="sliderOpen = true" @mouseup="sliderOpen = false" @mouseleave="sliderOpen = false"  class="h-64 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto w-16 bg-black-light -mt-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-end transition duration-150 overflow-hidden">
+        <div @touchstart="sliderOpen = true" @touchmove="handleDrag" @mousemove="handleDrag" @mousedown="sliderOpen = true" @mouseup="sliderOpen = false" @mouseleave="sliderOpen = false" class="h-64 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto w-16 bg-black-light -mt-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-end transition duration-150 overflow-hidden">
           <div ref="volumeCont" style="height:calc(100% - 6rem)" class="w-4 rounded-4xl mb-16 overflow-hidden flex justify-end items-end bg-black-dark">
             <div ref="slider" :style="{ height: value * 100 + '%' }" class="w-full bg-pink-500 rounded-4xl"></div>
           </div>
@@ -113,6 +119,7 @@
         aurLogo: '/assets/aur400.png',
         scale: 0,
         wikiAvailable: false,
+        lightHexColor: '#fff',
       };
     },
     methods: {
@@ -129,7 +136,7 @@
           let bottom = this.$refs.volumeCont.getBoundingClientRect().bottom;
           let top = this.$refs.volumeCont.getBoundingClientRect().top;
           let y = window.event.clientY || e.targetTouches[0].clientY;
-          let height = (bottom - top);
+          let height = bottom - top;
           y = ((y - top) * ((bottom + height) / containerRel)) / height;
           y = Math.min(Math.max(y, 0), 1);
           y = 1 - y;
@@ -195,6 +202,14 @@
           this.wikiAvailable = this.showWiki = false;
         }
       },
+      palette: {
+        handler(val) {
+          if (val.LightVibrant) {
+            this.lightHexColor = val.LightVibrant.hex;
+          }
+        },
+        deep: true,
+      },
     },
     created() {
       let proxy = this;
@@ -227,6 +242,8 @@
       playTime: String,
       artistWiki: Object,
       playing: Boolean,
+      percent: Number,
+      palette: Object,
     },
   };
 </script>

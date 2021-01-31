@@ -6,7 +6,7 @@
       <Card v-for="(val, index) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :index="index" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" :normalizedBassData="normalizedBassData" />
     </div>
     <SongBg class="z-0 transition-all duration-100" :changed="queue[0].changed" :percent="currentSongTimer.percent" :cover="queue[0].largeCover" :normalizedBassData="normalizedBassData" />
-    <Loading class="z-50" :show="audioLoading || metaLoading"/>
+    <Loading class="z-50" :show="audioLoading || metaLoading" />
   </div>
 </template>
 
@@ -209,8 +209,8 @@
         try {
           let res = await this.axios.get(proxy.wikiPageUrl + processedArtist, {
             responseType: 'json',
-            Origin:"https://ampupradio.com",
-            "Content-Type": "application/json; charset=UTF-8"
+            Origin: 'https://ampupradio.com',
+            'Content-Type': 'application/json; charset=UTF-8',
           });
 
           let relevancyCheck = Object.values(res.data.query.pages)[0].extract.toLowerCase();
@@ -292,15 +292,9 @@
               this.queue[i].date = this.res.response.history[i].date_played;
               this.queue[i].minutes = Math.floor((new Date().getTime() - new Date(this.res.response.history[i].date_played).getTime()) / 60000);
 
-              this.queue[i].cover = (`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails.small'))}` 
-              ||`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails["250"]'))}`  
-              || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].image'))}` 
-              || this.aurTmpLogo).replace('http://', 'https://');
+              this.queue[i].cover = (`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails.small'))}` || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails["250"]'))}` || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].image'))}` || this.aurTmpLogo).replace('http://', 'https://');
 
-              this.queue[i].largeCover = (`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails.large'))}` 
-              ||`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails["500"]'))}`  
-              || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].image'))}` 
-              || this.aurTmpLogo).replace('http://', 'https://');
+              this.queue[i].largeCover = (`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails.large'))}` || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails["500"]'))}` || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].image'))}` || this.aurTmpLogo).replace('http://', 'https://');
 
               this.preloadSuccess = false;
               this.preloadRunning = false;
@@ -316,10 +310,7 @@
       async preloadNext() {
         let src = await this.getNextArt();
 
-        let preloadSrc = (`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(src, 'response[0].images[0].thumbnails.small'))}` 
-        ||`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(src, 'response[0].images[0].thumbnails["250"]'))}`  
-        || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(src, 'response[0].images[0].image'))}`
-        || this.aurTmpLogo).replace('http://', 'https://');
+        let preloadSrc = (`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(src, 'response[0].images[0].thumbnails.small'))}` || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(src, 'response[0].images[0].thumbnails["250"]'))}` || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(src, 'response[0].images[0].image'))}` || this.aurTmpLogo).replace('http://', 'https://');
 
         let preloadImg = new Image();
         if (src) {
@@ -505,7 +496,7 @@
       setTimeout(async () => {
         await this.getQueue();
         await this.preloadNext();
-      },5000);
+      }, 5000);
 
       var myWorker = new Worker('wakeupWorker.js');
       myWorker.onmessage = function(ev) {

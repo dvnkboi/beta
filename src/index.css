@@ -115,6 +115,10 @@ body {
   line-height: 85%;
 }
 
+.line-height{
+  line-height: 120%;
+}
+
 .bgImg {
   filter:blur(7px) saturate(100%);
 }

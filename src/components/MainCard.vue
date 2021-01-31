@@ -1,7 +1,7 @@
 <template>
   <div ref="mainCard" class="mainCard bg-black-dark bg-opacity-70 max-h-full flex w-full min-h-screen sm:min-h-0 xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start shadow-2xl pt-4 flex-none transition duration-300 overflow-auto">
     <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
-      <div :class="{ 'cursor-pointer': wikiAvailable, 'pointer-events-none': !wikiAvailable }" @click="showWiki = true" class="artistImgCont transform-gpu h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 relative mx-8 transition-transform duration-300 overflow-hidden">
+      <div :class="{ 'cursor-pointer': wikiAvailable, 'pointer-events-none': !wikiAvailable }" @click="showWiki = true" class="artistImgCont transform-gpu h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 relative mx-8 pt-2 transition-transform duration-300 overflow-hidden">
         <transition name="fade-up" mode="out-in" appear>
           <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
         </transition>
@@ -10,7 +10,7 @@
         </transition>
       </div>
       <transition name="fade" mode="out-in" appear>
-        <div v-if="wikiAvailable && showWiki" class="fixed overflow-hidden w-screen h-screen top-0 bottom-0 left-0 right-0 backdrop-blur bg-black-dark bg-opacity-80 z-50 pt-8 transition duration-300">
+        <div v-if="wikiAvailable && showWiki" class="fixed overflow-hidden w-screen h-screen top-0 bottom-0 left-0 right-0 backdrop-blur bg-black-dark bg-opacity-80 z-50 pt-10 transition duration-300">
           <div class="float-left flex justify-center items-center md:justify-start md:items-start flex-auto w-full h-64 xxs:h-80 sm:h-96">
             <div @click="showWiki = false" class="wikiImgCont cursor-pointer transform-gpu hover:-translate-y-2 h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 flex-shrink-0 relative mx-8 transition-transform duration-300 overflow-hidden">
               <transition name="fade-up" mode="out-in">
@@ -39,22 +39,22 @@
             </div>
           </div>
           <transition name="fade-up" mode="out-in" appear>
-            <h2 :key="'artistInfo' + Date.now()" class="artistInfo font-sans break-words px-7 pt-2 z-20 text-gray-400 text-2xl md:text-3xl xl:text-4xl w-full text-center md:text-left transition-all duration-300">{{ artistWiki.extract }}</h2>
+            <h2 :key="'artistInfo' + Date.now()" class="artistInfo font-sans break-words px-7 pt-2 z-20 text-gray-400 text-1xl xxs:text-2xl md:text-3xl xl:text-4xl w-full text-center md:text-left transition-all duration-300">{{ artistWiki.extract }}</h2>
           </transition>
           <transition name="fade" mode="out-in" appear>
             <div class="mt-1 z-20 w-full text-center md:text-left transition-all duration-300 flex justify-center items-center md:justify-end">
-              <h2 :key="'wikiText' + Date.now()" class="font-sans break-words pr-1 text-gray-400 text-lg xl:text-lg">from</h2>
-              <a :href="artistWiki.fullurl" target="_blank" :key="'wikiLink' + Date.now()" class="font-sans break-words pr-7 text-gray-400 hover:text-gray-300 transition duration-300 text-xl xl:text-2xl font-bold outline-none">Wikipedia</a>
+              <h2 :key="'wikiText' + Date.now()" class="font-sans break-words pr-1 text-gray-400 text-base xl:text-lg">from</h2>
+              <a :href="artistWiki.fullurl" target="_blank" :key="'wikiLink' + Date.now()" class="font-sans break-words pr-7 text-gray-400 hover:text-gray-300 transition duration-300 text-lg xxs:text-xl xl:text-2xl font-bold outline-none">Wikipedia</a>
             </div>
           </transition>
         </div>
       </transition>
       <div class="px-7 w-full flex-auto overflow-hidden relative">
         <transition name="fade-up" mode="out-in" appear>
-          <h1 :key="'mainTitle'" v-show="showTitle" class="mainTitle font-sans overflow-ellipsis overflow-hidden break-words text-gray-300 text-5xl md:text-6xl xl:text-7xl pt-1 font-bold w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedTitle }}</h1>
+          <h1 :key="'mainTitle'" v-show="showTitle" class="mainTitle font-sans line-height overflow-ellipsis overflow-hidden break-words text-gray-300 text-3xl md:text-6xl xl:text-7xl pt-2 font-bold w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedTitle }}</h1>
         </transition>
         <transition name="fade-up" mode="out-in" appear>
-          <h2 :key="'mainArtist'" v-show="showArtist" class="mainArtist font-sans break-words truncate overflow-ellipsis max-w-full md:-mt-3 text-gray-400 text-3xl md:text-4xl xl:text-5xl w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedArtist }}</h2>
+          <h2 :key="'mainArtist'" v-show="showArtist" class="mainArtist line-height font-sans break-words truncate overflow-ellipsis max-w-full md:-mt-3 text-gray-400 text-1xl md:text-4xl xl:text-5xl w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedArtist }}</h2>
         </transition>
       </div>
       <h2 class="font-sans text-gray-400 text-lg md:text-2xl w-full text-center">{{ playTime || '00:00:00' }}</h2>
@@ -62,25 +62,25 @@
     <div class="h-24 w-full px-3 flex justify-between items-center relative">
       <div @click="$emit('playPause')" class="click cursor-pointer flex justify-center items-center h-full w-16 flex-none">
         <transition name="fade-left" mode="out-in">
-          <span key="playBtn" v-if="!playing" class="transition duration-150">
-            <box-icon name="play" size="cssSize" class="w-16 h-16 fill-current stroke-current text-gray-300" v-pre></box-icon>
+          <span key="playBtn" v-if="!playing" class="click w-16 h-16 pointer-events-none absolute z-40 flex justify-center items-center transition duration-150">
+            <box-icon name="play" size="cssSize" class="w-16 h-16 fill-current stroke-current text-gray-300 transform scale-75 xxs:scale-100" v-pre></box-icon>
           </span>
-          <span key="pauseBtn" v-else class="transition duration-150">
-            <box-icon name="pause" size="cssSize" class="w-16 h-16 fill-current stroke-current text-gray-300" v-pre></box-icon>
+          <span key="pauseBtn" v-else class="click w-16 h-16 pointer-events-none absolute z-40 flex justify-center items-center transition duration-150">
+            <box-icon name="pause" size="cssSize" class="w-16 h-16 fill-current stroke-current text-gray-300 transform scale-75 xxs:scale-100" v-pre></box-icon>
           </span>
         </transition>
       </div>
-      <div class="h-10 w-32 bg-gray-300 flex justify-center items-center text-lg text-black rounded-full transform-gpu hover:-translate-y-2 transition duration-300">
-        beta 0.3.2
+      <div class="h-full flex-none flex justify-center items-center">
+        <img src="../assets/logoB.png" alt="AmpUpRadio" class="h-auto w-28 xxs:w-36 md:w-48 lg:w-64">
       </div>
       <box-icon name="chevron-up" type="solid" size="cssSize" class="absolute bottom-0 w-full h-5 visible xl:hidden -ml-3 fill-current stroke-current text-gray-300 stroke-0" v-pre></box-icon>
       <div class="group slooder click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative transition duration-100">
         <transition name="fade-left" mode="out-in">
           <span key="volLarge" v-if="value >= 0.7" class="click w-12 h-12 pointer-events-none absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
-            <box-icon name="volume-full" type="solid" size="cssSize" class="w-12 h-12 fill-current -ml-2 stroke-current text-gray-300 stroke-0" v-pre></box-icon>
+            <box-icon name="volume-full" type="solid" size="cssSize" class="w-12 h-12 fill-current -ml-2 stroke-current text-gray-300 stroke-0 transform scale-75 xxs:scale-100" v-pre></box-icon>
           </span>
           <span key="volSmol" v-else class="click w-12 h-12 pointer-events-none absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
-            <box-icon name="volume-low" type="solid" size="cssSize" class="w-12 h-12 fill-current stroke-current text-gray-300 stroke-0" v-pre></box-icon>
+            <box-icon name="volume-low" type="solid" size="cssSize" class="w-12 h-12 fill-current stroke-current text-gray-300 stroke-0 transform scale-75 xxs:scale-100" v-pre></box-icon>
           </span>
         </transition>
         <div @touchstart="sliderOpen = true" @touchmove="handleDrag" @mousemove="handleDrag" @mousedown="sliderOpen = true" @mouseup="sliderOpen = false" @mouseleave="sliderOpen = false"  class="h-64 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto w-16 bg-black-light -mt-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-end transition duration-150 overflow-hidden">
@@ -134,7 +134,6 @@
           y = Math.min(Math.max(y, 0), 1);
           y = 1 - y;
           this.value = y;
-          console.log(y);
         }
       },
     },

@@ -85,6 +85,22 @@ body {
   overflow: hidden;
 }
 
+@media (min-height:700px){
+  .mainTitle{
+    word-break: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -moz-box-orient: vertical;
+    -ms-box-orient: vertical;
+    box-orient: vertical;
+    -webkit-line-clamp: 4!important;
+    -moz-line-clamp: 4!important;
+    -ms-line-clamp: 4!important;
+    line-clamp: 4!important;
+    overflow: hidden;
+  }
+}
+
 .artistInfo{
   word-break: normal;
   display: -webkit-box;

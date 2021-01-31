@@ -1,7 +1,7 @@
 <template>
   <div ref="mainCard" class="mainCard bg-black-dark bg-opacity-60 max-h-full flex w-full min-h-screen sm:min-h-0 xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start pt-4 flex-none transition duration-300 overflow-auto">
     <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
-      <div :style="{ filter: `saturate(${0.6 + normalizedBassData * 0.4}` }" :class="{ 'cursor-pointer': wikiAvailable, 'pointer-events-none': !wikiAvailable }" @click="showWiki = true" class="artistImgCont transform-gpu h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 relative mx-8 transition-all duration-150 overflow-hidden">
+      <div :style="{ filter: `saturate(${0.6 + normalizedBassData * 0.4}` }" :class="{ 'cursor-pointer': wikiAvailable, 'pointer-events-none': !wikiAvailable }" @click="showWiki = true" class="artistImgCont transform-gpu h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 relative mx-8 mt-10 md:mt-0 transition-all duration-150 overflow-hidden">
         <transition name="fade-up" mode="out-in" appear>
           <div v-show="wikiAvailable" style="mix-blend-mode: difference" class="absolute w-6 h-6 top-2 left-2 z-50">
             <box-icon type="solid" name="info-circle" size="cssSize" class="w-full h-full stroke-current text-white fill-current stroke-0 z-50" v-pre></box-icon>
@@ -17,7 +17,7 @@
       </div>
       <transition name="fade" mode="out-in" appear>
         <div v-if="wikiAvailable && showWiki" class="fixed overflow-hidden w-screen h-screen top-0 bottom-0 left-0 right-0 backdrop-blur bg-black-dark bg-opacity-80 z-50 pt-8 transition duration-300">
-          <div class="float-left flex justify-center items-center md:justify-start md:items-start flex-auto w-full h-64 xxs:h-80 sm:h-96">
+          <div class="float-left flex justify-center items-center md:justify-start md:items-start flex-auto w-full h-64 xxs:h-80 sm:h-96 mt-10 md:mt-0">
             <div :style="{ filter: `saturate(${0.7 + normalizedBassData * 0.3}` }" @click="showWiki = false" class="wikiImgCont cursor-pointer transform-gpu hover:-translate-y-2 h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 flex-shrink-0 relative mx-8 transition-all duration-150 overflow-hidden">
               <transition name="fade-up" mode="out-in">
                 <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
@@ -57,7 +57,7 @@
       </transition>
       <div class="px-7 w-full flex-auto overflow-hidden relative">
         <transition name="fade-up" mode="out-in" appear>
-          <h1 :key="'mainTitle'" v-show="showTitle" class="mainTitle font-sans line-height overflow-ellipsis overflow-hidden break-words text-gray-300 text-4xl xxs:text-5xl md:text-6xl xl:text-7xl pt-2 font-bold w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedTitle }}</h1>
+          <h1 :key="'mainTitle'" v-show="showTitle" class="mainTitle font-sans line-height overflow-ellipsis overflow-hidden break-words text-gray-300 text-4xl xxs:text-4xl md:text-6xl xl:text-7xl pt-2 font-bold w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedTitle }}</h1>
         </transition>
         <transition name="fade-up" mode="out-in" appear>
           <h2 :key="'mainArtist'" v-show="showArtist" class="mainArtist line-height font-sans break-words truncate overflow-ellipsis max-w-full md:-mt-3 text-gray-400 text-2xl xxs:text-3xl md:text-4xl xl:text-5xl w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedArtist }}</h2>

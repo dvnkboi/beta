@@ -246,14 +246,13 @@ class Silence {
         proxy._audioSource.onwaiting = function(){
           proxy.events.emit('loading');
           proxy.loadingTime = performance.now();
-          proxy._audioSource.oncanplaythrough = function(){
-            proxy.events.emit('loaded', this.loadingTime);
-            proxy.loadingTime = performance.now() - proxy.loadingTime;
-            console.log('hanged for ',proxy.loadingTime,'ms');
-          }
         }
         
-        proxy._audioSource.oncanplaythrough = null;
+        proxy._audioSource.oncanplaythrough = function(){
+          proxy.events.emit('loaded', this.loadingTime);
+          proxy.loadingTime = performance.now() - proxy.loadingTime;
+          console.log('hanged for ',proxy.loadingTime,'ms');
+        }
       };
     }
     catch(e){

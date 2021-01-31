@@ -51,10 +51,10 @@
       </transition>
       <div class="px-7 w-full flex-auto overflow-hidden relative">
         <transition name="fade-up" mode="out-in" appear>
-          <h1 :key="'mainTitle'" v-show="showTitle" class="mainTitle font-sans line-height overflow-ellipsis overflow-hidden break-words text-gray-300 text-3xl md:text-6xl xl:text-7xl pt-2 font-bold w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedTitle }}</h1>
+          <h1 :key="'mainTitle'" v-show="showTitle" class="mainTitle font-sans line-height overflow-ellipsis overflow-hidden break-words text-gray-300 text-4xl xxs:text-5xl md:text-6xl xl:text-7xl pt-2 font-bold w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedTitle }}</h1>
         </transition>
         <transition name="fade-up" mode="out-in" appear>
-          <h2 :key="'mainArtist'" v-show="showArtist" class="mainArtist line-height font-sans break-words truncate overflow-ellipsis max-w-full md:-mt-3 text-gray-400 text-1xl md:text-4xl xl:text-5xl w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedArtist }}</h2>
+          <h2 :key="'mainArtist'" v-show="showArtist" class="mainArtist line-height font-sans break-words truncate overflow-ellipsis max-w-full md:-mt-3 text-gray-400 text-2xl xxs:text-3xl md:text-4xl xl:text-5xl w-full text-center md:text-left capitalize transition-all duration-300">{{ updatedArtist }}</h2>
         </transition>
       </div>
       <h2 class="font-sans text-gray-400 text-lg md:text-2xl w-full text-center">{{ playTime || '00:00:00' }}</h2>

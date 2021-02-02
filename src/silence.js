@@ -5,8 +5,7 @@ class Silence {
   constructor(url, config) {
 
     this.events = new EventEmitter();
-    var AudioContext = window.AudioContext // Default
-    || (window as any).webkitAudioContext;  // Safari and old versions of Chrome
+    var AudioContext = window.AudioContext ? window.AudioContext : window.webkitAudioContext ? window.webkitAudioContext : false;
     Object.defineProperty(Silence.prototype, 'watch', {
       value: function (prop, handler) {
         var setter = function (newVal) {
@@ -68,17 +67,23 @@ class Silence {
     // });
 
     if (this.config.analyser ? this.config.analyser : Silence.defaultConfig.analyser) {
-      this.context = new AudioContext();
-      this.context.suspend();
-      this.analyser = this.context.createAnalyser();
-      this.analyser.fftSize = 2048;
-      this.analyser.smoothingTimeConstant = 0.7;
-      this.nodeSource = this.context.createMediaElementSource(this._audioSource);
-      this.nodeSource.connect(this.analyser);
-      this.analyser.connect(this.context.destination);
-      this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
-      this.timeData = new Uint8Array(this.analyser.frequencyBinCount);
-      this._updateCycle();
+      try{
+        this.context = new AudioContext();
+        this.context.suspend();
+        this.analyser = this.context.createAnalyser();
+        this.analyser.fftSize = 2048;
+        this.analyser.smoothingTimeConstant = 0.7;
+        this.nodeSource = this.context.createMediaElementSource(this._audioSource);
+        this.nodeSource.connect(this.analyser);
+        this.analyser.connect(this.context.destination);
+        this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
+        this.timeData = new Uint8Array(this.analyser.frequencyBinCount);
+        this._updateCycle();
+      }
+      catch(e){
+        this.context = false;
+        this.config.analyser = Silence.defaultConfig.analyser = false;
+      } 
     }
 
 
@@ -205,7 +210,7 @@ class Silence {
 
   unload() {
     this._audioSource.src = '';
-    this.context.suspend();
+    if(this.context) this.context.suspend();
     this.unloaded = true;
   }
 
@@ -216,7 +221,7 @@ class Silence {
       this.canPlay = false;
       this._audioSource.src = this.url;
       this._audioSource.load();
-      this.context.resume();
+      if(this.context) this.context.resume();
       
       this.slowCon = this.slowCon ? this.slowCon : false;
       if (this._slowLoad) clearTimeout(this._slowLoad);

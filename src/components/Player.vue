@@ -1,9 +1,9 @@
 <template>
   <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full relative">
     <connectivity class="z-50" :show="!connected || slowCon" />
-    <MainCard class="z-20" ref="mainCard" @volume="volume = $event" @playPause="playPause()" @failed="getQueue()" :palette="currentPalette" :percent="currentSongTimer.percent" :title="queue[0].title" :artist="queue[0].artist" :album="this.queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :normalizedBassData="normalizedBassData" :artistWiki="artistWiki" :playing="playing" />
-    <div class="w-full z-10 overflow-hidden xl:h-full">
-      <Card v-for="(val, index) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :index="index" :title="val.title" :artist="val.artist" :cover="val.cover" :minutes="val.minutes" :changed="val.changed" :normalizedBassData="normalizedBassData" />
+    <MainCard class="z-20" ref="mainCard" @volume="volume = $event" @playPause="playPause()" @failed="getQueue()" :palette="currentPalette" :percent="currentSongTimer.percent" :title="queue[0].title" :artist="queue[0].artist" :album="queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :normalizedBassData="normalizedBassData" :artistWiki="artistWiki" :playing="playing" />
+    <div class="w-full z-10 overflow-hidden xl:overflow-auto xl:h-full">
+      <Card v-for="(val, index) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :index="index" :title="val.title" :artist="val.artist" :cover="queueSongs[index].cover" :minutes="val.minutes" :changed="val.changed" :normalizedBassData="normalizedBassData" />
     </div>
     <SongBg class="z-0 transition-all duration-100" :changed="queue[0].changed" :currentColor="currentPalette.Vibrant.hex" :percent="currentSongTimer.percent" :cover="queue[0].largeCover" :normalizedBassData="normalizedBassData" />
     <Loading class="z-50" :show="audioLoading || metaLoading" />
@@ -152,7 +152,7 @@
           this.axios = await import(/* webpackChunkName: "axios" */ 'axios');
           this.axios = this.axios.default;
           this.axios = this.axios.create({
-            timeout: 3000,
+            timeout: 8000,
           });
         }
         require('dotenv').config();
@@ -172,6 +172,7 @@
           });
           return res.data;
         } catch (e) {
+          console.error(e);
           return Promise.reject(new Error('timed out at queue'));
         }
       },
@@ -183,6 +184,7 @@
           });
           return res.data;
         } catch (e) {
+          console.error(e);
           return Promise.reject(new Error('timed out at art'));
         }
       },
@@ -194,6 +196,7 @@
           });
           return res.data;
         } catch (e) {
+          console.error(e);
           return Promise.reject(new Error('timed out at preload'));
         }
       },
@@ -221,6 +224,7 @@
           if (relevancyCheck.includes('born') || relevancyCheck.includes('debuted') || relevancyCheck.includes('known') || relevancyCheck.includes('studio') || relevancyCheck.includes('album') || relevancyCheck.includes('song') || relevancyCheck.includes('music') || relevancyCheck.includes('release') || relevancyCheck.includes('singer') || relevancyCheck.includes('band') || relevancyCheck.includes('dj') || relevancyCheck.includes('producer')) return Object.values(res.data.query.pages)[0];
           else return null;
         } catch (e) {
+          console.error(e);
           return null;
         }
       },

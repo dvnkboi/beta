@@ -2,7 +2,6 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import 'boxicons'
 import './index.css'
-import './registerServiceWorker'
 
 
 Number.prototype.map = function (in_min, in_max, out_min, out_max) {

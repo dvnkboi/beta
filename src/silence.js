@@ -67,7 +67,7 @@ class Silence {
     // });
 
     if (this.config.analyser ? this.config.analyser : Silence.defaultConfig.analyser) {
-      this.context = new (window.AudioContext || window.webkitAudioContext)();
+      this.context = window.AudioContext ? new window.AudioContext() : window.webkitAudioContext();
       this.context.suspend();
       this.analyser = this.context.createAnalyser();
       this.analyser.fftSize = 2048;

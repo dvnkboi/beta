@@ -222,6 +222,7 @@ class Silence {
       this._audioSource.src = this.url;
       if(!this._preload) this._audioSource.load();
       if(this.context) this.context.resume();
+      console.log('loading'); 
       
       this.slowCon = this.slowCon ? this.slowCon : false;
       if (this._slowLoad) clearTimeout(this._slowLoad);
@@ -246,9 +247,10 @@ class Silence {
         if(proxy.playing) proxy.volume('unmute');
         clearTimeout(proxy._slowLoad);
         proxy.slowCon = false;
-  
-        if (proxy.playing) proxy.play();
         
+        if (proxy.playing) proxy.play();
+        console.log('loaded audio and playing: ',!proxy._audioSource.paused);
+
         proxy._audioSource.onwaiting = function(){
           proxy.events.emit('loading');
           proxy.loadingTime = performance.now();

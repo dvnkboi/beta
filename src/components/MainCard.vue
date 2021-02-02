@@ -1,7 +1,7 @@
 <template>
    <div
       ref="mainCard"
-      class="mainCard bg-black-dark bg-opacity-60 max-h-full flex w-full min-h-screen sm:min-h-0 xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start pt-4 flex-none transition duration-300 overflow-hidden md:overflow-auto"
+      class="mainCard bg-black-dark bg-opacity-60 max-h-full flex w-full min-h-screen sm:min-h-0 xl:w-2/5 xl:h-full flex-col min-h-120 justify-start items-start pt-4 flex-none transition duration-300 overflow-hidden xl:overflow-auto"
    >
       <div
          class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full"

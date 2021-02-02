@@ -5,7 +5,8 @@ class Silence {
   constructor(url, config) {
 
     this.events = new EventEmitter();
-
+    var AudioContext = window.AudioContext // Default
+    || (window as any).webkitAudioContext;  // Safari and old versions of Chrome
     Object.defineProperty(Silence.prototype, 'watch', {
       value: function (prop, handler) {
         var setter = function (newVal) {
@@ -67,7 +68,7 @@ class Silence {
     // });
 
     if (this.config.analyser ? this.config.analyser : Silence.defaultConfig.analyser) {
-      this.context = window.AudioContext ? new window.AudioContext() : window.webkitAudioContext();
+      this.context = new AudioContext();
       this.context.suspend();
       this.analyser = this.context.createAnalyser();
       this.analyser.fftSize = 2048;

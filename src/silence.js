@@ -220,7 +220,7 @@ class Silence {
       this.events.emit('loading');
       this.canPlay = false;
       this._audioSource.src = this.url;
-      this._audioSource.load();
+      if(!this._preload) this._audioSource.load();
       if(this.context) this.context.resume();
       
       this.slowCon = this.slowCon ? this.slowCon : false;

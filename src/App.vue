@@ -67,43 +67,40 @@ export default {
          }
       });
 
-      if (process.env.NODE_ENV == "production") {
-         register(`sw.js`, {
-            ready() {
-               console.log(
-                  "App is being served from cache by a service worker.\n" +
-                     "For more details, visit https://goo.gl/AFskqB"
-               );
-            },
-            registered() {
-               console.log("Service worker has been registered.");
-            },
-            cached() {
-               console.log("Content has been cached for offline use.");
-            },
-            updatefound() {
-               console.log("New content is downloading.");
-            },
-            updated(registration) {
-               console.log("New content is available; please refresh.");
-               proxy.showUpdatePrompt = true;
-               console.log(proxy.showUpdatePrompt);
-               let worker = registration.waiting;
-               worker.postMessage({ action: "skipWaiting" });
-            },
-            offline() {
-               console.log(
-                  "No internet connection found. App is running in offline mode."
-               );
-            },
-            error(error) {
-               console.error(
-                  "Error during service worker registration:",
-                  error
-               );
-            },
-         });
-      }
+      register(`sw.js`, {
+         ready() {
+            console.log(
+               "App is being served from cache by a service worker.\n" +
+                  "For more details, visit https://goo.gl/AFskqB"
+            );
+         },
+         registered() {
+            console.log("Service worker has been registered.");
+         },
+         cached() {
+            console.log("Content has been cached for offline use.");
+         },
+         updatefound() {
+            console.log("New content is downloading.");
+         },
+         updated(registration) {
+            console.log("New content is available; please refresh.");
+            proxy.showUpdatePrompt = true;
+            let worker = registration.waiting;
+            worker.postMessage({ action: "skipWaiting" });
+         },
+         offline() {
+            console.log(
+               "No internet connection found. App is running in offline mode."
+            );
+         },
+         error(error) {
+            console.error(
+               "Error during service worker registration:",
+               error
+            );
+         },
+      });
    },
    components: {
       Player,

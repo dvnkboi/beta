@@ -1,7 +1,7 @@
 <template>
   <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full relative">
     <connectivity class="z-50" :show="!connected || slowCon" />
-    <MainCard class="z-20" ref="mainCard" @volume="volume = $event" @playPause="playPause()" @failed="getQueue()" :palette="currentPalette" :percent="currentSongTimer.percent" :title="queue[0].title" :artist="queue[0].artist" :album="queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :normalizedBassData="normalizedBassData" :artistWiki="artistWiki" :playing="playing" />
+    <MainCard class="z-20" ref="mainCard" @volume="volume = $event" @playPause="playPause()" @failed="getQueue()" :palette="currentPalette" :percent="currentSongTimer.percent" :title="queue[0].title" :artist="queue[0].artist" :album="queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :normalizedBassData="normalizedBassData" :artistWiki="artistWiki" :playing="audio ? audio.playing : false" />
     <div class="w-full z-10 overflow-hidden xl:overflow-auto xl:h-full">
       <Card v-for="(val, index) in queueSongs" :key="val.id" class="z-10 w-full" @failed="getQueue()" :index="index" :title="val.title" :artist="val.artist" :cover="queueSongs[index].cover" :minutes="val.minutes" :changed="val.changed" :normalizedBassData="normalizedBassData" />
     </div>
@@ -37,6 +37,7 @@
         nextArt: null,
         queueOpen: true,
         connected: true,
+        audio:null,
         audioLatency: ((943718 * 8) / 256000) * 1000,
         loadLatency: 0,
         totalLatency: 0,
@@ -82,8 +83,7 @@
         normalizedBassData: 0,
         slowCon: false,
         playTime: null,
-        volume: 0,
-        playing: false,
+        volume: 0
       };
     },
     computed: {
@@ -93,8 +93,8 @@
     },
     methods: {
       playPause() {
-        if (this.audio) this.playing = !this.audio.playing;
-        else this.playing = true;
+        if (this.audio && this.audio.playing) this.pause();
+        else this.play();
       },
       async play() {
         let proxy = this;
@@ -126,10 +126,6 @@
 
             this.audio.watch('slowCon', (val) => {
               proxy.slowCon = val;
-            });
-
-            this.audio.watch('playing', (val) => {
-              proxy.playing = val;
             });
 
             proxy.audio.play();
@@ -224,7 +220,6 @@
           if (relevancyCheck.includes('born') || relevancyCheck.includes('debuted') || relevancyCheck.includes('known') || relevancyCheck.includes('studio') || relevancyCheck.includes('album') || relevancyCheck.includes('song') || relevancyCheck.includes('music') || relevancyCheck.includes('release') || relevancyCheck.includes('singer') || relevancyCheck.includes('band') || relevancyCheck.includes('dj') || relevancyCheck.includes('producer')) return Object.values(res.data.query.pages)[0];
           else return null;
         } catch (e) {
-          console.error(e);
           return null;
         }
       },
@@ -300,10 +295,12 @@
               this.queue[i].date = this.res.response.history[i].date_played;
               this.queue[i].minutes = Math.floor((new Date().getTime() - new Date(this.res.response.history[i].date_played).getTime()) / 60000);
 
-              this.queue[i].cover = (`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails.small'))}` || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails["250"]'))}` || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].image'))}` || this.aurTmpLogo).replace('http://', 'https://');
-
-              this.queue[i].largeCover = (`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails.large'))}` || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails["500"]'))}` || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].image'))}` || this.aurTmpLogo).replace('http://', 'https://');
-
+              this.queue[i].cover = (`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails.small'))}` || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails["250"]'))}` || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].image'))}`).replace('http://', 'https://');
+              if(this.queue[i].cover.includes('undefined')) this.queue[i].cover = this.aurTmpLogo;
+              
+              this.queue[i].largeCover = (`https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails.large'))}` || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].thumbnails["500"]'))}` || `https://api.allorigins.win/raw?url=${encodeURIComponent(this.lodashGet(this.art[i][0], 'images[0].image'))}`).replace('http://', 'https://');
+              if(this.queue[i].largeCover.includes('undefined')) this.queue[i].largeCover = this.aurTmpLogo;
+              
               this.preloadSuccess = false;
               this.preloadRunning = false;
             }
@@ -321,7 +318,6 @@
         .then((palette) => {
           proxy.currentPalette = palette;
 
-          
           document.documentElement.style.setProperty('--maskR', palette.Vibrant.rgb[0]);
           document.documentElement.style.setProperty('--maskG', palette.Vibrant.rgb[1]);
           document.documentElement.style.setProperty('--maskB', palette.Vibrant.rgb[2]);
@@ -342,7 +338,7 @@
             this.preloadRunning = false;
             this.preloadSuccess = true;
           }
-          preloadImg.src = preloadSrc;
+          preloadImg.src = preloadSrc.includes('undefined') ? this.aurTmpLogo : preloadSrc;
           this.preloadSuccess = false;
           this.preloadRunning = true;
           preloadImg.onload = () => {
@@ -447,13 +443,6 @@
         localStorage.setItem('volume', newVal);
         if (this.audio) this.audio.volume(newVal);
       },
-      playing: async function() {
-        if (!this.playing) {
-          this.pause();
-        } else {
-          this.play();
-        }
-      },
       loadLatency: function() {
         this.$nextTick(() => {
           console.log({
@@ -467,7 +456,7 @@
         console.log('connection changed', { oldVal, newVal });
       },
       keyEvent: function() {
-        this.playing = !this.playing;
+        this.playPause();
       },
     },
     async beforeCreate() {},

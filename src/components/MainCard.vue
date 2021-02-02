@@ -263,7 +263,7 @@
                   <div
                      ref="slider"
                      :style="{ height: value * 100 + '%' }"
-                     class="w-full bg-pink-500 rounded-4xl"
+                     class="w-full bg-gray-300 rounded-4xl"
                   ></div>
                </div>
                <!-- <input ref="volumeSlider" type="range" min="0" max="1" step="0.01" name="volume" v-model="value" orient="vertical" data-orientation="vertical" id="volumeSlider" class="w-2 h-40" /> -->
@@ -398,8 +398,6 @@ export default {
       this.value = parseFloat(localStorage.getItem("volume") || 1);
    },
    beforeUnmount() {
-      this.audio.unload();
-      this.audio = null;
    },
    directives: {
       loadedifcomplete: function (el, binding) {

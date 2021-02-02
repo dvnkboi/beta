@@ -4,12 +4,12 @@
       <div ref="scrollRadGr" style="opacity:0.4" class="absolute bgMaskRad w-full h-full z-20 transition duration-100"></div>
       <div ref="scrollLinGr" class="absolute bgMask w-full h-full z-40 transform origin-bottom scale-y-25 transition duration-100"></div>
       <div ref="scrollMask" style="opacity:1" class="absolute h-full w-full transition duration-100">
-        <div :style="{ filter: `${saturation}` }" class="absolute h-full w-full transition-all duration-100 z-10 opacity-40">
+        <div :style="{ filter: `${saturation}` }" class="absolute h-full w-full transition-all duration-50 z-10 opacity-40">
           <transition name="fade" appear class="z-50">
             <div :key="key" v-show="show" :style="{ 'background-color': cssBackground }" class="background absolute w-full h-full transition-all duration-300 ease-linear bg-yellow-400"></div>
           </transition>
         </div>
-        <div :style="{ filter: `${imgSaturation}` }" class="absolute h-full w-full overflow-hidden z-0 flex justify-center items-start transition-all duration-100">
+        <div :style="{ filter: `${imgSaturation}` }" class="absolute h-full w-full overflow-hidden z-0 flex justify-center items-start transition-all duration-50">
           <transition name="fade-up" appear>
             <img  @error="updatedCover = aurLogo" :key="updatedCover" :src="updatedCover" alt="" class="bgImg h-screen w-auto lg:w-full lg:h-auto object-cover opacity-100 transform-gpu scale-105 origin-top" />
           </transition>

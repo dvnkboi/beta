@@ -42,7 +42,7 @@
     },
     methods: {
       loaded(evt) {
-        if(evt) if(evt.path[0].naturalWidth != 0) this.hasLoaded = true;
+        if(evt) this.hasLoaded = true;
       },
     },
     watch: {

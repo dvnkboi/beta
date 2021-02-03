@@ -42,7 +42,7 @@ class Silence {
     this._audioSource.crossOrigin = this.config.crossOrigin || Silence.defaultConfig.crossOrigin;
     this._audioSource.preload = false;
     this._audioSource.volume = 0;
-    this.config.volume = this._sCurve(this.config.volume,0.4,1.6)
+    this.config.volume = this._sCurve(this.config.volume, 0.4, 1.6)
     this.url = url;
 
     this.slowCon = false;
@@ -57,34 +57,6 @@ class Silence {
     this.hhmmss = {};
     this.currentTime = this._audioSource.currentTime;
     this.unloaded = true;
-
-    // this.watch('vol', (newVal,oldVal) => {
-    //   console.log('changed vol from ', oldVal, ' to ', newVal);
-    // });
-
-    // this.watch('currentTime', (newTime,oldTime) => {
-    //   console.log({oldTime,newTime});
-    // });
-
-    if (this.config.analyser ? this.config.analyser : Silence.defaultConfig.analyser) {
-      try{
-        this.context = new AudioContext();
-        this.context.suspend();
-        this.analyser = this.context.createAnalyser();
-        this.analyser.fftSize = 2048;
-        this.analyser.smoothingTimeConstant = 0.7;
-        this.nodeSource = this.context.createMediaElementSource(this._audioSource);
-        this.nodeSource.connect(this.analyser);
-        this.analyser.connect(this.context.destination);
-        this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
-        this.timeData = new Uint8Array(this.analyser.frequencyBinCount);
-        this._updateCycle();
-      }
-      catch(e){
-        this.context = false;
-        this.config.analyser = Silence.defaultConfig.analyser = false;
-      } 
-    }
 
 
     if (this._preload) this.load();
@@ -125,13 +97,13 @@ class Silence {
   volume(val) {
     if (val <= 1 && val >= 0) {
       if (this.playing) {
-        val = this._sCurve(val,0.4,1.6);
+        val = this._sCurve(val, 0.4, 1.6);
         this.vol = val;
         this._prevVol = this._audioSource.volume;
         this.fade(this._audioSource.volume, val, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
       }
       else {
-        val = this._sCurve(val,0.4,1.6);
+        val = this._sCurve(val, 0.4, 1.6);
         this._prevVol = this.vol = val;
       }
     }
@@ -143,7 +115,7 @@ class Silence {
       }
       else if (val == 'unmute') {
         this.vol = (this._prevVol || this.config.volume || Silence.defaultConfig.volume);
-        if (this.firstInit) this.vol = this._sCurve(this.vol,0.4,1.6);
+        if (this.firstInit) this.vol = this._sCurve(this.vol, 0.4, 1.6);
         this.fade(this._audioSource.volume, this.vol, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
       }
     }
@@ -210,32 +182,32 @@ class Silence {
 
   unload() {
     this._audioSource.src = '';
-    if(this.context) this.context.suspend();
+    if (this.context) this.context.suspend();
     this.unloaded = true;
   }
 
   load() {
-    try{
+    try {
       let proxy = this;
       this.events.emit('loading');
       this.canPlay = false;
       this._audioSource.src = this.url;
-      if(!this._preload) this._audioSource.load();
-      if(this.context) this.context.resume();
-      console.log('loading'); 
-      
+      if (!this._preload) this._audioSource.load();
+      if (this.context) this.context.resume();
+      console.log('loading');
+
       this.slowCon = this.slowCon ? this.slowCon : false;
       if (this._slowLoad) clearTimeout(this._slowLoad);
       this._slowLoad = null;
       this._slowLoad = setTimeout(() => {
         if (!this.canplay) this.slowCon = true;
       }, this.config.slowTimeout || Silence.defaultConfig.slowTimeout);
-  
+
       this.loadingTime = performance.now();
       this.audioLoading = true;
       this.relativeTime = 0;
       this.absoluteTime = 0;
-  
+
       this._audioSource.oncanplaythrough = function () {
         proxy.events.emit('loaded', this.loadingTime);
         proxy.unloaded = false;
@@ -244,27 +216,49 @@ class Silence {
         proxy._audioSource.currentTime = proxy.loadingTime / 1000;
         proxy._audioSource.play();
         proxy.canPlay = true;
-        if(proxy.playing) proxy.volume('unmute');
+        if (proxy.playing) proxy.volume('unmute');
         clearTimeout(proxy._slowLoad);
         proxy.slowCon = false;
-        
-        if (proxy.playing) proxy.play();
-        console.log('loaded audio and playing: ',!proxy._audioSource.paused);
 
-        proxy._audioSource.onwaiting = function(){
+        if (proxy.playing) proxy.play();
+        console.log('loaded audio and playing: ', !proxy._audioSource.paused);
+
+        proxy._audioSource.onwaiting = function () {
           proxy.events.emit('loading');
           proxy.loadingTime = performance.now();
         }
-        
-        proxy._audioSource.oncanplaythrough = function(){
+
+        proxy._audioSource.oncanplaythrough = function () {
           proxy.events.emit('loaded', this.loadingTime);
           proxy.loadingTime = performance.now() - proxy.loadingTime;
-          console.log('hanged for ',proxy.loadingTime,'ms');
+          console.log('hanged for ', proxy.loadingTime, 'ms');
         }
       };
     }
-    catch(e){
-      setTimeout(this.load,1000);
+    catch (e) {
+      setTimeout(this.load, 1000);
+    }
+  }
+
+  _defineContext() {
+    if (this.config.analyser ? this.config.analyser : Silence.defaultConfig.analyser) {
+      try {
+        this.context = new AudioContext();
+        this.context.suspend();
+        this.analyser = this.context.createAnalyser();
+        this.analyser.fftSize = 2048;
+        this.analyser.smoothingTimeConstant = 0.7;
+        this.nodeSource = this.context.createMediaElementSource(this._audioSource);
+        this.nodeSource.connect(this.analyser);
+        this.analyser.connect(this.context.destination);
+        this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
+        this.timeData = new Uint8Array(this.analyser.frequencyBinCount);
+        this._updateCycle();
+      }
+      catch (e) {
+        this.context = false;
+        this.config.analyser = Silence.defaultConfig.analyser = false;
+      }
     }
   }
 
@@ -278,8 +272,26 @@ class Silence {
     }
     this._audioReqStack().then(() => {
 
-      if ((!this.preload && this.firstInit) || this.unloaded) {
-        this.load();
+      if ((this.firstInit) || this.unloaded) {
+
+        // eslint-disable-next-line no-inner-declarations
+        function playSoundIOS() {
+          document.removeEventListener('touchstart', playSoundIOS);
+          console.log('in IOS');
+          proxy._defineContext();
+          proxy.load();
+        }
+
+        if (/iPad|iPhone/.test(navigator.userAgent)) {
+          document.addEventListener('touchstart', playSoundIOS);
+          var e = new Event('touchstart');
+          document.dispatchEvent(e);
+        }
+        else { // Android etc. or Safari, but not on iPhone 
+          console.log('not in IOS');
+          proxy._defineContext();
+          proxy.load();
+        }
       }
 
       this.firstInit = false;
@@ -301,12 +313,12 @@ class Silence {
       if (navigator)
         if (navigator.mediaSession) {
           navigator.mediaSession.setActionHandler('play', () => {
-            if(!proxy.playing) proxy.play();
+            if (!proxy.playing) proxy.play();
             else proxy.pause();
             navigator.mediaSession.playbackState = 'playing';
           });
           navigator.mediaSession.setActionHandler('pause', () => {
-            if(!proxy.playing) proxy.play();
+            if (!proxy.playing) proxy.play();
             else proxy.pause();
             navigator.mediaSession.playbackState = 'paused';
           });
@@ -368,7 +380,7 @@ class Silence {
     requestAnimationFrame(update);
   }
 
-  _sCurve(val,skew,curvature){
+  _sCurve(val, skew, curvature) {
     return (skew / (skew + (Math.pow(val / (1 - val), -curvature))));
   }
 

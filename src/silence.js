@@ -5,7 +5,7 @@ class Silence {
   constructor(url, config) {
 
     this.events = new EventEmitter();
-    var AudioContext = window.AudioContext ? window.AudioContext : window.webkitAudioContext ? window.webkitAudioContext : false;
+
     Object.defineProperty(Silence.prototype, 'watch', {
       value: function (prop, handler) {
         var setter = function (newVal) {
@@ -243,6 +243,7 @@ class Silence {
   _defineContext() {
     if (this.config.analyser ? this.config.analyser : Silence.defaultConfig.analyser) {
       try {
+        var AudioContext = window.AudioContext ? window.AudioContext : window.webkitAudioContext ? window.webkitAudioContext : false;
         this.context = new AudioContext();
         this.context.suspend();
         this.analyser = this.context.createAnalyser();
@@ -276,16 +277,25 @@ class Silence {
 
         // eslint-disable-next-line no-inner-declarations
         function playSoundIOS() {
-          document.removeEventListener('touchstart', playSoundIOS);
           console.log('in IOS');
           proxy._defineContext();
           proxy.load();
+
+          document.removeEventListener('touchstart', playSoundIOS, true);
+          document.removeEventListener('touchend', playSoundIOS, true);
+          document.removeEventListener('click', playSoundIOS, true);
         }
 
         if (/iPad|iPhone/.test(navigator.userAgent)) {
-          document.addEventListener('touchstart', playSoundIOS);
-          var e = new Event('touchstart');
-          document.dispatchEvent(e);
+          document.addEventListener('touchstart', playSoundIOS, true);
+          document.addEventListener('touchend', playSoundIOS, true);
+          document.addEventListener('click', playSoundIOS, true);
+          var click = new Event('click');
+          var touchStart = new Event('touchstart');
+          var touchEnd = new Event('touchend');
+          document.dispatchEvent(click);
+          document.dispatchEvent(touchStart);
+          document.dispatchEvent(touchEnd);
         }
         else { // Android etc. or Safari, but not on iPhone 
           console.log('not in IOS');

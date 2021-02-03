@@ -97,42 +97,7 @@
         else this.play();
       },
       async play() {
-        let proxy = this;
-        if (!this.audio) {
-          import(/* webpackChunkName: "SilenceJS" */ '../silence').then((Silence) => {
-            Silence = Silence.default;
-
-            this.audio = new Silence('https://api.ampupradio.com:8443/TOP40.mp3?nocache=' + Date.now(), {
-              volume: parseFloat(localStorage.getItem('volume')) || 1,
-            });
-
-            this.audio.normalDataFn = (data) => {
-              proxy.normalizedBassData = data > 0.1 ? data : 0;
-              proxy.normalizedBassData = proxy.normalizedBassData < 0.97 ? proxy.normalizedBassData : 1;
-            };
-
-            this.audio.timeUpdateFn = (data) => {
-              proxy.playTime = data.hours + ':' + data.minutes + ':' + data.seconds;
-            };
-
-            this.audio.on('loading', () => {
-              proxy.audioLoading = true;
-            });
-
-            this.audio.on('loaded', (loadingTime) => {
-              proxy.loadingTime = loadingTime;
-              proxy.audioLoading = false;
-            });
-
-            this.audio.watch('slowCon', (val) => {
-              proxy.slowCon = val;
-            });
-
-            proxy.audio.play();
-          });
-        } else {
-          this.audio.play();
-        }
+        this.audio.play();
       },
       pause() {
         this.audio.pause();
@@ -353,6 +318,40 @@
           };
         }
       },
+      importAudio(){
+        let proxy = this;
+        if (!this.audio) {
+          import(/* webpackChunkName: "SilenceJS" */ '../silence').then((Silence) => {
+            Silence = Silence.default;
+
+            this.audio = new Silence('https://api.ampupradio.com:8443/TOP40.mp3?nocache=' + Date.now(), {
+              volume: parseFloat(localStorage.getItem('volume')) || 1,
+            });
+
+            this.audio.normalDataFn = (data) => {
+              proxy.normalizedBassData = data > 0.1 ? data : 0;
+              proxy.normalizedBassData = proxy.normalizedBassData < 0.97 ? proxy.normalizedBassData : 1;
+            };
+
+            this.audio.timeUpdateFn = (data) => {
+              proxy.playTime = data.hours + ':' + data.minutes + ':' + data.seconds;
+            };
+
+            this.audio.on('loading', () => {
+              proxy.audioLoading = true;
+            });
+
+            this.audio.on('loaded', (loadingTime) => {
+              proxy.loadingTime = loadingTime;
+              proxy.audioLoading = false;
+            });
+
+            this.audio.watch('slowCon', (val) => {
+              proxy.slowCon = val;
+            });
+          });
+        }
+      },
       async reconnectSocket() {
         let proxy = this;
 
@@ -480,6 +479,7 @@
         proxy.emptyQueue();
         proxy.reconnectSocket();
         proxy.getQueue();
+        proxy.audio.load();
       });
       window.addEventListener('offline', () => {
         this.$emit('offline');
@@ -488,6 +488,7 @@
         proxy.downlink = conApi ? navigator.connection.downlink : null;
         proxy.socket.disconnect();
       });
+      this.importAudio();
     },
     async beforeMount() {
       this.emptyQueue();

@@ -172,6 +172,7 @@
       <div class="h-24 w-full px-3 flex justify-between items-center relative">
          <div
             @click="$emit('playPause')"
+            @touchstart="$emit('playPause')"
             class="click cursor-pointer flex justify-center items-center h-full w-16 flex-none"
          >
             <transition name="fade-left" mode="out-in">

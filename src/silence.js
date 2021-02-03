@@ -25,7 +25,7 @@ class Silence {
 
     this.config = config ? config : {};
     Silence.defaultConfig = {
-      preload: true,
+      preload: false,
       volume: 0,
       crossOrigin: 'anonymous',
       analyser: true,
@@ -37,13 +37,15 @@ class Silence {
       slowTimeout: 8000
     }
 
-    this._audioSource = new Audio();
+    this._audioSource = config.audioNode || new Audio();
     this._preload = this.config.preload || Silence.defaultConfig.preload;
     this._audioSource.crossOrigin = this.config.crossOrigin || Silence.defaultConfig.crossOrigin;
     this._audioSource.preload = false;
     this._audioSource.volume = 0;
     this.config.volume = this._sCurve(this.config.volume, 0.4, 1.6)
     this.url = url;
+
+    console.log(this._audioSource);
 
     this.slowCon = false;
     this.relativeTime = 0;
@@ -58,8 +60,28 @@ class Silence {
     this.currentTime = this._audioSource.currentTime;
     this.unloaded = true;
 
+    let proxy = this;
+    function playSoundIOS() {
+      console.log('in IOS');
+      proxy._defineContext();
+      proxy._audioSource.load();
 
-    if (this._preload) this.load();
+      document.removeEventListener('touchstart', playSoundIOS, true);
+      document.removeEventListener('touchend', playSoundIOS, true);
+      document.removeEventListener('click', playSoundIOS, true);
+    }
+
+    if (/iPad|iPhone/.test(navigator.userAgent)) {
+      document.addEventListener('touchstart', playSoundIOS, true);
+      document.addEventListener('touchend', playSoundIOS, true);
+      document.addEventListener('click', playSoundIOS, true);
+    }
+    else { // Android etc. or Safari, but not on iOS
+      console.log('not in IOS');
+      proxy._defineContext();
+    }
+
+    if (this.preload) this.load();
 
   }
 
@@ -276,32 +298,7 @@ class Silence {
       if ((this.firstInit) || this.unloaded) {
 
         // eslint-disable-next-line no-inner-declarations
-        function playSoundIOS() {
-          console.log('in IOS');
-          proxy._defineContext();
-          proxy.load();
-
-          document.removeEventListener('touchstart', playSoundIOS, true);
-          document.removeEventListener('touchend', playSoundIOS, true);
-          document.removeEventListener('click', playSoundIOS, true);
-        }
-
-        if (/iPad|iPhone/.test(navigator.userAgent)) {
-          document.addEventListener('touchstart', playSoundIOS, true);
-          document.addEventListener('touchend', playSoundIOS, true);
-          document.addEventListener('click', playSoundIOS, true);
-          var click = new Event('click');
-          var touchStart = new Event('touchstart');
-          var touchEnd = new Event('touchend');
-          document.dispatchEvent(click);
-          document.dispatchEvent(touchStart);
-          document.dispatchEvent(touchEnd);
-        }
-        else { // Android etc. or Safari, but not on iPhone 
-          console.log('not in IOS');
-          proxy._defineContext();
-          proxy.load();
-        }
+        this.load();
       }
 
       this.firstInit = false;

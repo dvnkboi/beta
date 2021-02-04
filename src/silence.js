@@ -115,7 +115,9 @@ class Silence {
   pause() {
     this.playing = false;
     if(this.ios){
-      setTimeout(this.unload,300);
+      setTimeout(() => {
+        this.unload();
+      },300);
     }
     this.volume('mute');
     this.events.emit('pause');

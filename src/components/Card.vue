@@ -10,10 +10,10 @@
     </div>
     <div class="col-span-3 flex justify-items-start items-start flex-auto flex-col py-3 px-3 md:px-6 h-full">
       <transition name="fade-up" mode="out-in" appear>
-        <h1 v-show="showTitle" :key="'secondaryTitle' + index" class="font-sans text-gray-300 w-60 xxs:w-60 xs:w-full truncate text-xl sm:text-2xl md:text-5xl lg:text-5xl font-bold capitalize transition-all duration-300">{{ updatedTitle }}</h1>
+        <h1 v-show="showTitle" :key="'secondaryTitle' + index" class="font-sans text-gray-300 w-full truncate text-xl sm:text-2xl md:text-4xl lg:text-4xl font-bold capitalize transition-all duration-300">{{ updatedTitle }}</h1>
       </transition>
       <transition name="fade-up" mode="out-in" appear>
-        <h2 v-show="showArtist" :key="'secondaryArtist' + index" class="font-sans text-gray-400 md:-mt-2 w-32 xxs:w-44 xs:w-full truncate text-sm sm:text-2xl md:text-3xl lg:text-4xl capitalize transition-all duration-300">{{ updatedArtist }}</h2>
+        <h2 v-show="showArtist" :key="'secondaryArtist' + index" class="font-sans text-gray-400 md:-mt-2 w-full truncate text-sm sm:text-2xl md:text-3xl lg:text-3xl capitalize transition-all duration-300">{{ updatedArtist }}</h2>
       </transition>
       <transition name="fade-up" mode="out-in" appear>
         <h2 v-show="showMin" :key="'timePlayed' + index" class="font-sans text-gray-400 text-xxs md:text-xl absolute bottom-2 right-4 sm:right-2 md:right-5 capitalize transition-all duration-300">{{ updatedMin >= 1 ? minutes + ' min ago' : 'just now' }}</h2>

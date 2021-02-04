@@ -20,7 +20,7 @@
       </transition>
     </div>
   </div>
-</template>
+</template> 
 
 <script>
   export default {

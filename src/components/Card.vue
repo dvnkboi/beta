@@ -1,6 +1,6 @@
 <template>
-  <div :key="'recent' + index" class="card flex-auto w-full bg-black bg-opacity-80 relative grid grid-cols-4 grid-rows-1 overflow-hidden transition duration-300 border-b border-gray-600">
-    <div class="col-span-1 aspect-ratio-square overflow-hidden relative">
+  <div :key="'recent' + index" class="flex-grow-0 w-full rounded-none xxs:rounded-2xl p-2 xxs:p-4 bg-black-dark bg-opacity-80 relative grid grid-cols-4 grid-rows-1 overflow-hidden transition duration-300 border-b border-black-light xxs:border-none">
+    <div class="col-span-1 aspect-ratio-square overflow-hidden relative rounded-2xl">
       <transition name="fade-up" mode="out-in" appear>
         <img :key="'cover' + index" ref="coverArt" v-show="hasLoaded" @load="loaded" @error='updatedCover = aurLogo' v-loadedifcomplete :src="updatedCover" class="h-full w-full object-cover bg-cover ring-2 ring-purple-200 ring-opacity-25 transition-transform duration-300 absolute" alt="" />
       </transition>
@@ -10,7 +10,7 @@
     </div>
     <div class="col-span-3 flex justify-items-start items-start flex-auto flex-col py-3 px-3 md:px-6 h-full">
       <transition name="fade-up" mode="out-in" appear>
-        <h1 v-show="showTitle" :key="'secondaryTitle' + index" class="font-sans text-gray-300 w-52 xxs:w-64 xs:w-full truncate text-2xl sm:text-3xl md:text-5xl lg:text-5xl font-bold capitalize transition-all duration-300">{{ updatedTitle }}</h1>
+        <h1 v-show="showTitle" :key="'secondaryTitle' + index" class="font-sans text-gray-300 w-60 xxs:w-60 xs:w-full truncate text-xl sm:text-2xl md:text-5xl lg:text-5xl font-bold capitalize transition-all duration-300">{{ updatedTitle }}</h1>
       </transition>
       <transition name="fade-up" mode="out-in" appear>
         <h2 v-show="showArtist" :key="'secondaryArtist' + index" class="font-sans text-gray-400 md:-mt-2 w-32 xxs:w-44 xs:w-full truncate text-sm sm:text-2xl md:text-3xl lg:text-4xl capitalize transition-all duration-300">{{ updatedArtist }}</h2>

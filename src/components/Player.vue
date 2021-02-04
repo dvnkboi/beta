@@ -22,11 +22,11 @@
       :playing="audio ? audio.playing : false"
       :ios="audio ? audio.ios : false"
     />
-    <div class="w-full z-10 overflow-hidden xl:overflow-auto xl:h-full">
+    <div class="w-full z-10 overflow-hidden xl:overflow-auto xl:h-full flex justify-start items-center flex-col space-y-0 py-0 xxs:space-y-4 xxs:py-4 xxs:px-4">
       <Card
         v-for="(val, index) in queueSongs"
         :key="val.id"
-        class="z-10 w-full"
+        class="z-10 flex-none"
         @failed="getQueue()"
         :index="index"
         :title="val.title"

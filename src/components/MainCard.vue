@@ -35,7 +35,7 @@
               </div>
               <div class="flex flex-col justify-center items-start h-full w-full invisible max-w-0 pointer-events-none md:visible md:max-w-none max-h-full">
                 <transition name="fade-up" mode="out-in" appear>
-                  <h2 :key="'artistInfoBigTitle' + updatedArtist" class="artistInfoName invisible max-w-0 pointer-events-none md:visible md:max-w-none max-h-full uppercase font-bold text-7xl md:text-6xl lg:text-8xl xl:text-10xl text-gray-300">
+                  <h2 :key="'artistInfoBigTitle' + updatedArtist" class="artistInfoName invisible max-w-0 pointer-events-none md:visible md:max-w-none max-h-full uppercase break-words font-bold text-7xl md:text-6xl lg:text-8xl xl:text-10xl text-gray-300">
                     {{
                       updatedArtist
                         .split(',')[0]
@@ -84,7 +84,7 @@
           {{ playTime || '00:00:00' }}
         </h2>
         <div class="w-10/12 bg-gray-500 bg-opacity-50 rounded-full">
-           <div :style="{ width: percent * 100 + '%' }" class="h-1 z-50 bg-gray-300 transition-all duration-300 rounded-full"></div>
+          <div :style="{ width: percent * 100 + '%' }" class="h-1 z-50 bg-gray-300 transition-all duration-300 rounded-full"></div>
         </div>
         <div :class="{ 'justify-between': !ios, 'justify-center': ios }" class="h-24 w-full px-3 flex items-center relative">
           <div @click="$emit('playPause')" class="click cursor-pointer flex justify-center items-center h-full w-16 flex-none">
@@ -110,14 +110,11 @@
                 <box-icon name="volume-low" type="solid" size="cssSize" class="w-12 h-12 fill-current stroke-current text-gray-300 stroke-0 transform scale-75 xxs:scale-100" v-pre></box-icon>
               </span>
             </transition>
-            <div @touchstart="sliderOpen = true" @touchmove="handleDrag" @mousemove="handleDrag" @mousedown="sliderOpen = true" @mouseup="sliderOpen = false" @mouseleave="sliderOpen = false" 
-              class="h-64 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto w-16 bg-black-light -mt-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-end transition duration-150 overflow-hidden"
-            >
-              <div ref="volumeCont" style="height: calc(100% - 6rem)" :class="{'w-4': draggingSlider}" class="relative w-2 rounded-4xl mb-16 overflow-visible flex justify-center items-end bg-black-dark transition-width duration-200">
-                <div :style="{ height: `calc(${value * 100}% + 0.5rem)` }" :class="{'w-full': draggingSlider && value > 0.02}" class="w-2 bg-gray-300 rounded-4xl absolute transition-width duration-200"></div>
+            <div @touchstart="sliderOpen = true" @touchmove="handleDrag" @mousemove="handleDrag" @mousedown="sliderOpen = true" @mouseup="sliderOpen = false" @mouseleave="sliderOpen = false" class="h-64 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto w-16 bg-black-light -mt-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-end transition duration-150 overflow-hidden">
+              <div ref="volumeCont" style="height: calc(100% - 6rem)" :class="{ 'w-4': draggingSlider }" class="relative w-2 rounded-4xl mb-16 overflow-visible flex justify-center items-end bg-black-dark transition-width duration-200">
+                <div :style="{ height: `calc(${value * 100}% + 0.5rem)` }" :class="{ 'w-full': draggingSlider && value > 0.02 }" class="w-2 bg-gray-300 rounded-4xl absolute transition-width duration-200"></div>
                 <div :style="{ bottom: `calc(${value * 100}% - 0.5rem)` }" class="w-4 bg-gray-300 rounded-full absolute h-4"></div>
               </div>
-              <!-- <input ref="volumeSlider" type="range" min="0" max="1" step="0.01" name="volume" v-model="value" orient="vertical" data-orientation="vertical" id="volumeSlider" class="w-2 h-40" /> -->
             </div>
           </div>
         </div>
@@ -146,8 +143,8 @@
         scale: 0,
         wikiAvailable: false,
         lightHexColor: '#fff',
-        draggingSlider:false,
-        draggingSliderTimeout:null
+        draggingSlider: false,
+        draggingSliderTimeout: null,
       };
     },
     methods: {
@@ -158,7 +155,7 @@
         if (this.sliderOpen) {
           e.stopPropagation();
           e.preventDefault();
-          
+
           this.draggingSlider = true;
 
           let containerH = this.$refs.mainCard.getBoundingClientRect().height;
@@ -173,11 +170,11 @@
           y = 1 - y;
           this.value = y;
 
-          if(this.draggingSliderTimeout) clearTimeout(this.draggingSliderTimeout);
+          if (this.draggingSliderTimeout) clearTimeout(this.draggingSliderTimeout);
           this.draggingSliderTimeout = null;
           this.draggingSliderTimeout = setTimeout(() => {
-            this.draggingSlider = false;  
-          },250);
+            this.draggingSlider = false;
+          }, 250);
         }
       },
     },

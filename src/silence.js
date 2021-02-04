@@ -59,22 +59,24 @@ class Silence {
     this.hhmmss = {};
     this.currentTime = this._audioSource.currentTime;
     this.unloaded = true;
+    this.ios = false;
 
     let proxy = this;
-    function playSoundIOS() {
+    function unlockIOS() {
       console.log('in IOS');
       proxy._defineContext();
       proxy._audioSource.load();
 
-      document.removeEventListener('touchstart', playSoundIOS, true);
-      document.removeEventListener('touchend', playSoundIOS, true);
-      document.removeEventListener('click', playSoundIOS, true);
+      document.removeEventListener('touchstart', unlockIOS, true);
+      document.removeEventListener('touchend', unlockIOS, true);
+      document.removeEventListener('click', unlockIOS, true);
     }
 
     if (/iPad|iPhone/.test(navigator.userAgent)) {
-      document.addEventListener('touchstart', playSoundIOS, true);
-      document.addEventListener('touchend', playSoundIOS, true);
-      document.addEventListener('click', playSoundIOS, true);
+      proxy.ios = true;
+      document.addEventListener('touchstart', unlockIOS, true);
+      document.addEventListener('touchend', unlockIOS, true);
+      document.addEventListener('click', unlockIOS, true);
     }
     else { // Android etc. or Safari, but not on iOS
       console.log('not in IOS');
@@ -98,22 +100,26 @@ class Silence {
   }
 
   play() {
-    let proxy = this;
+    this.playing = true;
     if (!this._audioSource || this.unloaded || this.firstInit) {
       this._init();
     } else {
-      proxy.volume('unmute');
+      this.volume('unmute');
     }
     this.events.emit('play');
     this.events.emit('playPause');
-    this.playing = true;
+    
+    
   }
 
   pause() {
+    this.playing = false;
+    if(this.ios){
+      setTimeout(this.unload,300);
+    }
     this.volume('mute');
     this.events.emit('pause');
     this.events.emit('playPause');
-    this.playing = false;
   }
 
   volume(val) {
@@ -269,11 +275,13 @@ class Silence {
         this.context = new AudioContext();
         this.context.suspend();
         this.analyser = this.context.createAnalyser();
+        this.gainNode = this.context.createGain();
         this.analyser.fftSize = 2048;
         this.analyser.smoothingTimeConstant = 0.7;
         this.nodeSource = this.context.createMediaElementSource(this._audioSource);
         this.nodeSource.connect(this.analyser);
-        this.analyser.connect(this.context.destination);
+        this.analyser.connect(this.gainNode);
+        this.gainNode.connect(this.context.destination);
         this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
         this.timeData = new Uint8Array(this.analyser.frequencyBinCount);
         this._updateCycle();

@@ -20,6 +20,7 @@
          :normalizedBassData="normalizedBassData"
          :artistWiki="artistWiki"
          :playing="audio ? audio.playing : false"
+         :ios="audio ? audio.ios : false"
       />
       <div class="w-full z-10 overflow-hidden xl:overflow-auto xl:h-full">
          <Card
@@ -146,14 +147,8 @@ export default {
    },
    methods: {
       playPause() {
-         if (this.audio && this.audio.playing) this.pause();
-         else this.play();
-      },
-      play() {
-         this.audio.play();
-      },
-      pause() {
-         this.audio.pause();
+         if (this.audio && this.audio.playing) this.audio.pause();
+         else this.audio.play();
       },
       importAudio() {
          let proxy = this;

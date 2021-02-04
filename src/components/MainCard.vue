@@ -169,7 +169,7 @@
             {{ playTime || "00:00:00" }}
          </h2>
       </div>
-      <div class="h-24 w-full px-3 flex justify-between items-center relative">
+      <div :class="{'justify-between': !ios,'justify-center':ios}" class="h-24 w-full px-3 flex items-center relative">
          <div
             @click="$emit('playPause')"
             class="click cursor-pointer flex justify-center items-center h-full w-16 flex-none"
@@ -201,7 +201,7 @@
                </span>
             </transition>
          </div>
-         <div class="h-full flex-none flex justify-center items-center">
+         <div v-show="!ios" class="h-full flex-none flex justify-center items-center">
             <img
                src="../assets/logoB.png"
                alt="AmpUpRadio"
@@ -215,7 +215,7 @@
             class="absolute bottom-0 w-full h-5 visible xl:hidden -ml-3 fill-current stroke-current text-gray-300 stroke-0"
             v-pre
          ></box-icon>
-         <div
+         <div v-show="!ios"
             class="group slooder click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative transition duration-100"
          >
             <transition name="fade-left" mode="out-in">
@@ -418,6 +418,7 @@ export default {
       playing: Boolean,
       percent: Number,
       palette: Object,
+      ios: Boolean
    },
 };
 </script>

@@ -26,8 +26,8 @@
       <div
          class="w-full z-10 overflow-hidden xl:overflow-auto h-full p-0 xxs:px-2 xxs:py-4 md:p-4"
       >
-         <div class="flex justify-start items-center flex-col space-y-0 py-0 xxs:space-y-4 xxs:py-4 xxs:px-2 md:p-4 bg-gray-50  rounded-none xxs:rounded-2xl bg-opacity-50 ">
-            <h1 class="text-black-dark font-bold text-3xl hidden xxs:block -my-2 md:w-full md:text-4xl">Recent Songs</h1>
+         <div class="flex justify-start items-center flex-col space-y-0 py-0 xxs:space-y-4 xxs:py-4 xxs:px-2 md:p-4 bg-black-dark rounded-none xxs:rounded-2xl bg-opacity-70">
+            <h1 class="text-gray-300 font-bold text-3xl hidden xxs:block -my-2 md:w-full md:text-4xl">Recent Songs</h1>
             <Card
                v-for="(val, index) in queueSongs"
                :key="val.id"

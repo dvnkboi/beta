@@ -274,11 +274,12 @@ how to remove the virtical space around the range input in IE*/
 ::-webkit-scrollbar-button {
   width: 12px;
   height: 0px;
+  border-radius: 100px;
 }
 ::-webkit-scrollbar-thumb {
   background: #4a4a4a;
   border: 0px none #ffffff;
-  border-radius: 0px;
+  border-radius: 100px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #5e5e5e;

@@ -95,6 +95,10 @@ module.exports = {
       full: '9999px',
     },
     extend: {
+      transitionProperty: {
+        'height': 'height',
+        'width': 'width'
+       },
       borderWidth:{
         '1':'2px',
       },

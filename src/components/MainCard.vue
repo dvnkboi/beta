@@ -16,7 +16,7 @@
             </div>
           </transition>
           <transition name="fade-up" mode="out-in" appear>
-            <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-20 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
+            <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-20 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute transform scale-105" alt="" />
           </transition>
           <transition name="fade-up" mode="out-in" appear>
             <div :key="'mainCoverSkelly' + updatedCover" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute z-10"></div>
@@ -27,7 +27,7 @@
             <div class="float-left flex justify-center items-center md:justify-start md:items-start flex-auto w-full h-64 xxs:h-80 sm:h-96 mt-10 md:mt-0">
               <div @click="showWiki = false" class="wikiImgCont cursor-pointer transform-gpu hover:-translate-y-2 h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 flex-shrink-0 relative mx-8 transition-all duration-150 overflow-hidden rounded-2xl">
                 <transition name="fade-up" mode="out-in">
-                  <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute" alt="" />
+                  <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute transform scale-105" alt="" />
                 </transition>
                 <transition name="fade-up" mode="out-in">
                   <div :key="'mainCoverSkelly' + updatedCover" v-show="!hasLoaded" class="artistImg h-full w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute"></div>
@@ -83,7 +83,7 @@
         <h2 class="font-sans text-gray-400 text-lg md:text-2xl w-full text-center">
           {{ playTime || '00:00:00' }}
         </h2>
-        <div class="w-10/12 bg-gray-500 bg-opacity-50">
+        <div class="w-10/12 bg-gray-500 bg-opacity-50 rounded-full">
            <div :style="{ width: percent * 100 + '%' }" class="h-1 z-50 bg-gray-300 transition-all duration-300 rounded-full"></div>
         </div>
         <div :class="{ 'justify-between': !ios, 'justify-center': ios }" class="h-24 w-full px-3 flex items-center relative">
@@ -110,9 +110,12 @@
                 <box-icon name="volume-low" type="solid" size="cssSize" class="w-12 h-12 fill-current stroke-current text-gray-300 stroke-0 transform scale-75 xxs:scale-100" v-pre></box-icon>
               </span>
             </transition>
-            <div @touchstart="sliderOpen = true" @touchmove="handleDrag" @mousemove="handleDrag" @mousedown="sliderOpen = true" @mouseup="sliderOpen = false" @mouseleave="sliderOpen = false" class="h-64 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto w-16 bg-black-light -mt-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-end transition duration-150 overflow-hidden">
-              <div ref="volumeCont" style="height: calc(100% - 6rem)" class="w-4 rounded-4xl mb-16 overflow-hidden flex justify-end items-end bg-black-dark">
-                <div ref="slider" :style="{ height: value * 100 + '%' }" class="w-full bg-gray-300 rounded-4xl"></div>
+            <div @touchstart="sliderOpen = true" @touchmove="handleDrag" @mousemove="handleDrag" @mousedown="sliderOpen = true" @mouseup="sliderOpen = false" @mouseleave="sliderOpen = false" 
+              class="h-64 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto w-16 bg-black-light -mt-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-end transition duration-150 overflow-hidden"
+            >
+              <div ref="volumeCont" style="height: calc(100% - 6rem)" :class="{'w-4': draggingSlider}" class="relative w-2 rounded-4xl mb-16 overflow-visible flex justify-center items-end bg-black-dark transition-width duration-200">
+                <div :style="{ height: `calc(${value * 100}% + 0.5rem)` }" :class="{'w-full': draggingSlider && value > 0.02}" class="w-2 bg-gray-300 rounded-4xl absolute transition-width duration-200"></div>
+                <div :style="{ bottom: `calc(${value * 100}% - 0.5rem)` }" class="w-4 bg-gray-300 rounded-full absolute h-4"></div>
               </div>
               <!-- <input ref="volumeSlider" type="range" min="0" max="1" step="0.01" name="volume" v-model="value" orient="vertical" data-orientation="vertical" id="volumeSlider" class="w-2 h-40" /> -->
             </div>
@@ -143,6 +146,8 @@
         scale: 0,
         wikiAvailable: false,
         lightHexColor: '#fff',
+        draggingSlider:false,
+        draggingSliderTimeout:null
       };
     },
     methods: {
@@ -153,6 +158,9 @@
         if (this.sliderOpen) {
           e.stopPropagation();
           e.preventDefault();
+          
+          this.draggingSlider = true;
+
           let containerH = this.$refs.mainCard.getBoundingClientRect().height;
           let containerY = this.$refs.mainCard.getBoundingClientRect().y;
           let containerRel = containerH + containerY;
@@ -164,6 +172,12 @@
           y = Math.min(Math.max(y, 0), 1);
           y = 1 - y;
           this.value = y;
+
+          if(this.draggingSliderTimeout) clearTimeout(this.draggingSliderTimeout);
+          this.draggingSliderTimeout = null;
+          this.draggingSliderTimeout = setTimeout(() => {
+            this.draggingSlider = false;  
+          },250);
         }
       },
     },

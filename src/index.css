@@ -140,14 +140,6 @@ body {
   filter:blur(7px) saturate(100%);
 }
 
-.artistImgCont:hover,
-.artistImgCont:hover .wikiImgcont,
-.wikiImgCont:hover,
-.wikiImgCont:hover .artistImgcont
-{
-  @apply -translate-y-2;
-}
-
 
 .fade-up-enter-from,
 .fade-up-leave-to {

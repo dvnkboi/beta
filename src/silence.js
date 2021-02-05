@@ -22,7 +22,6 @@ class Silence {
       }
     });
 
-
     this.config = config ? config : {};
     Silence.defaultConfig = {
       preload: false,
@@ -41,11 +40,10 @@ class Silence {
     this._preload = this.config.preload || Silence.defaultConfig.preload;
     this._audioSource.crossOrigin = this.config.crossOrigin || Silence.defaultConfig.crossOrigin;
     this._audioSource.preload = false;
+    this.muted = true;
     this._audioSource.volume = 0;
-    this.config.volume = this._sCurve(this.config.volume, 0.4, 1.6)
+    this.config.volume = this._sCurve(this.config.volume, 0.4, 1.6);
     this.url = url;
-
-    console.log(this._audioSource);
 
     this.slowCon = false;
     this.relativeTime = 0;
@@ -108,8 +106,6 @@ class Silence {
     }
     this.events.emit('play');
     this.events.emit('playPause');
-    
-    
   }
 
   pause() {
@@ -136,17 +132,21 @@ class Silence {
         val = this._sCurve(val, 0.4, 1.6);
         this._prevVol = this.vol = val;
       }
+      if(this.vol == 0) this.muted = true;
+      else this.muted = false;
     }
     else if (typeof val == 'string') {
       if (val == 'mute') {
         this.vol = 0;
         this._prevVol = this._audioSource.volume;
         this.fade(this._audioSource.volume, 0, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 100 : 0);
+        this.muted = true;
       }
       else if (val == 'unmute') {
         this.vol = (this._prevVol || this.config.volume || Silence.defaultConfig.volume);
         if (this.firstInit) this.vol = this._sCurve(this.vol, 0.4, 1.6);
         this.fade(this._audioSource.volume, this.vol, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
+        this.muted = false;
       }
     }
     else if (!val) return this.vol;

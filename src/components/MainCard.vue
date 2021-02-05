@@ -103,14 +103,14 @@
           <box-icon name="chevron-up" type="solid" size="cssSize" class="absolute bottom-0 w-full h-5 visible xl:hidden -ml-3 fill-current stroke-current text-gray-300 stroke-0" v-pre></box-icon>
           <div v-show="!ios" class="group slooder click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative transition duration-100">
             <transition name="fade-left" mode="out-in">
-              <span key="volLarge" v-if="value >= 0.7" class="click w-12 h-12 pointer-events-none absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
+              <span @click="value > 0 || value == 'unmute' ? value = 'mute' : value = 'unmute'" key="volLarge" v-if="value >= 0.7" class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
                 <box-icon name="volume-full" type="solid" size="cssSize" class="w-12 h-12 fill-current -ml-2 stroke-current text-gray-300 stroke-0 transform scale-75 xxs:scale-100" v-pre></box-icon>
               </span>
-              <span key="volSmol" v-else class="click w-12 h-12 pointer-events-none absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
+              <span @click="value > 0 || value == 'unmute' ? value = 'mute' : value = 'unmute'" key="volSmol" v-else class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
                 <box-icon name="volume-low" type="solid" size="cssSize" class="w-12 h-12 fill-current stroke-current text-gray-300 stroke-0 transform scale-75 xxs:scale-100" v-pre></box-icon>
               </span>
             </transition>
-            <div @touchstart="sliderOpen = true" @touchmove="handleDrag" @mousemove="handleDrag" @mousedown="sliderOpen = true" @mouseup="sliderOpen = false" @mouseleave="sliderOpen = false" class="h-64 pointer-events-none opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto w-16 bg-black-light -mt-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-end transition duration-150 overflow-hidden">
+            <div @touchstart.prevent.stop="sliderOpen = true" @mousedown="sliderOpen = true" :class="{ 'opacity-0': !sliderOpen, 'pointer-events-none': !sliderOpen }" class="h-64 group-hover:opacity-100 group-hover:pointer-events-auto w-16 bg-black-light -mt-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-end transition duration-150 overflow-hidden">
               <div ref="volumeCont" style="height: calc(100% - 6rem)" :class="{ 'w-4': draggingSlider }" class="relative w-2 rounded-4xl mb-16 overflow-visible flex justify-center items-end bg-black-dark transition-width duration-200">
                 <div :style="{ height: `calc(${value * 100}% + 0.5rem)` }" :class="{ 'w-full': draggingSlider && value > 0.02 }" class="w-2 bg-gray-300 rounded-4xl absolute transition-width duration-200"></div>
                 <div :style="{ bottom: `calc(${value * 100}% - 0.5rem)` }" class="w-4 bg-gray-300 rounded-full absolute h-4"></div>
@@ -254,6 +254,14 @@
     beforeMount() {},
     mounted() {
       this.value = parseFloat(localStorage.getItem('volume') || 1);
+      document.addEventListener('mousemove', this.handleDrag);
+      document.addEventListener('touchmove', this.handleDrag);
+      document.addEventListener('mouseup', () => {
+        this.sliderOpen = false;
+      });
+      document.addEventListener('touchend', () => {
+        this.sliderOpen = false;
+      });
     },
     beforeUnmount() {},
     directives: {

@@ -123,12 +123,14 @@ class Silence {
   volume(val) {
     if (val <= 1 && val >= 0) {
       if (this.playing) {
+        this.linVol = val;
         val = this._sCurve(val, 0.4, 1.6);
         this.vol = val;
         this._prevVol = this._audioSource.volume;
         this.fade(this._audioSource.volume, val, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
       }
       else {
+        this.linVol = val;
         val = this._sCurve(val, 0.4, 1.6);
         this._prevVol = this.vol = val;
       }
@@ -136,15 +138,17 @@ class Silence {
       else this.muted = false;
     }
     else if (typeof val == 'string') {
-      if (val == 'mute') {
+      if (val == 'mute' && !this.muted) {
         this.vol = 0;
-        this._prevVol = this._audioSource.volume;
+        this._prevVol = this.linVol;
+        this.linVol = 0;
         this.fade(this._audioSource.volume, 0, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 100 : 0);
         this.muted = true;
       }
-      else if (val == 'unmute') {
+      else if (val == 'unmute' && this.muted) {
+        this.linVol = this._prevVol;
         this.vol = (this._prevVol || this.config.volume || Silence.defaultConfig.volume);
-        if (this.firstInit) this.vol = this._sCurve(this.vol, 0.4, 1.6);
+        if(this.firstInit) this.vol = this._sCurve(this.vol, 0.4, 1.6);
         this.fade(this._audioSource.volume, this.vol, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
         this.muted = false;
       }

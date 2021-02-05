@@ -159,7 +159,6 @@
       handleDrag(e) {
         if (this.sliderOpen) {
           e.stopPropagation();
-          e.preventDefault();
 
           this.draggingSlider = true;
 

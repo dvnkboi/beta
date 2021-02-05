@@ -134,7 +134,7 @@ module.exports = {
     backdropFilter: ['responsive'], // defaults to ['responsive']
     aspectRatio: ['responsive'], // defaults to ['responsive']
     extend: {
-      pointerEvents: ['hover', 'focus', 'group-hover'],
+      pointerEvents: ['hover', 'focus', 'group-hover','group-focus','focus-within'],
       scale: ['group-hover'],
     },
   },

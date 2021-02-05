@@ -109,7 +109,7 @@
       importAudio() {
         let proxy = this;
         if (!this.audio) {
-          this.audio = new Silence('https://api.ampupradio.com:8443/TOP40.mp3?nocache=' + Date.now(), {
+          this.audio = new Silence('https://play.adtonos.com/8102/ampupradio', {
             volume: parseFloat(localStorage.getItem('volume')) || 1,
           });
 

@@ -1,7 +1,7 @@
 <template>
   <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full relative">
     <connectivity class="z-50" :show="!connected || slowCon" />
-    <MainCard class="z-20" ref="mainCard" @volume="setVol" @playPause="playPause()" @muteUnmute="muteUnmute()" @failed="getQueue()" :palette="currentPalette" :vol="linVolume" :percent="currentSongTimer.percent" :title="queue[0].title" :artist="queue[0].artist" :album="queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :normalizedBassData="normalizedBassData" :artistWiki="artistWiki" :playing="audio ? audio.playing : false" :ios="audio ? audio.ios : false" />
+    <MainCard class="z-20" ref="mainCard" @volume="setVol" @playPause="playPause()" @failed="getQueue()" :palette="currentPalette" :vol="linVolume" :percent="currentSongTimer.percent" :title="queue[0].title" :artist="queue[0].artist" :album="queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :normalizedBassData="normalizedBassData" :artistWiki="artistWiki" :playing="audio ? audio.playing : false" :ios="audio ? audio.ios : false" />
 
     <div class="w-full z-10 overflow-hidden xl:overflow-auto h-full p-0 xxs:px-2 xxs:py-4 md:p-4">
       <div class="flex justify-start items-center flex-col space-y-0 py-0 xxs:space-y-4 xxs:py-4 xxs:px-2 md:p-4 bg-black-dark rounded-none xxs:rounded-2xl bg-opacity-70">
@@ -100,7 +100,7 @@
     },
     methods: {
       setVol(val){
-        if(this.audio) this.audio.volume(val);
+        if(this.audio && !this.audio.firstPlay) this.audio.volume(val);
       },
       playPause() {
         if (this.audio && this.audio.playing) this.audio.pause();
@@ -136,12 +136,17 @@
           });
 
           this.audio.watch('vol',(val) => {
-            localStorage.setItem('volume', val);
-            this.volume = val;
+            if(proxy.volumeSetTimeout) clearTimeout(proxy.volumeSetTimeout);
+            proxy.volumeSetTimeout = null;
+            proxy.volumeSetTimeout = setTimeout(()=> {
+              if(proxy.audio.playing) localStorage.setItem('volume', val);
+            },100); 
+            proxy.volume = val;
+            console.log(val);
           });
 
           this.audio.watch('linVol',(val) => {
-            if(this.audio.playing || this.audio.vol != 0) this.linVolume = val;
+            if(proxy.audio.playing || proxy.audio.vol != 0) proxy.linVolume = val;
           });
         }
       },

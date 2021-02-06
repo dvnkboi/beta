@@ -25,7 +25,7 @@ class Silence {
     this.config = config ? config : {};
     Silence.defaultConfig = {
       preload: false,
-      volume: 0,
+      volume: 1,
       crossOrigin: 'anonymous',
       analyser: true,
       analyserFps: 25,
@@ -45,6 +45,10 @@ class Silence {
     this.config.volume = this._sCurve(this.config.volume, 0.4, 1.6);
     this.url = url;
 
+    this.linVol = config.volume || Silence.defaultConfig.volume;
+    this.vol = config.volume || Silence.defaultConfig.volume;
+    this._prevVol = config.volume || Silence.defaultConfig.volume;
+
     this.slowCon = false;
     this.relativeTime = 0;
     this.absoluteTime = 0;
@@ -54,6 +58,7 @@ class Silence {
     this.pauseDate = null;
     this.canPlay = false;
     this.firstInit = true;
+    this.firstPlay = true;
     this.hhmmss = {};
     this.currentTime = this._audioSource.currentTime;
     this.unloaded = true;
@@ -106,6 +111,7 @@ class Silence {
     }
     this.events.emit('play');
     this.events.emit('playPause');
+    this.firstPlay = false;
   }
 
   pause() {
@@ -145,9 +151,9 @@ class Silence {
         this.fade(this._audioSource.volume, 0, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 100 : 0);
         this.muted = true;
       }
-      else if (val == 'unmute' && this.muted) {
+      else if (val == 'unmute' && this.playing) {
         this.linVol = this._prevVol;
-        this.vol = (this._prevVol || this.config.volume || Silence.defaultConfig.volume);
+        this.vol = this._prevVol;
         if(this.firstInit) this.vol = this._sCurve(this.vol, 0.4, 1.6);
         this.fade(this._audioSource.volume, this.vol, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
         this.muted = false;

@@ -101,15 +101,15 @@
             <img src="../assets/logoB.png" alt="AmpUpRadio" class="h-auto w-28 xxs:w-36 md:w-48 lg:w-64" />
           </div>
           <box-icon name="chevron-up" type="solid" size="cssSize" class="absolute bottom-0 w-full h-5 visible xl:hidden -ml-3 fill-current stroke-current text-gray-300 stroke-0" v-pre></box-icon>
-          <div v-show="!ios" class="group slooder click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative transition duration-100">
+          <div v-show="!ios" :class="{'pointer-events-none':!playing,'opacity-40':!playing}" class="group slooder click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative transition duration-100">
             <transition name="fade-left">
-              <span @click="value > 0 || value == 'unmute' ? value = 'mute' : value = 'unmute'" key="volLarge" v-if="vol >= 0.75" class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
+              <span @click="(value > 0 || value == 'unmute') && playing ? value = 'mute' : value = 'unmute'" key="volLarge" v-if="vol >= 0.75" class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
                 <box-icon name="volume-full" type="solid" size="cssSize" class="w-12 h-12 fill-current -ml-2 stroke-current text-gray-300 stroke-0 transform scale-75 xxs:scale-100" v-pre></box-icon>
               </span>
-              <span @click="value > 0 || value == 'unmute' ? value = 'mute' : value = 'unmute'" key="volSmol" v-else-if="vol > 0" class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
+              <span @click="(value > 0 || value == 'unmute') && playing ? value = 'mute' : value = 'unmute'" key="volSmol" v-else-if="vol > 0" class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
                 <box-icon name="volume-low" type="solid" size="cssSize" class="w-12 h-12 fill-current stroke-current text-gray-300 stroke-0 transform scale-75 xxs:scale-100" v-pre></box-icon>
               </span>
-              <span @click="value > 0 || value == 'unmute' ? value = 'mute' : value = 'unmute'" key="volNo" v-else class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
+              <span @click="(value > 0 || value == 'unmute') && playing ? value = 'mute' : value = 'unmute'" key="volNo" v-else class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
                 <box-icon name="volume-mute" type="solid" size="cssSize" class="w-12 h-12 fill-current -ml-2 stroke-current text-gray-300 stroke-0 transform scale-75 xxs:scale-100" v-pre></box-icon>
               </span>
             </transition>

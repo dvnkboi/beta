@@ -136,17 +136,16 @@
           });
 
           this.audio.watch('vol',(val) => {
-            if(proxy.volumeSetTimeout) clearTimeout(proxy.volumeSetTimeout);
-            proxy.volumeSetTimeout = null;
-            proxy.volumeSetTimeout = setTimeout(()=> {
-              if(proxy.audio.playing) localStorage.setItem('volume', val);
-            },100); 
             proxy.volume = val;
-            console.log(val);
           });
 
           this.audio.watch('linVol',(val) => {
             if(proxy.audio.playing || proxy.audio.vol != 0) proxy.linVolume = val;
+            if(proxy.volumeSetTimeout) clearTimeout(proxy.volumeSetTimeout);
+            proxy.volumeSetTimeout = null;
+            proxy.volumeSetTimeout = setTimeout(()=> {
+              if(proxy.audio.playing && val != 0) localStorage.setItem('volume', val);
+            },100); 
           });
         }
       },

@@ -53,6 +53,7 @@ module.exports = {
           /\.htaccess$/,
           /service-worker\.js$/,
           /sw\.js$/,
+          /ads\.txt$/
         ],
       })
     ],

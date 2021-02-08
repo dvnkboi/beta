@@ -135,9 +135,9 @@ class Silence {
         this.fade(this._audioSource.volume, val, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
       }
       else {
-        this.linVol = val;
+        this.linVol = this._prevVol = val;
         val = this._sCurve(val, 0.4, 1.6);
-        this._prevVol = this.vol = val;
+        this.vol = val;
       }
       if(this.vol == 0) this.muted = true;
       else this.muted = false;
@@ -153,7 +153,6 @@ class Silence {
       else if (val == 'unmute' && this.playing) {
         this.linVol = this._prevVol;
         this.vol = this._prevVol;
-        if(this.firstInit) this.vol = this._sCurve(this.vol, 0.4, 1.6);
         this.fade(this._audioSource.volume, this.vol, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
         this.muted = false;
       }

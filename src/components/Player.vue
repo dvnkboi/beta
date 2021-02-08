@@ -144,7 +144,7 @@
             if(proxy.volumeSetTimeout) clearTimeout(proxy.volumeSetTimeout);
             proxy.volumeSetTimeout = null;
             proxy.volumeSetTimeout = setTimeout(()=> {
-              if(proxy.audio.playing && val != 0) localStorage.setItem('volume', val);
+              if(val != 0) localStorage.setItem('volume', val);
             },100); 
           });
 

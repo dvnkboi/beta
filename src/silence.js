@@ -42,7 +42,6 @@ class Silence {
     this._audioSource.preload = false;
     this.muted = true;
     this._audioSource.volume = 0;
-    this.config.volume = this._sCurve(this.config.volume, 0.4, 1.6);
     this.url = url;
 
     this.linVol = config.volume || Silence.defaultConfig.volume;
@@ -256,7 +255,6 @@ class Silence {
         proxy._audioSource.currentTime = proxy.loadingTime / 1000;
         proxy._audioSource.play();
         proxy.canPlay = true;
-        if (proxy.playing) proxy.volume('unmute');
         clearTimeout(proxy._slowLoad);
         proxy.slowCon = false;
 

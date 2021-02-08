@@ -188,7 +188,6 @@
       },
       value: function(newVal) {
         if(this.sliderOpen) this.$emit('volume', newVal);
-        console.log(newVal);
       },
       updatedCover: function() {
         this.hasLoaded = false;

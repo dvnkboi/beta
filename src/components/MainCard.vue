@@ -68,12 +68,12 @@
         </transition>
         <div class="px-7 w-full flex-auto overflow-hidden relative">
           <transition name="fade-up" mode="out-in" appear>
-            <h1 :key="'mainTitle'" v-show="showTitle" class="mainTitle font-sans line-height overflow-ellipsis overflow-hidden break-words text-gray-300 text-3xl xxs:text-3xl md:text-5xl xl:text-6xl pt-2 font-bold w-full text-center md:text-left capitalize transition-all duration-300">
+            <h1 :key="'mainTitle'" v-show="showTitle" class="mainTitle font-sans line-height overflow-ellipsis overflow-hidden break-words text-gray-300 text-3xl xxs:text-3xl md:text-4xl xl:text-5xl pt-2 font-bold w-full text-center md:text-left capitalize transition-all duration-300">
               {{ updatedTitle }}
             </h1>
           </transition>
           <transition name="fade-up" mode="out-in" appear>
-            <h2 :key="'mainArtist'" v-show="showArtist" class="mainArtist line-height font-sans break-words truncate overflow-ellipsis max-w-full md:-mt-3 text-gray-400 text-2xl xxs:text-2xl md:text-4xl xl:text-5xl w-full text-center md:text-left capitalize transition-all duration-300">
+            <h2 :key="'mainArtist'" v-show="showArtist" class="mainArtist line-height font-sans break-words truncate overflow-ellipsis max-w-full text-gray-400 text-2xl xxs:text-2xl md:text-3xl xl:text-4xl w-full text-center md:text-left capitalize transition-all duration-300">
               {{ updatedArtist }}
             </h2>
           </transition>

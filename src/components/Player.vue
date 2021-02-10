@@ -1,8 +1,10 @@
 <template>
   <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full relative">
     <connectivity class="z-50" :show="!connected || slowCon" />
-    <MainCard class="z-20" ref="mainCard" @volSliderOpen="volSliderOpen = true" @volSliderClosed="volSliderOpen = false" @volume="setVol" @playPause="playPause()" @failed="getQueue()" :palette="currentPalette" :vol="linVolume" :percent="currentSongTimer.percent" :title="queue[0].title" :artist="queue[0].artist" :album="queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :normalizedBassData="normalizedBassData" :artistWiki="artistWiki" :playing="audio ? audio.playing : false" :ios="audio ? audio.ios : false" />
-
+    <transition name="fade-up" appear>
+      <MainCard class="z-20" ref="mainCard" @volSliderOpen="volSliderOpen = true" @volSliderClosed="volSliderOpen = false" @volume="setVol" @playPause="playPause()" @failed="getQueue()" :palette="currentPalette" :vol="linVolume" :percent="currentSongTimer.percent" :title="queue[0].title" :artist="queue[0].artist" :album="queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :normalizedBassData="normalizedBassData" :artistWiki="artistWiki" :playing="audio ? audio.playing : false" :ios="audio ? audio.ios : false" />
+    </transition>
+    
     <div class="w-full z-10 overflow-hidden xl:overflow-auto h-full p-0 xxs:px-2 xxs:py-4 md:p-4">
       <div class="flex justify-start items-center flex-col space-y-0 py-0 xxs:space-y-4 xxs:py-4 xxs:px-2 md:p-4 bg-black-dark rounded-none xxs:rounded-2xl bg-opacity-70">
         <h1 class="text-gray-300 font-bold text-3xl hidden xxs:block -my-2 md:w-full md:text-4xl">Recent Songs</h1>

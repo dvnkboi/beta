@@ -83,7 +83,7 @@
         <h2 class="font-sans text-gray-400 text-lg md:text-2xl w-full text-center">
           {{ playTime || '00:00:00' }}
         </h2>
-        <div class="w-10/12 bg-gray-500 bg-opacity-50 rounded-full">
+        <div class="w-10/12 bg-gray-500 bg-opacity-50 rounded-full overflow-hidden">
           <div :style="{ width: percent * 100 + '%' }" class="h-1 z-50 bg-gray-300 transition-all duration-300 rounded-full"></div>
         </div>
         <div :class="{ 'justify-between': !ios, 'justify-center': ios }" class="h-24 w-full px-3 flex items-center relative">

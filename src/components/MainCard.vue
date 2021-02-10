@@ -1,5 +1,5 @@
 <template>
-  <div class="max-h-full min-h-screen h-screen sm:min-h-0 w-full xl:w-3/5 xl:h-full p-0 xxs:p-4">
+  <div class="max-h-full min-h-screen h-screen md:h-full sm:min-h-0 w-full xl:w-3/5 xl:h-full p-0 xxs:p-4">
     <div ref="mainCard" class="bg-black-dark bg-opacity-80 h-full w-full flex flex-col justify-between items-center pt-4 transition duration-300 overflow-hidden xl:overflow-auto relative rounded-none xxs:rounded-3xl">
       <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
         <div
@@ -79,7 +79,7 @@
           </transition>
         </div>
       </div>
-      <div class="flex flex-col justify-center items-center w-full">
+      <div class="flex flex-col justify-center items-center w-full mt-10">
         <h2 class="font-sans text-gray-400 text-lg md:text-2xl w-full text-center">
           {{ playTime || '00:00:00' }}
         </h2>
@@ -98,7 +98,7 @@
             </transition>
           </div>
           <div v-show="!ios" class="h-full flex-none flex justify-center items-center">
-            <img src="../assets/logoB.png" alt="AmpUpRadio" class="h-auto w-28 xxs:w-36 md:w-48 lg:w-64" />
+            <img src="../assets/logoB.png" alt="AmpUpRadio" class="h-auto w-28 xxs:w-36 md:w-40 lg:w-56" />
           </div>
           <box-icon name="chevron-up" type="solid" size="cssSize" class="absolute bottom-0 w-full h-5 visible xl:hidden -ml-3 fill-current stroke-current text-gray-300 stroke-0" v-pre></box-icon>
           <div v-show="!ios" class="group slooder click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative transition duration-100">

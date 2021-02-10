@@ -125,19 +125,16 @@ class Silence {
     this.events.emit('playPause');
   }
 
-  volume(val) {
+  volume(val,lin) {
     if (val <= 1 && val >= 0) {
       if (this.playing) {
         this.linVol = val;
-        val = this._sCurve(val, 0.4, 1.6);
-        this.vol = val;
-        this._prevVol = this._audioSource.volume;
-        this.fade(this._audioSource.volume, val, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
+        this.vol = lin && typeof lin != 'undefined' ? this.vol : this._sCurve(val, 0.4, 1.6);
+        this.fade(this._audioSource.volume, this.vol, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
       }
       else {
         this.linVol = this._prevVol = val;
-        val = this._sCurve(val, 0.4, 1.6);
-        this.vol = val;
+        this.vol = lin && typeof lin != 'undefined' ? this.vol : this._sCurve(val, 0.4, 1.6);
       }
       if(this.vol == 0) this.muted = true;
       else this.muted = false;
@@ -152,12 +149,11 @@ class Silence {
       }
       else if (val == 'unmute' && this.playing) {
         this.linVol = this._prevVol;
-        this.vol = this._prevVol;
+        this.vol = lin && typeof lin != 'undefined' ? this.vol : this._sCurve(this._prevVol, 0.4, 1.6);
         this.fade(this._audioSource.volume, this.vol, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
         this.muted = false;
       }
     }
-    else if (!val) return this.vol;
     else {
       throw new Error('enter an acceptable value: val can be a float between 0 and 1, "mute", "unmute" or null');
     }

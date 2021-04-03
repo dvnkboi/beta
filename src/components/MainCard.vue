@@ -1,6 +1,6 @@
 <template>
   <div class="max-h-full min-h-screen h-screen md:h-full sm:min-h-0 w-full xl:w-3/5 xl:h-full p-0 xxs:p-4">
-    <div ref="mainCard" class="bg-black-dark bg-opacity-80 h-full w-full flex flex-col justify-between items-center pt-4 transition duration-300 overflow-hidden xl:overflow-auto relative rounded-none xxs:rounded-3xl">
+    <div ref="mainCard" class="bg-black-dark bg-opacity-70 h-full w-full flex flex-col justify-between items-center pt-4 transition duration-300 overflow-hidden xl:overflow-auto relative rounded-none xxs:rounded-3xl">
       <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
         <div
           :class="{
@@ -23,7 +23,10 @@
           </transition>
         </div>
         <transition name="fade" mode="out-in" appear>
-          <div v-if="wikiAvailable && showWiki" class="fixed overflow-y-auto overflow-x-hidden top-0 bottom-0 left-0 right-0 backdrop-blur bg-black-dark bg-opacity-80 z-50 pt-8 xxs:pt-12 pl-0 sm:pl-4 transition duration-300">
+          <div :style="{background:`rgba(${palette.DarkMuted.r},${palette.DarkMuted.g},${palette.DarkMuted.b},var(--tw-bg-opacity))`}" v-if="wikiAvailable && showWiki" class="fixed overflow-y-auto overflow-x-hidden top-0 bottom-0 left-0 right-0 backdrop-blur bg-opacity-95 z-50 pt-8 xxs:pt-12 pl-0 sm:pl-4 transition duration-300">
+            <div @click="showWiki = false" class="absolute top-2 right-2 w-8 h-8 bg-deep cursor-pointer rounded p-1 shadow-md hover:p-px transition-all">
+              <box-icon name="x" size="cssSize" class="w-full h-full fill-current stroke-current text-gray-300" v-pre></box-icon>
+            </div>
             <div class="float-left flex justify-center items-center md:justify-start md:items-start flex-auto w-full h-64 xxs:h-80 sm:h-96 mt-10 md:mt-0">
               <div @click="showWiki = false" class="wikiImgCont cursor-pointer transform-gpu hover:-translate-y-2 h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 flex-shrink-0 relative mx-8 transition-all duration-150 overflow-hidden rounded-2xl">
                 <transition name="fade-up" mode="out-in">
@@ -35,7 +38,7 @@
               </div>
               <div class="flex flex-col justify-center items-start h-full w-full invisible max-w-0 pointer-events-none md:visible md:max-w-none max-h-full">
                 <transition name="fade-up" mode="out-in" appear>
-                  <h2 :key="'artistInfoBigTitle' + updatedArtist" class="artistInfoName invisible max-w-0 pointer-events-none md:visible md:max-w-none max-h-full uppercase break-words font-bold text-7xl md:text-6xl lg:text-8xl xl:text-10xl text-gray-300">
+                  <h2 :key="'artistInfoBigTitle' + updatedArtist" class="artistInfoName text-gray-300 invisible max-w-0 pointer-events-none md:visible md:max-w-none max-h-full uppercase break-words font-bold text-7xl md:text-6xl lg:text-8xl xl:text-10xl ">
                     {{
                       updatedArtist
                         .split(',')[0]
@@ -45,23 +48,23 @@
                   </h2>
                 </transition>
                 <transition name="fade-up" mode="out-in" appear>
-                  <h2 :key="'artistInfoSmolTitle' + updatedAlbum" class="invisible max-w-0 pointer-events-none md:visible md:max-w-none max-h-full uppercase text-7xl md:text-3xl lg:text-5xl xl:text-7xl text-gray-400">
+                  <h2 :key="'artistInfoSmolTitle' + updatedAlbum" class="invisible text-gray-400 max-w-0 pointer-events-none md:visible md:max-w-none max-h-full uppercase text-7xl md:text-3xl lg:text-5xl xl:text-7xl">
                     {{ updatedAlbum }}
                   </h2>
                 </transition>
               </div>
             </div>
             <transition name="fade-up" mode="out-in" appear>
-              <h2 :key="'artistInfo' + Date.now()" class="artistInfo font-sans break-words px-7 pt-2 z-20 text-gray-400 text-1xl xxs:text-2xl md:text-3xl xl:text-4xl w-full text-center md:text-left transition-all duration-300">
+              <h2 :key="'artistInfo' + Date.now()" class="artistInfo text-gray-400 font-sans break-words px-7 pt-2 z-20 text-1xl xxs:text-2xl md:text-3xl xl:text-4xl w-full text-center md:text-left transition-all duration-300">
                 {{ artistWiki.extract }}
               </h2>
             </transition>
             <transition name="fade" mode="out-in" appear>
               <div class="mt-1 z-20 w-full text-center md:text-left transition-all duration-300 flex justify-center items-center md:justify-end">
-                <h2 :key="'wikiText' + Date.now()" class="font-sans break-words pr-1 text-gray-400 text-base xl:text-lg">
+                <h2 :key="'wikiText' + Date.now()" class="font-sans break-words pr-1 text-base xl:text-lg text-gray-400">
                   from
                 </h2>
-                <a :href="artistWiki.fullurl" target="_blank" :key="'wikiLink' + Date.now()" class="font-sans break-words pr-7 text-gray-400 hover:text-gray-300 transition duration-300 text-lg xxs:text-xl xl:text-2xl font-bold outline-none">Wikipedia</a>
+                <a :href="artistWiki.fullurl" target="_blank" :key="'wikiLink' + Date.now()" class="font-sans text-gray-400 hover:text-gray-300 break-words pr-7 transition duration-300 text-lg xxs:text-xl xl:text-2xl font-bold outline-none">Wikipedia</a>
               </div>
             </transition>
           </div>

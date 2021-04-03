@@ -149,7 +149,7 @@ body {
 }
 
 .bgImg {
-  filter:blur(7px) saturate(100%);
+  filter:blur(50px) saturate(100%);
 }
 
 

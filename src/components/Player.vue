@@ -335,12 +335,17 @@
           .getPalette()
           .then((palette) => {
             proxy.currentPalette = palette;
-
+            let r,g,b;
+            r = palette.Vibrant.r / 255 <= 0.03928 ? r = r / 12.92 : r = ((r + 0.055) / 1.055) ^ 2.4;
+            g = palette.Vibrant.g / 255 <= 0.03928 ? g = g / 12.92 : g = ((g + 0.055) / 1.055) ^ 2.4;
+            b = palette.Vibrant.b / 255 <= 0.03928 ? b = b / 12.92 : b = ((b + 0.055) / 1.055) ^ 2.4;
+            proxy.currentPalette.textColor = 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.179 ? 'dark' : 'light';
             document.documentElement.style.setProperty('--maskR', palette.Vibrant.rgb[0]);
             document.documentElement.style.setProperty('--maskG', palette.Vibrant.rgb[1]);
             document.documentElement.style.setProperty('--maskB', palette.Vibrant.rgb[2]);
           })
-          .catch(() => {
+          .catch((e) => {
+            console.error(e);
             let nextColor = proxy.colors[Math.floor(proxy.colors.length * Math.random())];
             proxy.currentPalette.Vibrant.hex = nextColor == proxy.currentPalette.Vibrant.hex ? proxy.colors[(proxy.colors.indexOf(proxy.currentPalette.Vibrant.hex) + 1) % proxy.colors.length] : nextColor;
           });

@@ -64,7 +64,7 @@ class Silence {
     this.ios = false;
 
     let proxy = this;
-    function unlockIOS() {
+    const unlockIOS = () => {
       console.log('in IOS');
       proxy._defineContext();
       proxy._audioSource.load();

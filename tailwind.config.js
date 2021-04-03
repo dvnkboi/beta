@@ -122,9 +122,33 @@ module.exports = {
       },
       colors: {
         black: {
-          dark: '#1b1b1b',
-          DEFAULT: '#2b2b2b',
+          dark: '#0E0E0E',
+          DEFAULT: '#232323',
           light: '#303030',
+        },
+        pink: {
+          500: "#D81159",
+          DEFAULT: "#D81159",
+        },
+        green: {
+          500: "#50CE8D",
+          DEFAULT: "#50CE8D",
+        },
+        purple: {
+          500: "#8F00DF",
+          DEFAULT: "#8F00DF",
+        },
+        cyan: {
+          500: "#27A4FD",
+          DEFAULT: "#27A4FD",
+        },
+        blue: {
+          500: "#422AD5",
+          DEFAULT: "#422AD5",
+        },
+        deep: {
+          
+          DEFAULT:"#1A182B",
         }
       }
     },
@@ -136,6 +160,7 @@ module.exports = {
     extend: {
       pointerEvents: ['hover', 'focus', 'group-hover','group-focus','focus-within'],
       scale: ['group-hover'],
+      padding: ['hover']
     },
   },
   plugins: [

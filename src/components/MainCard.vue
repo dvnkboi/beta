@@ -4,8 +4,8 @@
       <div class="flex flex-col justify-center items-center md:justify-start md:items-start mt-4 flex-auto w-full">
         <div
           :class="{
-            'cursor-pointer': 'wikiAvailable',
-            'pointer-events-none': !'wikiAvailable',
+            'cursor-pointer': wikiAvailable,
+            'pointer-events-none': !wikiAvailable,
           }"
           @click="showWiki = true"
           :style="{
@@ -15,7 +15,7 @@
           class="group artistImgCont transform-gpu ring-0 hover:ring-2 ring-offset-transparent h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 relative mx-8 mt-10 md:mt-0 transition-all duration-150 overflow-hidden rounded-2xl"
         >
           <transition name="fade-up" mode="out-in" appear>
-            <div v-show="'wikiAvailable'" class="transform group-hover:-translate-y-14 group-hover:scale-125 group-hover:opacity-100 transition duration-300 absolute w-full h-full top-0 left-0 z-50 flex justify-center items-end pointer-events-none opacity-75 p-2">
+            <div v-show="wikiAvailable" class="transform group-hover:-translate-y-14 group-hover:scale-125 group-hover:opacity-100 transition duration-300 absolute w-full h-full top-0 left-0 z-50 flex justify-center items-end pointer-events-none opacity-75 p-2">
               <box-icon type="solid" name="info-circle" size="cssSize" class="w-6 h-6 stroke-current text-gray-100 fill-current bg-gradient-to-br from-blue-400 to-pink-500 bg-clip-content stroke-0 z-50 rounded-full" v-pre></box-icon>
             </div>
           </transition>
@@ -27,11 +27,11 @@
           </transition>
         </div>
         <transition name="fade" mode="out-in" appear>
-          <div :style="{ background: `rgba(${palette?.DarkVibrant?.r},${palette?.DarkVibrant?.g},${palette?.DarkVibrant?.b},var(--tw-bg-opacity))` }" v-if="wikiAvailable && showWiki" class="fixed overflow-y-auto h-full overflow-x-hidden top-0 bottom-0 left-0 right-0 backdrop-blur bg-opacity-95 z-50 pt-8 xxs:pt-12 pl-0 sm:pl-4 transition duration-300">
-            <div @click="showWiki = false" class="absolute top-2 right-2 w-8 h-8 bg-deep cursor-pointer rounded p-1 shadow-md hover:p-px transition-all">
+          <div :style="{ background: `linear-gradient(120deg,rgba(${palette?.DarkMuted?.r},${palette?.DarkMuted?.g},${palette?.DarkMuted?.b},var(--tw-bg-opacity)),rgba(${palette?.DarkVibrant?.r},${palette?.DarkVibrant?.g},${palette?.DarkVibrant?.b},var(--tw-bg-opacity))) ` }" v-if="wikiAvailable && showWiki" class="fixed overflow-y-auto h-full overflow-x-hidden top-0 bottom-0 left-0 right-0 backdrop-blur bg-opacity-95 z-50 pt-8 xxs:pt-12 pl-0 sm:pl-4 transition duration-300">
+            <div @click="showWiki = false" class="absolute top-2 right-2 w-8 h-8 bg-deep cursor-pointer rounded p-1 shadow-md hover:p-px transition-all z-50">
               <box-icon name="x" size="cssSize" class="w-full h-full fill-current stroke-current text-gray-300" v-pre></box-icon>
             </div>
-            <div class="float-left flex justify-center items-center md:justify-start md:items-start flex-auto w-full h-64 xxs:h-80 sm:h-96 mt-10 md:mt-0">
+            <div class="float-left flex justify-center items-center md:justify-start md:items-start flex-auto w-full h-64 xxs:h-80 sm:h-96 mt-10 md:mt-0 z-50">
               <div
                 @click="showWiki = false"
                 :style="{

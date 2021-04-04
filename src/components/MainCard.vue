@@ -23,7 +23,7 @@
           </transition>
         </div>
         <transition name="fade" mode="out-in" appear>
-          <div :style="{ background: `rgba(${palette.DarkMuted.r},${palette.DarkMuted.g},${palette.DarkMuted.b},var(--tw-bg-opacity))` }" v-if="wikiAvailable && showWiki" class="fixed overflow-y-auto overflow-x-hidden top-0 bottom-0 left-0 right-0 backdrop-blur bg-opacity-95 z-50 pt-8 xxs:pt-12 pl-0 sm:pl-4 transition duration-300">
+          <div :style="{ background: `rgba(${palette.DarkVibrant.r},${palette.DarkVibrant.g},${palette.DarkVibrant.b},var(--tw-bg-opacity))` }" v-if="wikiAvailable && showWiki" class="fixed overflow-y-auto h-full overflow-x-hidden top-0 bottom-0 left-0 right-0 backdrop-blur bg-opacity-95 z-50 pt-8 xxs:pt-12 pl-0 sm:pl-4 transition duration-300">
             <div @click="showWiki = false" class="absolute top-2 right-2 w-8 h-8 bg-deep cursor-pointer rounded p-1 shadow-md hover:p-px transition-all">
               <box-icon name="x" size="cssSize" class="w-full h-full fill-current stroke-current text-gray-300" v-pre></box-icon>
             </div>
@@ -103,7 +103,9 @@
           <div v-show="!ios" class="h-full flex-none flex justify-center items-center">
             <img src="../assets/logoB.png" alt="AmpUpRadio" class="h-auto w-28 xxs:w-36 md:w-40 lg:w-56" />
           </div>
-          <box-icon name="chevron-up" type="solid" size="cssSize" class="absolute bottom-0 w-full h-5 visible xl:hidden -ml-3 fill-current stroke-current text-gray-300 stroke-0" v-pre></box-icon>
+          <div :class="!ios ? '-ml-3' : ''" class="absolute bottom-0 w-full h-5 flex justify-center items-center">
+            <box-icon name="chevron-up" type="solid" size="cssSize" class="h-5 visible xl:hidden fill-current stroke-current text-gray-300 stroke-0" v-pre></box-icon>
+          </div>
           <div v-show="!ios" class="group slooder click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative transition duration-100">
             <transition name="fade-left">
               <span @click="(value > 0 || value == 'unmute') && playing ? (value = 'mute') : (value = 'unmute')" key="volLarge" v-if="vol >= 0.75" class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
@@ -250,11 +252,14 @@
         else this.$emit('volSliderClosed');
       },
       percent: function(val) {
-        if (val == this.percentLerp || (this.percentLerp == 0 && val != 0)) this.percentLerp = val;
-        else {
+        if ((this.percentLerp == 0 && val != 0) || val <= 0.02 || val >= 0.98) {
           if (this.percentInterval) clearInterval(this.percentInterval);
           this.percentInterval = null;
-          this.percentInterval = setInterval(() => (this.percentLerp = lerp(this.percentLerp, val, 0.1)), 100);
+          this.percentLerp = val;
+        } else {
+          if (this.percentInterval) clearInterval(this.percentInterval);
+          this.percentInterval = null;
+          this.percentInterval = setInterval(() => (this.percentLerp = lerp(this.percentLerp, val, 0.1)), 75);
         }
       },
     },

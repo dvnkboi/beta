@@ -73,9 +73,9 @@
         if (this.prevPosY == this.targetPosY) {
           let proxy = this;
           // eslint-disable-next-line no-inner-declarations
-          function detectScroll(){
+          function detectScroll() {
             requestAnimationFrame(proxy.handleScroll);
-            window.removeEventListener('scroll',detectScroll);
+            window.removeEventListener('scroll', detectScroll);
           }
           window.addEventListener('scroll', detectScroll);
           // console.log('listenning to scroll');
@@ -115,3 +115,24 @@
     },
   };
 </script>
+
+<style scoped>
+
+  .bgImg {
+    filter: blur(15px);
+  }
+
+  .background {
+    filter: blur(7px);
+  }
+
+  .bgMask {
+    background: linear-gradient(180deg, transparent, #000);
+    /* background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.46) 17%, rgba(0,0,0,0.75) 35%, rgba(0,0,0,1) 100%); */
+  }
+
+  .bgMaskRad {
+    background: radial-gradient(circle farthest-corner, transparent, #000 50%);
+  }
+  
+</style>

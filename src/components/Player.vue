@@ -55,7 +55,7 @@
           timer: new AdjustingInterval(
             () => {
               try {
-                this.currentSongTimer.time += 0.25;
+                this.currentSongTimer.time += 1;
                 this.currentSongTimer.percent = this.currentSongTimer.time / this.res.response.history[0].duration;
                 if (this.currentSongTimer.percent > 1) {
                   this.currentSongTimer.time = 0;
@@ -63,7 +63,7 @@
                 // eslint-disable-next-line no-empty
               } catch (e) {}
             },
-            250,
+            1000,
             () => this.currentSongTimer.init()
           ),
           time: null,

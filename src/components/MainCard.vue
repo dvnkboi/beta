@@ -23,7 +23,7 @@
           </transition>
         </div>
         <transition name="fade" mode="out-in" appear>
-          <div :style="{background:`rgba(${palette.DarkMuted.r},${palette.DarkMuted.g},${palette.DarkMuted.b},var(--tw-bg-opacity))`}" v-if="wikiAvailable && showWiki" class="fixed overflow-y-auto overflow-x-hidden top-0 bottom-0 left-0 right-0 backdrop-blur bg-opacity-95 z-50 pt-8 xxs:pt-12 pl-0 sm:pl-4 transition duration-300">
+          <div :style="{ background: `rgba(${palette.DarkMuted.r},${palette.DarkMuted.g},${palette.DarkMuted.b},var(--tw-bg-opacity))` }" v-if="wikiAvailable && showWiki" class="fixed overflow-y-auto overflow-x-hidden top-0 bottom-0 left-0 right-0 backdrop-blur bg-opacity-95 z-50 pt-8 xxs:pt-12 pl-0 sm:pl-4 transition duration-300">
             <div @click="showWiki = false" class="absolute top-2 right-2 w-8 h-8 bg-deep cursor-pointer rounded p-1 shadow-md hover:p-px transition-all">
               <box-icon name="x" size="cssSize" class="w-full h-full fill-current stroke-current text-gray-300" v-pre></box-icon>
             </div>
@@ -87,7 +87,7 @@
           {{ playTime || '00:00:00' }}
         </h2>
         <div class="w-10/12 bg-gray-500 bg-opacity-50 rounded-full overflow-hidden">
-          <div :style="{ width: percent * 100 + '%' }" class="h-1 z-50 bg-gray-300 transition-all duration-300 rounded-full"></div>
+          <div :style="{ transform: `translateX(${(-1 + percentLerp) * 100}%)` }" class="h-1 z-50 bg-gray-300 w-full rounded-full"></div>
         </div>
         <div :class="{ 'justify-between': !ios, 'justify-center': ios }" class="h-24 w-full px-3 flex items-center relative">
           <div @click="$emit('playPause')" class="click cursor-pointer flex justify-center items-center h-full w-16 flex-none">
@@ -106,17 +106,17 @@
           <box-icon name="chevron-up" type="solid" size="cssSize" class="absolute bottom-0 w-full h-5 visible xl:hidden -ml-3 fill-current stroke-current text-gray-300 stroke-0" v-pre></box-icon>
           <div v-show="!ios" class="group slooder click cursor-pointer flex justify-center items-center h-full w-16 flex-none relative transition duration-100">
             <transition name="fade-left">
-              <span @click="(value > 0 || value == 'unmute') && playing ? value = 'mute' : value = 'unmute'" key="volLarge" v-if="vol >= 0.75" class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
+              <span @click="(value > 0 || value == 'unmute') && playing ? (value = 'mute') : (value = 'unmute')" key="volLarge" v-if="vol >= 0.75" class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
                 <box-icon name="volume-full" type="solid" size="cssSize" class="w-12 h-12 fill-current -ml-2 stroke-current text-gray-300 stroke-0 transform scale-75 xxs:scale-100" v-pre></box-icon>
               </span>
-              <span @click="(value > 0 || value == 'unmute') && playing ? value = 'mute' : value = 'unmute'" key="volSmol" v-else-if="vol > 0" class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
+              <span @click="(value > 0 || value == 'unmute') && playing ? (value = 'mute') : (value = 'unmute')" key="volSmol" v-else-if="vol > 0" class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
                 <box-icon name="volume-low" type="solid" size="cssSize" class="w-12 h-12 fill-current stroke-current text-gray-300 stroke-0 transform scale-75 xxs:scale-100" v-pre></box-icon>
               </span>
-              <span @click="(value > 0 || value == 'unmute') && playing ? value = 'mute' : value = 'unmute'" key="volNo" v-else class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
+              <span @click="(value > 0 || value == 'unmute') && playing ? (value = 'mute') : (value = 'unmute')" key="volNo" v-else class="click w-12 h-12 absolute z-40 flex justify-center items-center transition duration-150 transform group-hover:scale-90">
                 <box-icon name="volume-mute" type="solid" size="cssSize" class="w-12 h-12 fill-current -ml-2 stroke-current text-gray-300 stroke-0 transform scale-75 xxs:scale-100" v-pre></box-icon>
               </span>
             </transition>
-            <div @touchstart.prevent.stop="sliderOpen = true" @mousedown="sliderOpen = true" :class="{ 'opacity-0': !sliderOpen, 'pointer-events-none': !sliderOpen}" class="h-64 group-hover:opacity-100 group-hover:pointer-events-auto w-16 bg-black-light -mt-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-end transition duration-150 overflow-hidden">
+            <div @touchstart.prevent.stop="sliderOpen = true" @mousedown="sliderOpen = true" :class="{ 'opacity-0': !sliderOpen, 'pointer-events-none': !sliderOpen }" class="h-64 group-hover:opacity-100 group-hover:pointer-events-auto w-16 bg-black-light -mt-48 -ml-2 z-30 shadow-xl rounded-4xl flex justify-center items-end transition duration-150 overflow-hidden">
               <div ref="volumeCont" style="height: calc(100% - 6rem)" :class="{ 'w-4': draggingSlider }" class="relative w-2 rounded-4xl mb-16 overflow-visible flex justify-center items-end bg-black-dark transition-width duration-200">
                 <div :style="{ height: `calc(${vol * 100}% + 0.5rem)` }" :class="{ 'w-full': draggingSlider && value > 0.04 }" class="w-2 bg-gray-300 rounded-4xl absolute transition-width duration-200"></div>
                 <div :style="{ bottom: `calc(${vol * 100}% - 0.5rem)` }" class="w-4 bg-gray-300 rounded-full absolute h-4"></div>
@@ -130,6 +130,7 @@
 </template>
 
 <script>
+  import { lerp } from '../utils';
   export default {
     name: 'MainCard',
     data() {
@@ -151,10 +152,11 @@
         lightHexColor: '#fff',
         draggingSlider: false,
         draggingSliderTimeout: null,
+        percentInterval: null,
+        percentLerp: 0,
       };
     },
-    computed:{
-    },
+    computed: {},
     methods: {
       loaded(evt) {
         if (evt) this.hasLoaded = true;
@@ -190,7 +192,7 @@
         this.scale = newVal;
       },
       value: function(newVal) {
-        if(this.sliderOpen) this.$emit('volume', newVal);
+        if (this.sliderOpen) this.$emit('volume', newVal);
       },
       updatedCover: function() {
         this.hasLoaded = false;
@@ -243,18 +245,18 @@
           this.wikiAvailable = this.showWiki = false;
         }
       },
-      palette: {
-        handler(val) {
-          if (val.LightVibrant) {
-            this.lightHexColor = val.LightVibrant.hex;
-          }
-        },
-        deep: true,
-      },
-      sliderOpen: function(){
-        if(this.sliderOpen) this.$emit('volSliderOpen');
+      sliderOpen: function() {
+        if (this.sliderOpen) this.$emit('volSliderOpen');
         else this.$emit('volSliderClosed');
-      }
+      },
+      percent: function(val) {
+        if (val == this.percentLerp || (this.percentLerp == 0 && val != 0)) this.percentLerp = val;
+        else {
+          if (this.percentInterval) clearInterval(this.percentInterval);
+          this.percentInterval = null;
+          this.percentInterval = setInterval(() => (this.percentLerp = lerp(this.percentLerp, val, 0.1)), 100);
+        }
+      },
     },
     created() {
       let proxy = this;
@@ -272,6 +274,7 @@
       document.addEventListener('touchend', () => {
         this.sliderOpen = false;
       });
+      this.percentLerp = this.percent;
     },
     beforeUnmount() {},
     directives: {
@@ -294,7 +297,70 @@
       percent: Number,
       palette: Object,
       ios: Boolean,
-      vol: Number
+      vol: Number,
     },
   };
 </script>
+
+<style scoped>
+  .mainTitle {
+    word-break: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -moz-box-orient: vertical;
+    -ms-box-orient: vertical;
+    box-orient: vertical;
+    -webkit-line-clamp: 2;
+    -moz-line-clamp: 2;
+    -ms-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+
+  @media (min-height: 700px) {
+    .mainTitle {
+      word-break: normal;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -moz-box-orient: vertical;
+      -ms-box-orient: vertical;
+      box-orient: vertical;
+      -webkit-line-clamp: 4 !important;
+      -moz-line-clamp: 4 !important;
+      -ms-line-clamp: 4 !important;
+      line-clamp: 4 !important;
+      overflow: hidden;
+    }
+  }
+
+  .artistInfo {
+    word-break: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -moz-box-orient: vertical;
+    -ms-box-orient: vertical;
+    box-orient: vertical;
+    -webkit-line-clamp: 7;
+    -moz-line-clamp: 7;
+    -ms-line-clamp: 7;
+    line-clamp: 7;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .artistInfoName {
+    word-break: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -moz-box-orient: vertical;
+    -ms-box-orient: vertical;
+    box-orient: vertical;
+    -webkit-line-clamp: 2;
+    -moz-line-clamp: 2;
+    -ms-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 85%;
+  }
+</style>

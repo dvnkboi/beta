@@ -160,7 +160,10 @@ module.exports = {
     extend: {
       pointerEvents: ['hover', 'focus', 'group-hover','group-focus','focus-within'],
       scale: ['group-hover'],
-      padding: ['hover']
+      padding: ['hover'],
+      ringWidth:['hover','group-hover'],
+      translate:['group-hover'],
+      borderRadius: ['hover', 'group-hover'],
     },
   },
   plugins: [

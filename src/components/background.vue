@@ -27,7 +27,7 @@
         </div>
         <div :style="{ filter: `${imgSaturation}` }" class="absolute h-full w-full overflow-hidden z-0 flex justify-center items-start transition-all duration-150">
           <transition name="fade-up" appear>
-            <img @error="updatedCover = aurLogo" :key="updatedCover" @load="loaded" v-show="hasLoaded" :src="updatedCover" v-loadedifcomplete alt="" class="bgImg h-screen w-auto lg:w-full lg:h-auto object-cover opacity-100 transform-gpu scale-105 origin-top" />
+            <img @error="updatedCover = aurLogo" :key="updatedCover" @load="loaded" v-show="hasLoaded" :src="updatedCover" v-loadedifcomplete alt="" class="bgImg h-screen w-auto lg:w-full lg:h-auto object-cover opacity-100 transform-gpu scale-105 origin-top transition-all duration-300" />
           </transition>
         </div>
       </div>

@@ -152,8 +152,4 @@
   .bgImg {
     filter: blur(7px);
   }
-
-  .background {
-    filter: blur(5px);
-  }
 </style>

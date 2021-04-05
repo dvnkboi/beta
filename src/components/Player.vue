@@ -80,6 +80,7 @@
                 this.currentSongTimer.percent = this.currentSongTimer.time / this.res.response.history[0].duration;
                 if (this.currentSongTimer.percent > 1) {
                   this.currentSongTimer.time = 0;
+                  this.currentSongTimer.percent = 0;
                 }
                 // eslint-disable-next-line no-empty
               } catch (e) {}

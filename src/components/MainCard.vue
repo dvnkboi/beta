@@ -27,7 +27,7 @@
           </transition>
         </div>
         <transition name="fade" mode="out-in" appear>
-          <div :style="{ background: `linear-gradient(120deg,rgba(${palette?.DarkMuted?.r},${palette?.DarkMuted?.g},${palette?.DarkMuted?.b},var(--tw-bg-opacity)),rgba(${palette?.DarkVibrant?.r},${palette?.DarkVibrant?.g},${palette?.DarkVibrant?.b},var(--tw-bg-opacity))) ` }" v-if="wikiAvailable && showWiki" class="fixed overflow-y-auto h-full overflow-x-hidden top-0 bottom-0 left-0 right-0 backdrop-blur bg-opacity-95 z-50 pt-8 xxs:pt-12 pl-0 sm:pl-4 transition duration-300">
+          <div :style="{ background: `linear-gradient(120deg,rgba(${palette?.DarkMuted?.r},${palette?.DarkMuted?.g},${palette?.DarkMuted?.b},var(--tw-bg-opacity)),rgba(${palette?.DarkVibrant?.r},${palette?.DarkVibrant?.g},${palette?.DarkVibrant?.b},var(--tw-bg-opacity))) ` }" v-if="wikiAvailable && showWiki" class="fixed overflow-y-auto h-screen overflow-x-hidden top-0 left-0 right-0 backdrop-blur bg-opacity-90 z-50 pt-8 xxs:pt-12 pl-0 sm:pl-4 transition duration-300">
             <div @click="showWiki = false" class="absolute top-2 right-2 w-8 h-8 bg-deep cursor-pointer rounded p-1 shadow-md hover:p-px transition-all z-50">
               <box-icon name="x" size="cssSize" class="w-full h-full fill-current stroke-current text-gray-300" v-pre></box-icon>
             </div>

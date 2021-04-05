@@ -5,7 +5,7 @@
         <img :key="'cover' + index" ref="coverArt" v-show="hasLoaded" @load="loaded" @error='updatedCover = aurLogo' v-loadedifcomplete :src="updatedCover" class="w-full object-cover ring-2 ring-purple-200 ring-opacity-25 transition-transform duration-300 absolute transform scale-105 rounded-2xl" alt="" />
       </transition>
       <transition name="fade-up" mode="out-in" appear class="overflow-hidden">
-        <div :key="'skelly' + index" v-show="!hasLoaded" class="box-border w-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute rounded-2xl"></div>
+        <div :key="'skelly' + index" v-show="!hasLoaded" class="box-border w-full h-full bg-gradient-to-br from-gray-700 to-gray-600 bg-opacity-50 grad ring-2 ring-purple-200 ring-opacity-25 transition duration-300 absolute rounded-2xl"></div>
       </transition>
     </div>
     <div class="col-span-3 flex justify-items-start items-start flex-auto flex-col py-3 px-3 md:px-6 h-full">

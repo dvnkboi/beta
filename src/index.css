@@ -54,6 +54,12 @@ body {
   background: #1b1b1b;
 }
 
+@property --color-stop {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
 .click {
   -webkit-tap-highlight-color: transparent;
 }

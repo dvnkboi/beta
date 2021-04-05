@@ -2,9 +2,30 @@
   <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full relative">
     <connectivity class="z-50" :show="!connected || slowCon" />
     <transition name="fade-up" appear>
-      <MainCard class="z-20" ref="mainCard" @volSliderOpen="volSliderOpen = true" @volSliderClosed="volSliderOpen = false" @volume="setVol" @playPause="playPause()" @failed="getQueue()" :palette="currentPalette" :vol="linVolume" :percent="currentSongTimer.percent" :title="queue[0].title" :artist="queue[0].artist" :album="queue[0].album" :cover="queue[0].largeCover" :changed="queue[0].changed" :playTime="playTime" :normalizedBassData="normalizedBassData" :artistWiki="artistWiki" :playing="audio ? audio.playing : false" :ios="audio ? audio.ios : false" />
+      <MainCard
+        class="z-20"
+        ref="mainCard"
+        @volSliderOpen="volSliderOpen = true"
+        @volSliderClosed="volSliderOpen = false"
+        @volume="setVol"
+        @playPause="playPause()"
+        @failed="getQueue()"
+        :palette="currentPalette"
+        :vol="linVolume"
+        :percent="currentSongTimer.percent"
+        :title="queue[0].title"
+        :artist="queue[0].artist"
+        :album="queue[0].album"
+        :cover="queue[0].largeCover"
+        :changed="queue[0].changed"
+        :playTime="playTime"
+        :normalizedBassData="normalizedBassData"
+        :artistWiki="artistWiki"
+        :playing="audio ? audio.playing : false"
+        :ios="audio ? audio.ios : false"
+      />
     </transition>
-    
+
     <div class="w-full z-10 overflow-hidden xl:overflow-auto h-full p-0 xxs:px-2 xxs:py-4 md:p-4">
       <div class="flex justify-start items-center flex-col space-y-0 py-0 xxs:space-y-4 xxs:py-4 xxs:px-2 md:p-4 bg-black-dark rounded-none xxs:rounded-2xl bg-opacity-70">
         <h1 class="text-gray-300 font-bold text-3xl hidden xxs:block -my-2 md:w-full md:text-4xl">Recent Songs</h1>
@@ -12,7 +33,7 @@
       </div>
     </div>
 
-    <SongBg class="z-0 transition-all duration-100" :changed="queue[0].changed" :currentColor="currentPalette.Vibrant.hex" :percent="currentSongTimer.percent" :cover="queue[0].largeCover" :normalizedBassData="normalizedBassData" />
+    <SongBg class="z-0 transition-all duration-100" :changed="queue[0].changed" :currentColor="currentPalette.Vibrant.hex" :percent="currentSongTimer.percent" :cover="queue[0].largeCover" :normalizedBassData="normalizedBassData" :palette="currentPalette" />
     <Loading class="z-50" :show="audioLoading || metaLoading" />
   </div>
 </template>
@@ -92,7 +113,7 @@
         slowCon: false,
         playTime: null,
         volume: 0,
-        linVolume:0,
+        linVolume: 0,
       };
     },
     computed: {
@@ -101,8 +122,8 @@
       },
     },
     methods: {
-      setVol(val){
-        if(this.audio) this.audio.volume(val);
+      setVol(val) {
+        if (this.audio) this.audio.volume(val);
       },
       playPause() {
         if (this.audio && this.audio.playing) this.audio.pause();
@@ -137,17 +158,17 @@
             proxy.slowCon = val;
           });
 
-          this.audio.watch('vol',(val) => {
+          this.audio.watch('vol', (val) => {
             proxy.volume = val;
           });
 
-          this.audio.watch('linVol',(val) => {
-            if(this.audio.playing || this.volSliderOpen) proxy.linVolume = val;
-            if(proxy.volumeSetTimeout) clearTimeout(proxy.volumeSetTimeout);
+          this.audio.watch('linVol', (val) => {
+            if (this.audio.playing || this.volSliderOpen) proxy.linVolume = val;
+            if (proxy.volumeSetTimeout) clearTimeout(proxy.volumeSetTimeout);
             proxy.volumeSetTimeout = null;
-            proxy.volumeSetTimeout = setTimeout(()=> {
-              if(val != 0) localStorage.setItem('volume', val);
-            },100); 
+            proxy.volumeSetTimeout = setTimeout(() => {
+              if (val != 0) localStorage.setItem('volume', val);
+            }, 100);
           });
 
           this.linVolume = parseFloat(localStorage.getItem('volume')) || 1;
@@ -335,10 +356,10 @@
           .getPalette()
           .then((palette) => {
             proxy.currentPalette = palette;
-            let r,g,b;
-            r = palette.Vibrant.r / 255 <= 0.03928 ? r = r / 12.92 : r = ((r + 0.055) / 1.055) ^ 2.4;
-            g = palette.Vibrant.g / 255 <= 0.03928 ? g = g / 12.92 : g = ((g + 0.055) / 1.055) ^ 2.4;
-            b = palette.Vibrant.b / 255 <= 0.03928 ? b = b / 12.92 : b = ((b + 0.055) / 1.055) ^ 2.4;
+            let r, g, b;
+            r = palette.Vibrant.r / 255 <= 0.03928 ? (r = r / 12.92) : (r = ((r + 0.055) / 1.055) ^ 2.4);
+            g = palette.Vibrant.g / 255 <= 0.03928 ? (g = g / 12.92) : (g = ((g + 0.055) / 1.055) ^ 2.4);
+            b = palette.Vibrant.b / 255 <= 0.03928 ? (b = b / 12.92) : (b = ((b + 0.055) / 1.055) ^ 2.4);
             proxy.currentPalette.textColor = 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.179 ? 'dark' : 'light';
             document.documentElement.style.setProperty('--maskR', palette.Vibrant.rgb[0]);
             document.documentElement.style.setProperty('--maskG', palette.Vibrant.rgb[1]);

@@ -12,7 +12,7 @@
         @failed="getQueue()"
         :palette="currentPalette"
         :vol="linVolume"
-        :percent="currentSongTimer.percent"
+        :percent="currentSongTimer"
         :title="queue[0].title"
         :artist="queue[0].artist"
         :album="queue[0].album"
@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    <SongBg class="z-0 transition-all duration-100" :changed="queue[0].changed" :currentColor="currentPalette.Vibrant.hex" :percent="currentSongTimer.percent" :cover="queue[0].largeCover" :normalizedBassData="normalizedBassData" :palette="currentPalette" />
+    <SongBg class="z-0 transition-all duration-100" :changed="queue[0].changed" :currentColor="currentPalette.Vibrant.hex" :percent="currentSongTimer" :cover="queue[0].largeCover" :normalizedBassData="normalizedBassData" :palette="currentPalette" />
     <Loading class="z-50" :show="audioLoading || metaLoading" />
   </div>
 </template>
@@ -44,7 +44,6 @@
   import Connectivity from './connectivity';
   import Loading from './loading';
   import SongBg from './background';
-  import { AdjustingInterval } from '../utils';
   import * as Vibrant from 'node-vibrant';
   import Silence from '../silence';
 
@@ -60,6 +59,7 @@
         covers: 11,
         queue: [],
         art: [],
+        res: {},
         currentPalette: { Vibrant: { hex: '#fff' } },
         colors: ['rgba(219, 39, 119)', 'rgba(124, 58, 237)', 'rgba(251, 191, 36)'],
         aurTmpLogo: '/assets/aur400.png',
@@ -73,30 +73,24 @@
         audioLoading: false,
         metaLoading: false,
         currentSongTimer: {
-          timer: new AdjustingInterval(
-            () => {
-              try {
-                this.currentSongTimer.time += 1;
-                this.currentSongTimer.percent = this.currentSongTimer.time / this.res.response.history[0].duration;
-                if (this.currentSongTimer.percent > 1) {
-                  this.currentSongTimer.time = 0;
-                  this.currentSongTimer.percent = 0;
-                }
-                // eslint-disable-next-line no-empty
-              } catch (e) {}
-            },
-            1000,
-            () => this.currentSongTimer.init()
-          ),
-          time: null,
-          percent: 0,
+          percent: [],
+          intervalDuration: 0,
+          currentIndex: 0,
           init: () => {
-            try {
-              this.currentSongTimer.time = (Date.now() - new Date(this.res.response.history[0].date_played).getTime() - this.audioLatency - 1000) / 1000;
-              if (this.currentSongTimer.timer.running) this.currentSongTimer.timer.stop();
-              this.currentSongTimer.timer.start();
-              // eslint-disable-next-line no-empty
-            } catch (e) {}
+            this.currentSongTimer.time = (Date.now() - new Date(this.res.response.history[0].date_played).getTime() - this.audioLatency - 1000) / 1000;
+
+            this.currentSongTimer.intervalDuration = this.res.response?.history[0].duration;
+
+            this.currentSongTimer.percent = [0];
+            for (let i = 1; i < 1000; ++i) {
+              this.currentSongTimer.percent.push(this.currentSongTimer.percent[i - 1] + this.currentSongTimer.intervalDuration / 1000);
+            }
+            this.currentSongTimer.percent = this.currentSongTimer.percent.map((time) => time / this.currentSongTimer.intervalDuration);
+            const diffArr = this.currentSongTimer.percent.map((x) => Math.abs((this.currentSongTimer.time / this.currentSongTimer.intervalDuration) - x));
+            const minNumber = Math.min(...diffArr);
+            const index = diffArr.findIndex((x) => x === minNumber);
+            
+            this.currentSongTimer.currentIndex = index;
           },
         },
         socket: null,

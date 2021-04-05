@@ -98,7 +98,7 @@
           {{ playTime || '00:00:00' }}
         </h2>
         <div class="w-10/12 bg-gray-500 bg-opacity-50 rounded-full overflow-hidden">
-          <div :style="{ transform: `translateX(${(-1 + percentLerp) * 100}%)` }" class="h-1 z-50 bg-gray-300 w-full rounded-full"></div>
+          <div :style="{ transform: `translate3D(${(-1 + percentLerp) * 100}%, 0, 0)` }" class="h-1 z-50 transform-gpu bg-gray-300 w-full rounded-full"></div>
         </div>
         <div :class="{ 'justify-between': !ios, 'justify-center': ios }" class="h-24 w-full px-3 flex items-center relative">
           <div @click="$emit('playPause')" class="click cursor-pointer flex justify-center items-center h-full w-16 flex-none">
@@ -143,7 +143,6 @@
 </template>
 
 <script>
-  import { lerp, map } from '../utils';
   export default {
     name: 'MainCard',
     data() {
@@ -262,17 +261,18 @@
         if (this.sliderOpen) this.$emit('volSliderOpen');
         else this.$emit('volSliderClosed');
       },
-      percent: function(val) {
-        if ((this.percentLerp == 0 && val != 0) || val <= 0.005 || val >= 0.995) {
-          if (this.percentInterval) clearInterval(this.percentInterval);
+      percent: {
+        deep: true,
+        handler: function(p) {
+          if(this.percentInterval) clearInterval(this.percentInterval);
           this.percentInterval = null;
-          this.percentLerp = val;
-        } else {
-          if (this.percentInterval) clearInterval(this.percentInterval);
-          this.percentInterval = null;
-          const dist = 1/(Math.abs(this.percentLerp - val));
-          this.percentInterval = setInterval(() => (this.percentLerp = lerp(this.percentLerp, val, 0.1)), map(dist, 0, 1000, 25, 500));
-        }
+
+          let offset = 0;
+          this.percentInterval = setInterval(() => {
+            this.percentLerp = p.percent[p.currentIndex + offset];
+            offset++;
+          },p.intervalDuration);
+        },
       },
     },
     created() {
@@ -291,7 +291,7 @@
       document.addEventListener('touchend', () => {
         this.sliderOpen = false;
       });
-      this.percentLerp = this.percent;
+      this.percentLerp = this.percent.percent[this.percent.currentIndex];
     },
     beforeUnmount() {},
     directives: {
@@ -311,7 +311,7 @@
       playTime: String,
       artistWiki: Object,
       playing: Boolean,
-      percent: Number,
+      percent: Object,
       palette: Object,
       ios: Boolean,
       vol: Number,

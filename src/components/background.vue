@@ -20,12 +20,12 @@
         class="absolute w-full h-full z-40 transform origin-bottom scale-y-25"
       ></div>
       <div ref="scrollMask" style="opacity:1" class="absolute h-full w-full">
-        <div :style="{ filter: `${saturation}` }" class="absolute h-full w-full transition-all duration-150 z-10 opacity-40">
+        <div class="absolute h-full w-full z-10 opacity-40">
           <transition name="fade" appear class="z-50">
             <div :key="key" v-show="show" :style="{ 'background-color': cssBackground }" class="background absolute w-full h-full transition-all duration-300 ease-linear bg-yellow-400"></div>
           </transition>
         </div>
-        <div :style="{ filter: `${imgSaturation}` }" class="absolute h-full w-full overflow-hidden z-0 flex justify-center items-start transition-all duration-150">
+        <div class="absolute h-full w-full overflow-hidden z-0 flex justify-center items-start">
           <transition name="fade" appear>
             <img @error="updatedCover = aurLogo" :key="updatedCover" @load="loaded" v-show="hasLoaded" :src="updatedCover" v-loadedifcomplete alt="" class="bgImg h-screen w-auto lg:w-full lg:h-auto object-cover opacity-100 transform-gpu scale-105 origin-top transition duration-2000" />
           </transition>
@@ -58,15 +58,16 @@
         return 'none';
       },
       opacity() {
-        if (this.percent > 0.75) {
-          return 1;
-        } else if (this.percent > 0.5) {
-          return 0.75;
-        } else if (this.percent > 0.25) {
-          return 0.5;
-        } else {
-          return 0.25;
-        }
+        return '0'
+        // if (this.percent > 0.75) {
+        //   return 1;
+        // } else if (this.percent > 0.5) {
+        //   return 0.75;
+        // } else if (this.percent > 0.25) {
+        //   return 0.5;
+        // } else {
+        //   return 0.25;
+        // }
       },
       cssBackground() {
         return this.currentColor;
@@ -131,7 +132,7 @@
       requestAnimationFrame(this.handleScroll);
     },
     props: {
-      percent: Number,
+      percent: Object,
       changed: Boolean,
       cover: String,
       normalizedBassData: Number,

@@ -3,9 +3,11 @@ import App from './App.vue'
 import 'boxicons'
 import './index.css'
 
-
-Number.prototype.map = function (in_min, in_max, out_min, out_max) {
-    return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+try{
+    screen.orientation.lock("portrait");
+}
+catch(e){
+    console.log('device cannot lock rotation');
 }
 
 createApp(App)

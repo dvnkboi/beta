@@ -29,6 +29,8 @@ function AdjustingInterval(workFunc, interval, errorFunc) {
 
 const lerp = (x, y, a) => y*a + x*(1-a);
 
+const map = (number, in_min, in_max, out_min, out_max) => (number - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+
 function hexToRgb(hex) {
    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
    return result ? {
@@ -41,5 +43,6 @@ function hexToRgb(hex) {
 module.exports = {
    AdjustingInterval,
    lerp,
-   hexToRgb
+   hexToRgb,
+   map
 };

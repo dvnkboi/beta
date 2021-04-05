@@ -15,7 +15,7 @@
           class="group artistImgCont transform-gpu ring-0 hover:ring-2 ring-offset-transparent h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 relative mx-8 mt-10 md:mt-0 transition-all duration-150 overflow-hidden rounded-2xl"
         >
           <transition name="fade-up" mode="out-in" appear>
-            <div v-show="wikiAvailable" class="transform group-hover:-translate-y-14 group-hover:scale-125 group-hover:opacity-100 transition duration-300 absolute w-full h-full top-0 left-0 z-50 flex justify-center items-end pointer-events-none opacity-75 p-2">
+            <div v-if="wikiAvailable" class="transform group-hover:-translate-y-14 group-hover:scale-125 group-hover:opacity-100 transition duration-300 absolute w-full h-full top-0 left-0 z-50 flex justify-center items-end pointer-events-none opacity-75 p-2">
               <box-icon type="solid" name="info-circle" size="cssSize" class="w-6 h-6 stroke-current text-gray-100 fill-current bg-gradient-to-br from-blue-400 to-pink-500 bg-clip-content stroke-0 z-50 rounded-full" v-pre></box-icon>
             </div>
           </transition>
@@ -143,7 +143,7 @@
 </template>
 
 <script>
-  import { lerp } from '../utils';
+  import { lerp, map } from '../utils';
   export default {
     name: 'MainCard',
     data() {
@@ -263,14 +263,15 @@
         else this.$emit('volSliderClosed');
       },
       percent: function(val) {
-        if ((this.percentLerp == 0 && val != 0) || val <= 0.02 || val >= 0.98) {
+        if ((this.percentLerp == 0 && val != 0) || val <= 0.005 || val >= 0.995) {
           if (this.percentInterval) clearInterval(this.percentInterval);
           this.percentInterval = null;
           this.percentLerp = val;
         } else {
           if (this.percentInterval) clearInterval(this.percentInterval);
           this.percentInterval = null;
-          this.percentInterval = setInterval(() => (this.percentLerp = lerp(this.percentLerp, val, 0.1)), 75);
+          const dist = 1/(Math.abs(this.percentLerp - val));
+          this.percentInterval = setInterval(() => (this.percentLerp = lerp(this.percentLerp, val, 0.1)), map(dist, 0, 1000, 25, 500));
         }
       },
     },

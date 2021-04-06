@@ -44,7 +44,7 @@
                   '--tw-ring-opacity': 1,
                   '--tw-ring-color': `rgba(${palette?.LightMuted?.r},${palette?.LightMuted?.g},${palette?.LightMuted?.b},var(--tw-ring-opacity))`,
                 }"
-                class="wikiImgCont cursor-pointer transform-gpu ring-0 hover:ring-2 ring-offset-transparent h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 flex-shrink-0 relative px-8 transition-all duration-150 overflow-hidden rounded-2xl"
+                class="wikiImgCont cursor-pointer transform-gpu ring-0 hover:ring-2 ring-offset-transparent h-64 w-64 xxs:h-80 xxs:w-80 sm:w-96 sm:h-96 flex-shrink-0 relative mx-8 transition-all duration-150 overflow-hidden rounded-2xl"
               >
                 <transition name="fade-up" mode="out-in">
                   <img :key="'mainCover' + updatedCover" ref="coverArt" v-show="hasLoaded" @load="loaded" @error="updatedCover = aurLogo" v-loadedifcomplete :src="updatedCover" class="z-10 artistImg h-full w-full object-cover ring-2 ring-purple-100 ring-opacity-20 transition duration-300 absolute transform scale-105" alt="" />

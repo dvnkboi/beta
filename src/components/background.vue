@@ -3,7 +3,7 @@
     <div class="absolute top-0 left-0 w-full h-full flex justify-center items-center z-0 transition duration-300">
       <div
         :style="{
-          'transition':'--color-stop 3s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: '--color-stop 3s cubic-bezier(0.4, 0, 0.2, 1)',
           '--color-stop': `rgba(${palette?.LightVibrant?.r},${palette?.LightVibrant?.g},${palette?.LightVibrant?.b},1)`,
           background: `radial-gradient(circle farthest-corner, transparent, var(--color-stop) 50%)`,
         }"
@@ -12,7 +12,7 @@
       ></div>
       <div
         :style="{
-          'transition':'--color-stop 3s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: '--color-stop 3s cubic-bezier(0.4, 0, 0.2, 1)',
           '--color-stop': `rgba(${palette?.LightVibrant?.r},${palette?.LightVibrant?.g},${palette?.LightVibrant?.b},1)`,
           background: `linear-gradient(180deg, transparent, var(--color-stop))`,
         }"
@@ -46,7 +46,7 @@
         prevPosY: 1,
         aurLogo: '/assets/aur400.png',
         updatedCover: null,
-        hasLoaded:false,
+        hasLoaded: false,
       };
     },
     computed: {
@@ -58,7 +58,7 @@
         return 'none';
       },
       opacity() {
-        return '0'
+        return '0';
         // if (this.percent > 0.75) {
         //   return 1;
         // } else if (this.percent > 0.5) {
@@ -104,7 +104,7 @@
         }
         // console.log('oh well');
         this.$refs.scrollMask.style.opacity = 1.4 * this.targetPosY;
-        this.$refs.scrollLinGr.style.transform = `scaleY(${(1/Math.max(0.001,this.targetPosY)) * 0.25})`;
+        this.$refs.scrollLinGr.style.transform = `scaleY(${(1 / Math.max(0.05, this.targetPosY)) * 0.25})`;
         this.$refs.scrollRadGr.style.opacity = (1 - this.targetPosY) * 0.6 + 0.4;
         this.prevPosY = this.targetPosY;
         requestAnimationFrame(this.handleScroll);

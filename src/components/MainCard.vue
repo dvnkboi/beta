@@ -27,7 +27,13 @@
           </transition>
         </div>
         <transition name="fade" mode="out-in" appear>
-          <div :style="{ background: `linear-gradient(120deg,rgba(${palette?.DarkMuted?.r},${palette?.DarkMuted?.g},${palette?.DarkMuted?.b},var(--tw-bg-opacity)),rgba(${palette?.DarkVibrant?.r},${palette?.DarkVibrant?.g},${palette?.DarkVibrant?.b},var(--tw-bg-opacity))) ` }" v-if="wikiAvailable && showWiki" class="fixed overflow-y-auto h-screen overflow-x-hidden top-0 left-0 right-0 backdrop-blur bg-opacity-90 z-50 pt-8 xxs:pt-12 pl-0 sm:pl-4 transition duration-300">
+          <div
+            :style="{
+              background: `linear-gradient(120deg,rgba(${palette?.DarkMuted?.r},${palette?.DarkMuted?.g},${palette?.DarkMuted?.b},var(--tw-bg-opacity)),rgba(${palette?.DarkVibrant?.r},${palette?.DarkVibrant?.g},${palette?.DarkVibrant?.b},var(--tw-bg-opacity))) `,
+            }"
+            v-if="wikiAvailable && showWiki"
+            class="fixed h-screen overflow-hidden top-0 left-0 right-0 backdrop-blur bg-opacity-90 z-50 pt-8 xxs:pt-12 pl-0 sm:pl-4 transition duration-300"
+          >
             <div @click="showWiki = false" class="absolute top-2 right-2 w-8 h-8 bg-deep cursor-pointer rounded p-1 shadow-md hover:p-px transition-all z-50">
               <box-icon name="x" size="cssSize" class="w-full h-full fill-current stroke-current text-gray-300" v-pre></box-icon>
             </div>
@@ -66,7 +72,7 @@
               </div>
             </div>
             <transition name="fade-up" mode="out-in" appear>
-              <h2 :key="'artistInfo' + Date.now()" class="artistInfo text-gray-300 font-sans break-words px-7 pt-2 z-20 text-1xl xxs:text-2xl md:text-3xl xl:text-4xl w-full text-center md:text-left transition-all duration-300">
+              <h2 :key="'artistInfo' + Date.now()" class="artistInfo text-gray-300 font-sans break-words px-7 pt-2 z-20 xxs:text-2xl md:text-3xl xl:text-4xl w-full text-center md:text-left transition-all overflow-hidden duration-300">
                 {{ artistWiki.extract }}
               </h2>
             </transition>
@@ -264,14 +270,14 @@
       percent: {
         deep: true,
         handler: function(p) {
-          if(this.percentInterval) clearInterval(this.percentInterval);
+          if (this.percentInterval) clearInterval(this.percentInterval);
           this.percentInterval = null;
 
           let offset = 0;
           this.percentInterval = setInterval(() => {
             this.percentLerp = p.percent[p.currentIndex + offset];
             offset++;
-          },p.intervalDuration);
+          }, p.intervalDuration);
         },
       },
     },

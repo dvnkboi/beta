@@ -26,6 +26,8 @@
       />
     </transition>
 
+    <!-- <PlayerControls class="z-20" @volSliderOpen="volSliderOpen = true" @volSliderClosed="volSliderOpen = false" @volume="setVol" @playPause="playPause()" :vol="linVolume" :percent="currentSongTimer" :playTime="playTime" :playing="audio ? audio.playing : false" :ios="audio ? audio.ios : false" /> -->
+
     <div class="w-full z-10 overflow-hidden xl:overflow-auto h-full p-0 xxs:px-2 xxs:py-4 md:p-4">
       <div class="flex justify-start items-center flex-col space-y-0 py-0 xxs:space-y-4 xxs:py-4 xxs:px-2 md:p-4 bg-black-dark rounded-none xxs:rounded-2xl bg-opacity-70">
         <h1 class="text-gray-300 font-bold text-3xl hidden xxs:block -my-2 md:w-full md:text-4xl">Recent Songs</h1>
@@ -46,6 +48,7 @@
   import SongBg from './background';
   import * as Vibrant from 'node-vibrant';
   import Silence from '../silence';
+  import PlayerControls from './PlayerControls'
 
   export default {
     name: 'Player',
@@ -127,7 +130,7 @@
       importAudio() {
         let proxy = this;
         if (!this.audio) {
-          this.audio = new Silence('https://api.ampupradio.com:8443/TOP40.mp3', {
+          this.audio = new Silence('https://icecast.ampupradio.com/TOP40.mp3', {
             volume: parseFloat(localStorage.getItem('volume')) || 1,
           });
 
@@ -597,6 +600,7 @@
       Connectivity,
       Loading,
       SongBg,
+      PlayerControls
     },
     props: {
       keyEvent: Number,

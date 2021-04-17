@@ -130,7 +130,7 @@
       importAudio() {
         let proxy = this;
         if (!this.audio) {
-          this.audio = new Silence('https://api.ampupradio.com:8443/TOP40.mp3', {
+          this.audio = new Silence('https://icecast.ampupradio.com/TOP40.mp3', {
             volume: parseFloat(localStorage.getItem('volume')) || 1,
           });
 

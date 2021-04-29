@@ -101,36 +101,34 @@ class Silence {
     this.events.removeListener(evt);
   }
 
-  play() {
+  async play() {
     this.playing = true;
     if (!this._audioSource || this.unloaded || this.firstInit) {
       this._init();
     } else {
-      this.volume('unmute');
+      await this.volume('unmute');
     }
     this.events.emit('play');
     this.events.emit('playPause');
     this.firstPlay = false;
   }
 
-  pause() {
+  async pause() {
     this.playing = false;
     if(this.ios){
-      setTimeout(() => {
-        this.unload();
-      },300);
+      this.unload();
     }
-    this.volume('mute');
+    await this.volume('mute');
     this.events.emit('pause');
     this.events.emit('playPause');
   }
 
-  volume(val,lin) {
+  async volume(val,lin) {
     if (val <= 1 && val >= 0) {
       if (this.playing) {
         this.linVol = val;
         this.vol = lin && typeof lin != 'undefined' ? this.vol : this._sCurve(val, 0.4, 1.6);
-        this.fade(this._audioSource.volume, this.vol, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
+        await this.fade(this._audioSource.volume, this.vol, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
       }
       else {
         this.linVol = this._prevVol = val;
@@ -144,13 +142,13 @@ class Silence {
         this.vol = 0;
         this._prevVol = this.linVol;
         this.linVol = 0;
-        this.fade(this._audioSource.volume, 0, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 100 : 0);
+        await this.fade(this._audioSource.volume, 0, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 100 : 0);
         this.muted = true;
       }
       else if (val == 'unmute' && this.playing) {
         this.linVol = this._prevVol;
         this.vol = lin && typeof lin != 'undefined' ? this.vol : this._sCurve(this._prevVol, 0.4, 1.6);
-        this.fade(this._audioSource.volume, this.vol, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
+        await this.fade(this._audioSource.volume, this.vol, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
         this.muted = false;
       }
     }
@@ -159,40 +157,44 @@ class Silence {
     }
   }
 
-  fade(from, to, len) {
+  async fade(from, to, len) {
     this.events.emit('fadeStart');
-    if (this._fadeInterval) clearInterval(this._fadeInterval);
-    this._fadeInterval = null;
-    let proxy = this;
-    let vol = from;
-    let diff = to - from;
-    let steps = Math.abs(diff / 0.01);
-    let stepLen = Math.max(4, steps > 0 ? len / steps : len);
-    var lastTick = Date.now();
-    this._audioSource.volume = from;
+    return new Promise((resolve) =>{
+      if (this._fadeInterval) clearInterval(this._fadeInterval);
+      this._fadeInterval = null;
+      let proxy = this;
+      let vol = from;
+      let diff = to - from;
+      let steps = Math.abs(diff / 0.01);
+      let stepLen = Math.max(4, steps > 0 ? len / steps : len);
+      var lastTick = Date.now();
+      this._audioSource.volume = from;
 
-    this._fadeTo = to;
-    var tick;
+      this._fadeTo = to;
+      var tick;
 
-    this._fadeInterval = setInterval(() => {
-      tick = (Date.now() - lastTick) / len;
-      lastTick = Date.now();
-      vol += diff * tick;
+      this._fadeInterval = setInterval(() => {
+        tick = (Date.now() - lastTick) / len;
+        lastTick = Date.now();
+        vol += diff * tick;
 
-      vol = Math.round(vol * 100) / 100;
+        vol = Math.round(vol * 100) / 100;
 
-      vol = diff < 0 ? Math.max(to, vol) : Math.min(to, vol);
+        vol = diff < 0 ? Math.max(to, vol) : Math.min(to, vol);
 
-      proxy._audioSource.volume = vol;
+        proxy._audioSource.volume = vol;
 
-      if ((to < from && vol <= to) || (to > from && vol >= to)) {
-        clearInterval(proxy._fadeInterval);
-        proxy._fadeInterval = null;
-        proxy._fadeTo = null;
-        proxy._audioSource.volume = to;
-        proxy.events.emit('fadeStop');
-      }
-    }, stepLen);
+        if ((to < from && vol <= to) || (to > from && vol >= to)) {
+          clearInterval(proxy._fadeInterval);
+          proxy._fadeInterval = null;
+          proxy._fadeTo = null;
+          proxy._audioSource.volume = to;
+          proxy.events.emit('fadeStop');
+          resolve(true);
+        }
+      }, stepLen);
+    })
+    
   }
 
   toHHMMSS(s) {
@@ -352,7 +354,7 @@ class Silence {
         if (this.playing && this.canPlay) this.relativeTime += date;
         this.absoluteTime += date;
         date = Date.now();
-        if (this.absoluteTime - this.relativeTime > 60000) this.unload();
+        if (this.absoluteTime - this.relativeTime > 10000) this.unload();
         if (document.visibilityState === 'visible') {
           this.hhmmss = this.toHHMMSS(this.relativeTime / 1000);
         }
@@ -373,7 +375,7 @@ class Silence {
 
     function update() {
       setTimeout(function () {
-        requestAnimationFrame(update);
+        this._freqUpdateFrame = requestAnimationFrame(update);
         if (document.visibilityState === 'visible') {
           if (proxy.freqDataFn) {
             proxy.analyser.getByteFrequencyData(proxy.freqData);
@@ -397,7 +399,16 @@ class Silence {
       }, 1000 / proxy.config.analyserFps || Silence.defaultConfig.analyserFps);
     }
 
-    requestAnimationFrame(update);
+    this._freqUpdateFrame = requestAnimationFrame(update);
+  }
+
+  startFreq(){
+    this._defineContext();
+    this._updateCycle();
+  }
+
+  stopFreq(){
+    cancelAnimationFrame(this._freqUpdateFrame);
   }
 
   _sCurve(val, skew, curvature) {

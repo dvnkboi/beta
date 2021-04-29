@@ -85,8 +85,8 @@
             this.currentSongTimer.intervalDuration = this.res.response?.history[0].duration;
 
             this.currentSongTimer.percent = [0];
-            for (let i = 1; i < 1000; ++i) {
-              this.currentSongTimer.percent.push(this.currentSongTimer.percent[i - 1] + this.currentSongTimer.intervalDuration / 1000);
+            for (let i = 1; i < 750; ++i) {
+              this.currentSongTimer.percent.push(this.currentSongTimer.percent[i - 1] + this.currentSongTimer.intervalDuration / 750);
             }
             this.currentSongTimer.percent = this.currentSongTimer.percent.map((time) => time / this.currentSongTimer.intervalDuration);
             const diffArr = this.currentSongTimer.percent.map((x) => Math.abs((this.currentSongTimer.time / this.currentSongTimer.intervalDuration) - x));
@@ -133,6 +133,8 @@
           this.audio = new Silence('https://api.ampupradio.com:8443/TOP40.mp3', {
             volume: parseFloat(localStorage.getItem('volume')) || 1,
           });
+
+          this.audio.stopFreq();
 
           this.audio.normalDataFn = (data) => {
             proxy.normalizedBassData = data > 0.1 ? data : 0;

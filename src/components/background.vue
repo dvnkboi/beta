@@ -90,24 +90,24 @@
         if (evt) this.hasLoaded = true;
       },
       handleScroll() {
-        this.targetPosY = 1 - Math.min(window.scrollY, window.innerHeight) / window.innerHeight;
-        if (this.prevPosY == this.targetPosY) {
-          let proxy = this;
-          // eslint-disable-next-line no-inner-declarations
-          function detectScroll() {
-            requestAnimationFrame(proxy.handleScroll);
-            window.removeEventListener('scroll', detectScroll);
+        setTimeout(() => {
+          this.targetPosY = 1 - Math.min(window.scrollY, window.innerHeight) / window.innerHeight;
+          if (this.prevPosY == this.targetPosY) {
+            let proxy = this;
+            // eslint-disable-next-line no-inner-declarations
+            function detectScroll() {
+              requestAnimationFrame(proxy.handleScroll);
+              window.removeEventListener('scroll', detectScroll);
+            }
+            window.addEventListener('scroll', detectScroll);
+            return;
           }
-          window.addEventListener('scroll', detectScroll);
-          // console.log('listenning to scroll');
-          return;
-        }
-        // console.log('oh well');
-        this.$refs.scrollMask.style.opacity = 1.4 * this.targetPosY;
-        this.$refs.scrollLinGr.style.transform = `scaleY(${(1 / Math.max(0.05, this.targetPosY)) * 0.25})`;
-        this.$refs.scrollRadGr.style.opacity = (1 - this.targetPosY) * 0.6 + 0.4;
-        this.prevPosY = this.targetPosY;
-        requestAnimationFrame(this.handleScroll);
+          this.$refs.scrollMask.style.opacity = 1.4 * this.targetPosY;
+          this.$refs.scrollLinGr.style.transform = `scaleY(${(1 / Math.max(0.05, this.targetPosY)) * 0.25})`;
+          this.$refs.scrollRadGr.style.opacity = (1 - this.targetPosY) * 0.6 + 0.4;
+          this.prevPosY = this.targetPosY;
+          requestAnimationFrame(this.handleScroll);
+        }, 1000 / 25);
       },
     },
     watch: {

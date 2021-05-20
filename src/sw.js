@@ -8,6 +8,8 @@ import { precacheAndRoute } from 'workbox-precaching';
 // import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { BroadcastUpdatePlugin } from 'workbox-broadcast-update';
 
+self.__WB_DISABLE_DEV_LOGS = true;
+
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
 precacheAndRoute(self.__WB_MANIFEST);
 

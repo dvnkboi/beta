@@ -48,7 +48,7 @@
   import SongBg from './background';
   import * as Vibrant from 'node-vibrant';
   import Silence from '../silence';
-  import PlayerControls from './PlayerControls'
+  // import PlayerControls from './PlayerControls'
 
   export default {
     name: 'Player',
@@ -602,7 +602,7 @@
       Connectivity,
       Loading,
       SongBg,
-      PlayerControls
+      // PlayerControls
     },
     props: {
       keyEvent: Number,

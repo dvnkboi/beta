@@ -55,7 +55,6 @@ class Silence {
     this.canPlay = false;
     this.loadingTime = 0;
     this.pauseDate = null;
-    this.canPlay = false;
     this.firstInit = true;
     this.firstPlay = true;
     this.hhmmss = {};
@@ -224,6 +223,7 @@ class Silence {
 
   load() {
     try {
+      this.unload();
       let proxy = this;
       this.events.emit('loading');
       this.canPlay = false;
@@ -245,15 +245,19 @@ class Silence {
       this.absoluteTime = 0;
 
       this._audioSource.oncanplaythrough = function () {
-        proxy.events.emit('loaded', this.loadingTime);
-        proxy.unloaded = false;
-        proxy.audioLoading = false;
         proxy.loadingTime = performance.now() - proxy.loadingTime;
+        proxy.events.emit('loaded', this.loadingTime);
+        console.log('loaded in ', proxy.loadingTime, 'ms');
+
         proxy._audioSource.currentTime = proxy.loadingTime / 1000;
         proxy._audioSource.play();
+
+        proxy.unloaded = false;
         proxy.canPlay = true;
-        clearTimeout(proxy._slowLoad);
+        proxy.audioLoading = false;
         proxy.slowCon = false;
+        
+        clearTimeout(proxy._slowLoad);
 
         if (proxy.playing) proxy.play();
         console.log('loaded audio and playing: ', !proxy._audioSource.paused);
@@ -347,18 +351,28 @@ class Silence {
         }
 
       if (this._tick) clearInterval(this._tick);
-      let date = Date.now();
+      let time = Date.now();
       this._tick = null;
+
+
       this._tick = setInterval(() => {
-        date = Date.now() - date;
-        if (this.playing && this.canPlay) this.relativeTime += date;
-        this.absoluteTime += date;
-        date = Date.now();
-        if (this.absoluteTime - this.relativeTime > 10000) this.unload();
+
+        time = Date.now() - time;
+
+        if (this.playing && this.canPlay) this.relativeTime += time;
+        this.absoluteTime += time;
+        if (this.absoluteTime - this.relativeTime > 2000 && this.canPlay && !this.playing && !this.unloaded) {
+          this._audioSource.pause();
+          this.unloaded = true;
+          console.log('unloaded audio');
+        }
         if (document.visibilityState === 'visible') {
           this.hhmmss = this.toHHMMSS(this.relativeTime / 1000);
         }
         this.currentTime = this._audioSource.currentTime;
+
+        time = Date.now();
+
       }, this.config.timeUpdateTick || Silence.defaultConfig.timeUpdateTick);
 
     });

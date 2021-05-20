@@ -26,6 +26,8 @@
       />
     </transition>
 
+    <!-- <div :style="{transform:`scaleX(${this.peak})`}" class="w-full h-24 absolute bg-white z-50 origin-left transition"></div> -->
+
     <!-- <PlayerControls class="z-20" @volSliderOpen="volSliderOpen = true" @volSliderClosed="volSliderOpen = false" @volume="setVol" @playPause="playPause()" :vol="linVolume" :percent="currentSongTimer" :playTime="playTime" :playing="audio ? audio.playing : false" :ios="audio ? audio.ios : false" /> -->
 
     <div class="w-full z-10 overflow-hidden xl:overflow-auto h-full p-0 xxs:px-2 xxs:py-4 md:p-4">
@@ -54,9 +56,9 @@
     name: 'Player',
     data() {
       return {
-        queueUrl: `https://api.ampupradio.com:3000/v2?action=get_queue`,
-        artUrl: `https://api.ampupradio.com:3000/v2?action=get_art`,
-        nextArtUrl: `https://api.ampupradio.com:3000/v2?action=get_next_art`,
+        queueUrl: `https://api.ampupradio.com/v2?action=get_queue`,
+        artUrl: `https://api.ampupradio.com/v2?action=get_art`,
+        nextArtUrl: `https://api.ampupradio.com/v2?action=get_next_art`,
         wikiPageUrl: `https://en.wikipedia.org/w/api.php?origin=*&format=json&action=query&prop=info|extracts|categories&inprop=url&exintro&explaintext&redirects=1&titles=`,
         artistWiki: {},
         covers: 11,
@@ -89,10 +91,10 @@
               this.currentSongTimer.percent.push(this.currentSongTimer.percent[i - 1] + this.currentSongTimer.intervalDuration / 750);
             }
             this.currentSongTimer.percent = this.currentSongTimer.percent.map((time) => time / this.currentSongTimer.intervalDuration);
-            const diffArr = this.currentSongTimer.percent.map((x) => Math.abs((this.currentSongTimer.time / this.currentSongTimer.intervalDuration) - x));
+            const diffArr = this.currentSongTimer.percent.map((x) => Math.abs(this.currentSongTimer.time / this.currentSongTimer.intervalDuration - x));
             const minNumber = Math.min(...diffArr);
             const index = diffArr.findIndex((x) => x === minNumber);
-            
+
             this.currentSongTimer.currentIndex = index;
           },
         },
@@ -130,11 +132,9 @@
       importAudio() {
         let proxy = this;
         if (!this.audio) {
-          this.audio = new Silence('https://api.ampupradio.com:8443/TOP40.mp3', {
+          this.audio = new Silence('https://icecast.ampupradio.com/TOP40.mp3', {
             volume: parseFloat(localStorage.getItem('volume')) || 1,
           });
-
-          this.audio.stopFreq();
 
           this.audio.normalDataFn = (data) => {
             proxy.normalizedBassData = data > 0.1 ? data : 0;
@@ -145,11 +145,17 @@
             proxy.playTime = data.hours + ':' + data.minutes + ':' + data.seconds;
           };
 
+          this.audio.timePeakFn = (data) => {
+            data = data / 65536;
+            this.peak = data;
+          };
+
           this.audio.on('loading', () => {
             proxy.audioLoading = true;
           });
 
           this.audio.on('loaded', (loadingTime) => {
+            this.audio.startFreq();
             proxy.loadingTime = loadingTime;
             proxy.audioLoading = false;
           });

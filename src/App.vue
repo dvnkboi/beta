@@ -15,21 +15,21 @@
             :keyEvent="keyPlayPause"
          />
       </transition>
-      <transition name="fade-up" appear>
+      <!-- <transition name="fade-up" appear>
          <update-prompt
             v-if="showUpdatePrompt"
             @accept="reload()"
             @decline="showUpdatePrompt = false"
             class="transition duration-300"
          />
-      </transition>
+      </transition> -->
    </div>
 </template>
 
 <script>
 import { register } from "register-service-worker";
 import Player from "./components/Player";
-import UpdatePrompt from "./components/UpdatePrompt.vue";
+// import UpdatePrompt from "./components/UpdatePrompt.vue";
 
 export default {
    name: "App",
@@ -85,7 +85,7 @@ export default {
          },
          updated(registration) {
             console.log("New content is available; please refresh.");
-            proxy.showUpdatePrompt = true;
+            // proxy.showUpdatePrompt = true;
             let worker = registration.waiting;
             worker.postMessage({ action: "skipWaiting" });
          },
@@ -104,7 +104,7 @@ export default {
    },
    components: {
       Player,
-      UpdatePrompt,
+      // UpdatePrompt,
    },
 };
 </script>

@@ -1,25 +1,23 @@
-var EventEmitter = require('events')
+var EventEmitter = require('events');
 
 class Silence {
-
   constructor(url, config) {
-
     this.events = new EventEmitter();
 
     Object.defineProperty(Silence.prototype, 'watch', {
-      value: function (prop, handler) {
-        var setter = function (newVal) {
+      value: function(prop, handler) {
+        var setter = function(newVal) {
           let oldVal = this[prop];
           this['_watched_' + prop] = newVal;
-          return newVal = handler.call(this, newVal, oldVal);
+          return (newVal = handler.call(this, newVal, oldVal));
         };
         Object.defineProperty(this, prop, {
           set: setter,
           get() {
-            return this['_watched_' + prop]
-          }
+            return this['_watched_' + prop];
+          },
         });
-      }
+      },
     });
 
     this.config = config ? config : {};
@@ -32,9 +30,10 @@ class Silence {
       fade: true,
       freqDataFn: null,
       timeDataFn: null,
+      timePeakFn: null,
       timeUpdateTick: 1000,
-      slowTimeout: 8000
-    }
+      slowTimeout: 8000,
+    };
 
     this._audioSource = config.audioNode || new Audio();
     this._preload = this.config.preload || Silence.defaultConfig.preload;
@@ -71,21 +70,20 @@ class Silence {
       document.removeEventListener('touchstart', unlockIOS, true);
       document.removeEventListener('touchend', unlockIOS, true);
       document.removeEventListener('click', unlockIOS, true);
-    }
+    };
 
     if (/iPad|iPhone/.test(navigator.userAgent)) {
       proxy.ios = true;
       document.addEventListener('touchstart', unlockIOS, true);
       document.addEventListener('touchend', unlockIOS, true);
       document.addEventListener('click', unlockIOS, true);
-    }
-    else { // Android etc. or Safari, but not on iOS
+    } else {
+      // Android etc. or Safari, but not on iOS
       console.log('not in IOS');
       proxy._defineContext();
     }
 
     if (this.preload) this.load();
-
   }
 
   on(evt, fn) {
@@ -114,7 +112,7 @@ class Silence {
 
   async pause() {
     this.playing = false;
-    if(this.ios){
+    if (this.ios) {
       this.unload();
     }
     await this.volume('mute');
@@ -122,43 +120,39 @@ class Silence {
     this.events.emit('playPause');
   }
 
-  async volume(val,lin) {
+  async volume(val, lin) {
     if (val <= 1 && val >= 0) {
       if (this.playing) {
         this.linVol = val;
         this.vol = lin && typeof lin != 'undefined' ? this.vol : this._sCurve(val, 0.4, 1.6);
         await this.fade(this._audioSource.volume, this.vol, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
-      }
-      else {
+      } else {
         this.linVol = this._prevVol = val;
         this.vol = lin && typeof lin != 'undefined' ? this.vol : this._sCurve(val, 0.4, 1.6);
       }
-      if(this.vol == 0) this.muted = true;
+      if (this.vol == 0) this.muted = true;
       else this.muted = false;
-    }
-    else if (typeof val == 'string') {
+    } else if (typeof val == 'string') {
       if (val == 'mute' && !this.muted) {
         this.vol = 0;
         this._prevVol = this.linVol;
         this.linVol = 0;
         await this.fade(this._audioSource.volume, 0, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 100 : 0);
         this.muted = true;
-      }
-      else if (val == 'unmute' && this.playing) {
+      } else if (val == 'unmute' && this.playing) {
         this.linVol = this._prevVol;
         this.vol = lin && typeof lin != 'undefined' ? this.vol : this._sCurve(this._prevVol, 0.4, 1.6);
         await this.fade(this._audioSource.volume, this.vol, (this.config.fade == null ? Silence.defaultConfig.fade : this.config.fade) ? 300 : 0);
         this.muted = false;
       }
-    }
-    else {
+    } else {
       throw new Error('enter an acceptable value: val can be a float between 0 and 1, "mute", "unmute" or null');
     }
   }
 
   async fade(from, to, len) {
     this.events.emit('fadeStart');
-    return new Promise((resolve) =>{
+    return new Promise((resolve) => {
       if (this._fadeInterval) clearInterval(this._fadeInterval);
       this._fadeInterval = null;
       let proxy = this;
@@ -192,8 +186,7 @@ class Silence {
           resolve(true);
         }
       }, stepLen);
-    })
-    
+    });
   }
 
   toHHMMSS(s) {
@@ -244,7 +237,7 @@ class Silence {
       this.relativeTime = 0;
       this.absoluteTime = 0;
 
-      this._audioSource.oncanplaythrough = function () {
+      this._audioSource.oncanplaythrough = function() {
         proxy.loadingTime = performance.now() - proxy.loadingTime;
         proxy.events.emit('loaded', this.loadingTime);
         console.log('loaded in ', proxy.loadingTime, 'ms');
@@ -256,25 +249,24 @@ class Silence {
         proxy.canPlay = true;
         proxy.audioLoading = false;
         proxy.slowCon = false;
-        
+
         clearTimeout(proxy._slowLoad);
 
         if (proxy.playing) proxy.play();
         console.log('loaded audio and playing: ', !proxy._audioSource.paused);
 
-        proxy._audioSource.onwaiting = function () {
+        proxy._audioSource.onwaiting = function() {
           proxy.events.emit('loading');
           proxy.loadingTime = performance.now();
-        }
+        };
 
-        proxy._audioSource.oncanplaythrough = function () {
+        proxy._audioSource.oncanplaythrough = function() {
           proxy.events.emit('loaded', this.loadingTime);
           proxy.loadingTime = performance.now() - proxy.loadingTime;
           console.log('hanged for ', proxy.loadingTime, 'ms');
-        }
+        };
       };
-    }
-    catch (e) {
+    } catch (e) {
       setTimeout(this.load, 1000);
     }
   }
@@ -285,19 +277,54 @@ class Silence {
         var AudioContext = window.AudioContext ? window.AudioContext : window.webkitAudioContext ? window.webkitAudioContext : false;
         this.context = new AudioContext();
         this.context.suspend();
+
+        this.nodeSource = this.context.createMediaElementSource(this._audioSource);
+
         this.analyser = this.context.createAnalyser();
         this.gainNode = this.context.createGain();
+        this.lowShelf = this.context.createBiquadFilter();
+        this.mid = this.context.createBiquadFilter();
+        this.highShelf = this.context.createBiquadFilter();
+
+        //analyzer params
         this.analyser.fftSize = 2048;
         this.analyser.smoothingTimeConstant = 0.7;
-        this.nodeSource = this.context.createMediaElementSource(this._audioSource);
-        this.nodeSource.connect(this.analyser);
-        this.analyser.connect(this.gainNode);
-        this.gainNode.connect(this.context.destination);
         this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
         this.timeData = new Uint8Array(this.analyser.frequencyBinCount);
+
+        //low pass filter
+        this.lowShelf.type = 'lowshelf';
+        this.lowShelf.gain.value = 0;
+        this.lowShelf.frequency.value = 140;
+
+        //mid filter
+        this.mid.type = 'peaking';
+        this.mid.gain.value = 0;
+        this.mid.frequency.value = 750;
+
+        //mid filter
+        this.highShelf.type = 'highshelf';
+        this.highShelf.gain.value = 0;
+        this.highShelf.frequency.value = 8000;
+
+        //input => eq
+        this.nodeSource.connect(this.lowShelf);
+
+        //pre eq => gain
+        this.lowShelf.connect(this.mid);
+        this.mid.connect(this.highShelf);
+        this.highShelf.connect(this.gainNode);
+
+        //gain => analyzer
+        this.gainNode.connect(this.analyser);
+
+        //eq compenssation
+        // this.gainNode.gain.value = 1 - Math.max(0,Math.max(this.lowShelf.gain.value,this.mid.gain.value,this.highShelf.gain.value) - 1);
+
+        //analyzer => output
+        this.analyser.connect(this.context.destination);
         this._updateCycle();
-      }
-      catch (e) {
+      } catch (e) {
         this.context = false;
         this.config.analyser = Silence.defaultConfig.analyser = false;
       }
@@ -305,7 +332,6 @@ class Silence {
   }
 
   _init() {
-
     let proxy = this;
 
     if (this.firstInit) console.log('%c ✨✨ SilenceJS is initialising 🔊🔊 ', 'background: rgb(219, 39, 119); color: rgb(27, 27, 27);font-size: 1rem;padding: 1rem;font-weight:700;');
@@ -313,26 +339,24 @@ class Silence {
       console.warn('reloading');
     }
     this._audioReqStack().then(() => {
-
-      if ((this.firstInit) || this.unloaded) {
-
+      if (this.firstInit || this.unloaded) {
         // eslint-disable-next-line no-inner-declarations
         this.load();
       }
 
       this.firstInit = false;
 
-      this._audioSource.onplay = function () {
+      this._audioSource.onplay = function() {
         proxy.events.emit('play');
         // proxy.updateTime();
       };
 
-      this._audioSource.onpause = function () {
+      this._audioSource.onpause = function() {
         proxy.events.emit('pause');
         // proxy.updateTime();
       };
 
-      this._audioSource.onerror = function () {
+      this._audioSource.onerror = function() {
         proxy.events.emit('audioError');
       };
 
@@ -354,9 +378,7 @@ class Silence {
       let time = Date.now();
       this._tick = null;
 
-
       this._tick = setInterval(() => {
-
         time = Date.now() - time;
 
         if (this.playing && this.canPlay) this.relativeTime += time;
@@ -372,9 +394,7 @@ class Silence {
         this.currentTime = this._audioSource.currentTime;
 
         time = Date.now();
-
       }, this.config.timeUpdateTick || Silence.defaultConfig.timeUpdateTick);
-
     });
   }
 
@@ -384,51 +404,73 @@ class Silence {
 
   _updateCycle() {
     let proxy = this;
+
+    function calculatePeak() {
+      let peak = 0;
+      for (let i = 0; i < proxy.timeData.length; i++) {
+        const power = proxy.timeData[i] ** 2;
+        peak = Math.max(power, peak);
+      }
+      proxy.timePeakFn(peak);
+    }
+
     if (this.freqDataFn) this.analyser.getByteFrequencyData(this.freqData);
     if (this.timeDataFn) this.analyser.getByteTimeDomainData(this.timeData);
+    if (this.timePeakFn && !this.timeDataFn) this.analyser.getByteTimeDomainData(this.timeData);
 
     function update() {
-      setTimeout(function () {
-        this._freqUpdateFrame = requestAnimationFrame(update);
-        if (document.visibilityState === 'visible') {
+      setTimeout(function() {
+
+        proxy._freqUpdateFrame = requestAnimationFrame(update);
+
+          //calc freq if freqFn is present
           if (proxy.freqDataFn) {
             proxy.analyser.getByteFrequencyData(proxy.freqData);
             proxy.freqDataFn(proxy.freqData);
             if (proxy.normalDataFn) {
               proxy.normalizedBassData = (proxy.freqData[0] + proxy.freqData[1] + proxy.freqData[2]) / (3 * 255);
+              proxy.normalizedBassData = proxy.normalizedBassData = 0.01 / (0.01 + Math.pow(proxy.normalizedBassData / (1 - proxy.normalizedBassData), -6));
+              proxy.normalDataFn(proxy.normalizedBassData);
             }
           }
+
+          //calculate time domain data
           if (proxy.timeDataFn) {
             proxy.analyser.getByteTimeDomainData(proxy.timeData);
             proxy.timeDataFn(proxy.timeData);
           }
 
+          //calculate peak 
+          if (proxy.timePeakFn) {
+            if (!proxy.timeDataFn) proxy.analyser.getByteTimeDomainData(proxy.timeData);
+            calculatePeak();
+          }
+
+          //calculate bass data
           if (proxy.normalDataFn && !proxy.freqDataFn) {
             proxy.analyser.getByteFrequencyData(proxy.freqData);
-            proxy.normalizedBassData = ((proxy.freqData[0] + proxy.freqData[1] + proxy.freqData[2]) / (3 * 255));
+            proxy.normalizedBassData = (proxy.freqData[0] + proxy.freqData[1] + proxy.freqData[2]) / (3 * 255);
             proxy.normalizedBassData = proxy.normalizedBassData = 0.01 / (0.01 + Math.pow(proxy.normalizedBassData / (1 - proxy.normalizedBassData), -6));
             proxy.normalDataFn(proxy.normalizedBassData);
           }
-        }
       }, 1000 / proxy.config.analyserFps || Silence.defaultConfig.analyserFps);
     }
 
     this._freqUpdateFrame = requestAnimationFrame(update);
   }
 
-  startFreq(){
+  startFreq() {
     this._defineContext();
     this._updateCycle();
   }
 
-  stopFreq(){
+  stopFreq() {
     cancelAnimationFrame(this._freqUpdateFrame);
   }
 
   _sCurve(val, skew, curvature) {
-    return (skew / (skew + (Math.pow(val / (1 - val), -curvature))));
+    return skew / (skew + Math.pow(val / (1 - val), -curvature));
   }
-
 }
 
 module.exports = Silence;

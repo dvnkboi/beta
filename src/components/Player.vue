@@ -412,7 +412,7 @@
         }
 
         if (this.socket == null) {
-          this.socket = new this.io('https://api.ampupradio.com:8080', {
+          this.socket = new this.io('https://api.ampupradio.com', {
             secure: true,
             rejectUnauthorized: false,
           });

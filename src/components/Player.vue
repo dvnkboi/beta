@@ -87,8 +87,8 @@
             this.currentSongTimer.intervalDuration = this.res.response?.history[0].duration;
 
             this.currentSongTimer.percent = [0];
-            for (let i = 1; i < 750; ++i) {
-              this.currentSongTimer.percent.push(this.currentSongTimer.percent[i - 1] + this.currentSongTimer.intervalDuration / 750);
+            for (let i = 1; i <= 1000; ++i) {
+              this.currentSongTimer.percent.push(this.currentSongTimer.percent[i - 1] + this.currentSongTimer.intervalDuration / 1000);
             }
             this.currentSongTimer.percent = this.currentSongTimer.percent.map((time) => time / this.currentSongTimer.intervalDuration);
             const diffArr = this.currentSongTimer.percent.map((x) => Math.abs(this.currentSongTimer.time / this.currentSongTimer.intervalDuration - x));

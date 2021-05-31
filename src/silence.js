@@ -383,7 +383,7 @@ class Silence {
 
         if (this.playing && this.canPlay) this.relativeTime += time;
         this.absoluteTime += time;
-        if (this.absoluteTime - this.relativeTime > 2000 && this.canPlay && !this.playing && !this.unloaded) {
+        if (this.absoluteTime - this.relativeTime > 5000 && this.canPlay && !this.playing && !this.unloaded) {
           this._audioSource.pause();
           this.unloaded = true;
           console.log('unloaded audio');
@@ -391,7 +391,7 @@ class Silence {
         if (document.visibilityState === 'visible') {
           this.hhmmss = this.toHHMMSS(this.relativeTime / 1000);
         }
-        this.currentTime = this._audioSource.currentTime;
+        this.currentTime = this._audioSource.currentTime
 
         time = Date.now();
       }, this.config.timeUpdateTick || Silence.defaultConfig.timeUpdateTick);

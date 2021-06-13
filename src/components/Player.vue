@@ -2,7 +2,7 @@
   <div class="w-full flex justify-start items-start flex-col xl:flex-row xl:h-full relative">
     <connectivity class="z-50" :show="!connected || slowCon" />
     <transition name="fade-up" appear>
-      <PlayerBar
+      <MainCard
         class="z-20"
         ref="mainCard"
         @volSliderOpen="volSliderOpen = true"
@@ -133,7 +133,7 @@
       importAudio() {
         let proxy = this;
         if (!this.audio) {
-          this.audio = new Silence('https://icecast.ampupradio.com:8443/TOP40.mp3', {
+          this.audio = new Silence('https://api.ampupradio.com:8443/TOP40.mp3', {
             volume: parseFloat(localStorage.getItem('volume')) || 1,
           });
 

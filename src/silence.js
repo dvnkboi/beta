@@ -278,6 +278,9 @@ class Silence {
         this.context = new AudioContext();
         this.context.suspend();
 
+        if(this.nodeSource) this.nodeSource.disconnect();
+        this.nodeSource = null;
+
         this.nodeSource = this.context.createMediaElementSource(this._audioSource);
 
         this.analyser = this.context.createAnalyser();
@@ -309,10 +312,10 @@ class Silence {
 
         //input => eq
         this.nodeSource.connect(this.lowShelf);
-
-        //pre eq => gain
         this.lowShelf.connect(this.mid);
         this.mid.connect(this.highShelf);
+
+        //pre eq => gain
         this.highShelf.connect(this.gainNode);
 
         //gain => analyzer
@@ -327,6 +330,7 @@ class Silence {
       } catch (e) {
         this.context = false;
         this.config.analyser = Silence.defaultConfig.analyser = false;
+        console.error(e);
       }
     }
   }
@@ -460,12 +464,21 @@ class Silence {
   }
 
   startFreq() {
-    this._defineContext();
-    this._updateCycle();
+    if(!this.contextDefined){
+      this._defineContext();
+      this.contextDefined = true;
+    } 
+    if(!this.updateCycleStarted){
+      this._updateCycle();
+      this.updateCycleStarted = true;
+    }
   }
 
   stopFreq() {
-    cancelAnimationFrame(this._freqUpdateFrame);
+    if(this.updateCycleStarted){
+      cancelAnimationFrame(this._freqUpdateFrame);
+      this.updateCycleStarted = false;
+    }
   }
 
   _sCurve(val, skew, curvature) {

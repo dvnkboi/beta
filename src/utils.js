@@ -42,6 +42,15 @@ function hexToRgb(hex) {
     : null;
 }
 
+function debounce(callback, interval) {
+  let debounceTimeoutId;
+
+  return function(...args) {
+    clearTimeout(debounceTimeoutId);
+    debounceTimeoutId = setTimeout(() => callback.apply(this, args), interval);
+  };
+}
+
 const ease = {
   // no easing, no acceleration
   linear: (t) => t,
@@ -77,4 +86,5 @@ module.exports = {
   hexToRgb,
   map,
   ease,
+  debounce
 };

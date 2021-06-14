@@ -50,7 +50,7 @@
   import SongBg from './background';
   import * as Vibrant from 'node-vibrant';
   import Silence from '../silence';
-  import PlayerBar from './PlayerBar'
+  // import PlayerBar from './PlayerBar'
   // import PlayerControls from './PlayerControls'
 
   export default {
@@ -609,7 +609,7 @@
       Connectivity,
       Loading,
       SongBg,
-      PlayerBar
+      // PlayerBar
       // PlayerControls
     },
     props: {
